@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- kalejdoskop: sex speglade tårtbitar i en mässingsring -->
+    <path
+        android:fillColor="#FF3B6B"
+        android:strokeColor="#2A1A00"
+        android:strokeWidth="1.2"
+        android:pathData="M54,54 L54.00,24.00 L79.98,39.00 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.55"
+        android:pathData="M62.66,36.00 L64.66,39.00 L62.66,42.00 L60.66,39.00 Z" />
+    <path
+        android:fillColor="#FFB84A"
+        android:strokeColor="#2A1A00"
+        android:strokeWidth="1.2"
+        android:pathData="M54,54 L79.98,39.00 L79.98,69.00 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.55"
+        android:pathData="M71.32,51.00 L73.32,54.00 L71.32,57.00 L69.32,54.00 Z" />
+    <path
+        android:fillColor="#FFE14A"
+        android:strokeColor="#2A1A00"
+        android:strokeWidth="1.2"
+        android:pathData="M54,54 L79.98,69.00 L54.00,84.00 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.55"
+        android:pathData="M62.66,66.00 L64.66,69.00 L62.66,72.00 L60.66,69.00 Z" />
+    <path
+        android:fillColor="#2FD07A"
+        android:strokeColor="#2A1A00"
+        android:strokeWidth="1.2"
+        android:pathData="M54,54 L54.00,84.00 L28.02,69.00 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.55"
+        android:pathData="M45.34,66.00 L47.34,69.00 L45.34,72.00 L43.34,69.00 Z" />
+    <path
+        android:fillColor="#3FA9FF"
+        android:strokeColor="#2A1A00"
+        android:strokeWidth="1.2"
+        android:pathData="M54,54 L28.02,69.00 L28.02,39.00 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.55"
+        android:pathData="M36.68,51.00 L38.68,54.00 L36.68,57.00 L34.68,54.00 Z" />
+    <path
+        android:fillColor="#9B5CFF"
+        android:strokeColor="#2A1A00"
+        android:strokeWidth="1.2"
+        android:pathData="M54,54 L28.02,39.00 L54.00,24.00 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.55"
+        android:pathData="M45.34,36.00 L47.34,39.00 L45.34,42.00 L43.34,39.00 Z" />
+    <path
+        android:strokeColor="#FFB84A"
+        android:strokeWidth="3"
+        android:fillColor="#00000000"
+        android:pathData="M54,20 A34,34 0 1,1 53.99,20 Z" />
+</vector>

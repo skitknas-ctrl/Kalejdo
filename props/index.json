@@ -1,0 +1,656 @@
+{
+ "categories": [
+  {
+   "id": "glass",
+   "name": "Glass & beads",
+   "items": [
+    {
+     "id": "glass/bead_blue",
+     "name": "Bead blue",
+     "file": "props/glass/bead_blue.svg"
+    },
+    {
+     "id": "glass/bead_gold",
+     "name": "Bead gold",
+     "file": "props/glass/bead_gold.svg"
+    },
+    {
+     "id": "glass/bead_green",
+     "name": "Bead green",
+     "file": "props/glass/bead_green.svg"
+    },
+    {
+     "id": "glass/bead_red",
+     "name": "Bead red",
+     "file": "props/glass/bead_red.svg"
+    },
+    {
+     "id": "glass/glass_drop",
+     "name": "Glass drop",
+     "file": "props/glass/glass_drop.svg"
+    },
+    {
+     "id": "glass/glass_moon",
+     "name": "Glass moon",
+     "file": "props/glass/glass_moon.svg"
+    },
+    {
+     "id": "glass/glass_rod",
+     "name": "Glass rod",
+     "file": "props/glass/glass_rod.svg"
+    },
+    {
+     "id": "glass/glass_rod_blue",
+     "name": "Glass rod blue",
+     "file": "props/glass/glass_rod_blue.svg"
+    },
+    {
+     "id": "glass/sequin_gold",
+     "name": "Sequin gold",
+     "file": "props/glass/sequin_gold.svg"
+    },
+    {
+     "id": "glass/sequin_holo",
+     "name": "Sequin holo",
+     "file": "props/glass/sequin_holo.svg"
+    },
+    {
+     "id": "glass/shard_amber",
+     "name": "Shard amber",
+     "file": "props/glass/shard_amber.svg"
+    },
+    {
+     "id": "glass/shard_blue",
+     "name": "Shard blue",
+     "file": "props/glass/shard_blue.svg"
+    },
+    {
+     "id": "glass/shard_cyan",
+     "name": "Shard cyan",
+     "file": "props/glass/shard_cyan.svg"
+    },
+    {
+     "id": "glass/shard_green",
+     "name": "Shard green",
+     "file": "props/glass/shard_green.svg"
+    },
+    {
+     "id": "glass/shard_lime",
+     "name": "Shard lime",
+     "file": "props/glass/shard_lime.svg"
+    },
+    {
+     "id": "glass/shard_pink",
+     "name": "Shard pink",
+     "file": "props/glass/shard_pink.svg"
+    },
+    {
+     "id": "glass/shard_red",
+     "name": "Shard red",
+     "file": "props/glass/shard_red.svg"
+    },
+    {
+     "id": "glass/shard_violet",
+     "name": "Shard violet",
+     "file": "props/glass/shard_violet.svg"
+    }
+   ]
+  },
+  {
+   "id": "gems",
+   "name": "Gems",
+   "items": [
+    {
+     "id": "gems/diamond",
+     "name": "Diamond",
+     "file": "props/gems/diamond.svg"
+    },
+    {
+     "id": "gems/emerald",
+     "name": "Emerald",
+     "file": "props/gems/emerald.svg"
+    },
+    {
+     "id": "gems/heart_gem",
+     "name": "Heart gem",
+     "file": "props/gems/heart_gem.svg"
+    },
+    {
+     "id": "gems/marquise",
+     "name": "Marquise",
+     "file": "props/gems/marquise.svg"
+    },
+    {
+     "id": "gems/opal",
+     "name": "Opal",
+     "file": "props/gems/opal.svg"
+    },
+    {
+     "id": "gems/pear_gem",
+     "name": "Pear gem",
+     "file": "props/gems/pear_gem.svg"
+    },
+    {
+     "id": "gems/pearl",
+     "name": "Pearl",
+     "file": "props/gems/pearl.svg"
+    },
+    {
+     "id": "gems/ruby",
+     "name": "Ruby",
+     "file": "props/gems/ruby.svg"
+    },
+    {
+     "id": "gems/sapphire",
+     "name": "Sapphire",
+     "file": "props/gems/sapphire.svg"
+    },
+    {
+     "id": "gems/topaz",
+     "name": "Topaz",
+     "file": "props/gems/topaz.svg"
+    },
+    {
+     "id": "gems/trillion",
+     "name": "Trillion",
+     "file": "props/gems/trillion.svg"
+    }
+   ]
+  },
+  {
+   "id": "shapes",
+   "name": "Shapes",
+   "items": [
+    {
+     "id": "shapes/dots",
+     "name": "Dots",
+     "file": "props/shapes/dots.svg"
+    },
+    {
+     "id": "shapes/flower_shape",
+     "name": "Flower shape",
+     "file": "props/shapes/flower_shape.svg"
+    },
+    {
+     "id": "shapes/heart",
+     "name": "Heart",
+     "file": "props/shapes/heart.svg"
+    },
+    {
+     "id": "shapes/lightning",
+     "name": "Lightning",
+     "file": "props/shapes/lightning.svg"
+    },
+    {
+     "id": "shapes/moon",
+     "name": "Moon",
+     "file": "props/shapes/moon.svg"
+    },
+    {
+     "id": "shapes/plus",
+     "name": "Plus",
+     "file": "props/shapes/plus.svg"
+    },
+    {
+     "id": "shapes/raindrop",
+     "name": "Raindrop",
+     "file": "props/shapes/raindrop.svg"
+    },
+    {
+     "id": "shapes/ring",
+     "name": "Ring",
+     "file": "props/shapes/ring.svg"
+    },
+    {
+     "id": "shapes/snowflake",
+     "name": "Snowflake",
+     "file": "props/shapes/snowflake.svg"
+    },
+    {
+     "id": "shapes/sparkle",
+     "name": "Sparkle",
+     "file": "props/shapes/sparkle.svg"
+    },
+    {
+     "id": "shapes/spiral",
+     "name": "Spiral",
+     "file": "props/shapes/spiral.svg"
+    },
+    {
+     "id": "shapes/squiggle",
+     "name": "Squiggle",
+     "file": "props/shapes/squiggle.svg"
+    },
+    {
+     "id": "shapes/star",
+     "name": "Star",
+     "file": "props/shapes/star.svg"
+    },
+    {
+     "id": "shapes/star8",
+     "name": "Star8",
+     "file": "props/shapes/star8.svg"
+    },
+    {
+     "id": "shapes/sun",
+     "name": "Sun",
+     "file": "props/shapes/sun.svg"
+    },
+    {
+     "id": "shapes/triangle",
+     "name": "Triangle",
+     "file": "props/shapes/triangle.svg"
+    },
+    {
+     "id": "shapes/zigzag",
+     "name": "Zigzag",
+     "file": "props/shapes/zigzag.svg"
+    }
+   ]
+  },
+  {
+   "id": "nature",
+   "name": "Nature",
+   "items": [
+    {
+     "id": "nature/acorn",
+     "name": "Acorn",
+     "file": "props/nature/acorn.svg"
+    },
+    {
+     "id": "nature/autumn_leaf",
+     "name": "Autumn leaf",
+     "file": "props/nature/autumn_leaf.svg"
+    },
+    {
+     "id": "nature/blossom",
+     "name": "Blossom",
+     "file": "props/nature/blossom.svg"
+    },
+    {
+     "id": "nature/cactus",
+     "name": "Cactus",
+     "file": "props/nature/cactus.svg"
+    },
+    {
+     "id": "nature/clover",
+     "name": "Clover",
+     "file": "props/nature/clover.svg"
+    },
+    {
+     "id": "nature/daisy",
+     "name": "Daisy",
+     "file": "props/nature/daisy.svg"
+    },
+    {
+     "id": "nature/feather",
+     "name": "Feather",
+     "file": "props/nature/feather.svg"
+    },
+    {
+     "id": "nature/leaf",
+     "name": "Leaf",
+     "file": "props/nature/leaf.svg"
+    },
+    {
+     "id": "nature/mushroom",
+     "name": "Mushroom",
+     "file": "props/nature/mushroom.svg"
+    },
+    {
+     "id": "nature/pine",
+     "name": "Pine",
+     "file": "props/nature/pine.svg"
+    },
+    {
+     "id": "nature/shell",
+     "name": "Shell",
+     "file": "props/nature/shell.svg"
+    },
+    {
+     "id": "nature/starfish",
+     "name": "Starfish",
+     "file": "props/nature/starfish.svg"
+    },
+    {
+     "id": "nature/sunflower",
+     "name": "Sunflower",
+     "file": "props/nature/sunflower.svg"
+    },
+    {
+     "id": "nature/tulip",
+     "name": "Tulip",
+     "file": "props/nature/tulip.svg"
+    }
+   ]
+  },
+  {
+   "id": "food",
+   "name": "Food",
+   "items": [
+    {
+     "id": "food/banana",
+     "name": "Banana",
+     "file": "props/food/banana.svg"
+    },
+    {
+     "id": "food/candy",
+     "name": "Candy",
+     "file": "props/food/candy.svg"
+    },
+    {
+     "id": "food/cheese",
+     "name": "Cheese",
+     "file": "props/food/cheese.svg"
+    },
+    {
+     "id": "food/cherries",
+     "name": "Cherries",
+     "file": "props/food/cherries.svg"
+    },
+    {
+     "id": "food/chili",
+     "name": "Chili",
+     "file": "props/food/chili.svg"
+    },
+    {
+     "id": "food/cookie",
+     "name": "Cookie",
+     "file": "props/food/cookie.svg"
+    },
+    {
+     "id": "food/cupcake",
+     "name": "Cupcake",
+     "file": "props/food/cupcake.svg"
+    },
+    {
+     "id": "food/donut",
+     "name": "Donut",
+     "file": "props/food/donut.svg"
+    },
+    {
+     "id": "food/fried_egg",
+     "name": "Fried egg",
+     "file": "props/food/fried_egg.svg"
+    },
+    {
+     "id": "food/grapefruit_slice",
+     "name": "Grapefruit slice",
+     "file": "props/food/grapefruit_slice.svg"
+    },
+    {
+     "id": "food/ice_cream",
+     "name": "Ice cream",
+     "file": "props/food/ice_cream.svg"
+    },
+    {
+     "id": "food/kiwi_slice",
+     "name": "Kiwi slice",
+     "file": "props/food/kiwi_slice.svg"
+    },
+    {
+     "id": "food/lemon_slice",
+     "name": "Lemon slice",
+     "file": "props/food/lemon_slice.svg"
+    },
+    {
+     "id": "food/lime_slice",
+     "name": "Lime slice",
+     "file": "props/food/lime_slice.svg"
+    },
+    {
+     "id": "food/lollipop",
+     "name": "Lollipop",
+     "file": "props/food/lollipop.svg"
+    },
+    {
+     "id": "food/orange_slice",
+     "name": "Orange slice",
+     "file": "props/food/orange_slice.svg"
+    },
+    {
+     "id": "food/pretzel",
+     "name": "Pretzel",
+     "file": "props/food/pretzel.svg"
+    },
+    {
+     "id": "food/strawberry",
+     "name": "Strawberry",
+     "file": "props/food/strawberry.svg"
+    },
+    {
+     "id": "food/watermelon",
+     "name": "Watermelon",
+     "file": "props/food/watermelon.svg"
+    }
+   ]
+  },
+  {
+   "id": "critters",
+   "name": "Critters",
+   "items": [
+    {
+     "id": "critters/bee",
+     "name": "Bee",
+     "file": "props/critters/bee.svg"
+    },
+    {
+     "id": "critters/bird",
+     "name": "Bird",
+     "file": "props/critters/bird.svg"
+    },
+    {
+     "id": "critters/butterfly",
+     "name": "Butterfly",
+     "file": "props/critters/butterfly.svg"
+    },
+    {
+     "id": "critters/cat_face",
+     "name": "Cat face",
+     "file": "props/critters/cat_face.svg"
+    },
+    {
+     "id": "critters/crab",
+     "name": "Crab",
+     "file": "props/critters/crab.svg"
+    },
+    {
+     "id": "critters/frog",
+     "name": "Frog",
+     "file": "props/critters/frog.svg"
+    },
+    {
+     "id": "critters/goldfish",
+     "name": "Goldfish",
+     "file": "props/critters/goldfish.svg"
+    },
+    {
+     "id": "critters/jellyfish",
+     "name": "Jellyfish",
+     "file": "props/critters/jellyfish.svg"
+    },
+    {
+     "id": "critters/ladybug",
+     "name": "Ladybug",
+     "file": "props/critters/ladybug.svg"
+    },
+    {
+     "id": "critters/octopus",
+     "name": "Octopus",
+     "file": "props/critters/octopus.svg"
+    },
+    {
+     "id": "critters/owl",
+     "name": "Owl",
+     "file": "props/critters/owl.svg"
+    },
+    {
+     "id": "critters/rubber_duck",
+     "name": "Rubber duck",
+     "file": "props/critters/rubber_duck.svg"
+    },
+    {
+     "id": "critters/snail",
+     "name": "Snail",
+     "file": "props/critters/snail.svg"
+    },
+    {
+     "id": "critters/turtle",
+     "name": "Turtle",
+     "file": "props/critters/turtle.svg"
+    },
+    {
+     "id": "critters/whale",
+     "name": "Whale",
+     "file": "props/critters/whale.svg"
+    }
+   ]
+  },
+  {
+   "id": "things",
+   "name": "Things",
+   "items": [
+    {
+     "id": "things/anchor",
+     "name": "Anchor",
+     "file": "props/things/anchor.svg"
+    },
+    {
+     "id": "things/balloon",
+     "name": "Balloon",
+     "file": "props/things/balloon.svg"
+    },
+    {
+     "id": "things/bell",
+     "name": "Bell",
+     "file": "props/things/bell.svg"
+    },
+    {
+     "id": "things/button",
+     "name": "Button",
+     "file": "props/things/button.svg"
+    },
+    {
+     "id": "things/button_blue",
+     "name": "Button blue",
+     "file": "props/things/button_blue.svg"
+    },
+    {
+     "id": "things/coin",
+     "name": "Coin",
+     "file": "props/things/coin.svg"
+    },
+    {
+     "id": "things/crown",
+     "name": "Crown",
+     "file": "props/things/crown.svg"
+    },
+    {
+     "id": "things/dice",
+     "name": "Dice",
+     "file": "props/things/dice.svg"
+    },
+    {
+     "id": "things/gear",
+     "name": "Gear",
+     "file": "props/things/gear.svg"
+    },
+    {
+     "id": "things/googly_eye",
+     "name": "Googly eye",
+     "file": "props/things/googly_eye.svg"
+    },
+    {
+     "id": "things/hex_nut",
+     "name": "Hex nut",
+     "file": "props/things/hex_nut.svg"
+    },
+    {
+     "id": "things/hourglass",
+     "name": "Hourglass",
+     "file": "props/things/hourglass.svg"
+    },
+    {
+     "id": "things/key",
+     "name": "Key",
+     "file": "props/things/key.svg"
+    },
+    {
+     "id": "things/light_bulb",
+     "name": "Light bulb",
+     "file": "props/things/light_bulb.svg"
+    },
+    {
+     "id": "things/magnet",
+     "name": "Magnet",
+     "file": "props/things/magnet.svg"
+    },
+    {
+     "id": "things/marble",
+     "name": "Marble",
+     "file": "props/things/marble.svg"
+    },
+    {
+     "id": "things/music_note",
+     "name": "Music note",
+     "file": "props/things/music_note.svg"
+    },
+    {
+     "id": "things/paper_plane",
+     "name": "Paper plane",
+     "file": "props/things/paper_plane.svg"
+    },
+    {
+     "id": "things/paperclip",
+     "name": "Paperclip",
+     "file": "props/things/paperclip.svg"
+    },
+    {
+     "id": "things/pencil",
+     "name": "Pencil",
+     "file": "props/things/pencil.svg"
+    },
+    {
+     "id": "things/planet",
+     "name": "Planet",
+     "file": "props/things/planet.svg"
+    },
+    {
+     "id": "things/robot",
+     "name": "Robot",
+     "file": "props/things/robot.svg"
+    },
+    {
+     "id": "things/rocket",
+     "name": "Rocket",
+     "file": "props/things/rocket.svg"
+    },
+    {
+     "id": "things/safety_pin",
+     "name": "Safety pin",
+     "file": "props/things/safety_pin.svg"
+    },
+    {
+     "id": "things/screw",
+     "name": "Screw",
+     "file": "props/things/screw.svg"
+    },
+    {
+     "id": "things/sunglasses",
+     "name": "Sunglasses",
+     "file": "props/things/sunglasses.svg"
+    },
+    {
+     "id": "things/teacup",
+     "name": "Teacup",
+     "file": "props/things/teacup.svg"
+    },
+    {
+     "id": "things/umbrella",
+     "name": "Umbrella",
+     "file": "props/things/umbrella.svg"
+    }
+   ]
+  }
+ ]
+}
