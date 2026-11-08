@@ -21,8 +21,9 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 #panel{flex:1;min-height:0;display:flex;flex-direction:column;background:var(--panel);
   border-radius:18px 18px 0 0;padding:8px 10px calc(4px + env(safe-area-inset-bottom));gap:8px}
 body.full #panel{display:none}
-body.full #stage{flex:1}
-#hint{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);background:#000a;padding:6px 12px;
+body.full #stage{flex:1;padding:0}
+body.full #view{position:absolute;left:0;top:0;border-radius:0}
+#hint{position:absolute;left:50%;top:14px;transform:translateX(-50%);background:#000a;padding:6px 12px;
   border-radius:20px;font-size:12px;color:#fff;opacity:0;white-space:nowrap;transition:opacity .4s;pointer-events:none}
 #hint.on{opacity:1}
 
@@ -35,7 +36,9 @@ body.full #stage{flex:1}
 .ib svg{width:22px;height:22px}
 .ib:active,.seg button:active,.chip:active{filter:brightness(1.3)}
 .spin{flex:1;display:flex;align-items:center;gap:4px;min-width:0;background:var(--panel2);border-radius:10px;padding:0 8px;height:38px}
-.spin svg{width:18px;height:18px;flex:none;color:var(--dim)}
+.spin button{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;flex:none;color:var(--brass)}
+.spin button svg{width:18px;height:18px}
+.spin.off input{opacity:.45}
 input[type=range]{-webkit-appearance:none;appearance:none;width:100%;min-width:0;height:28px;background:none;margin:0}
 input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:var(--line)}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--brass);margin-top:-8px;border:2px solid #2a1a00}
@@ -107,15 +110,15 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 <div id="app">
   <div id="stage">
     <canvas id="view"></canvas>
-    <div id="hint">Double-tap to show the controls</div>
+    <div id="hint">Tap: stop/start · double-tap: controls</div>
   </div>
   <div id="panel">
     <div class="bar">
       <div class="seg" id="slices"><button data-n="6">6</button><button data-n="8">8</button></div>
-      <label class="spin" title="Auto-rotate">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v4h-4"/></svg>
+      <div class="spin" id="spinBox" title="Auto-rotate">
+        <button id="pauseBtn" title="Stop/start rotation"></button>
         <input id="spin" type="range" min="-100" max="100" step="1">
-      </label>
+      </div>
       <button class="ib" id="shakeBtn" title="Shake"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="5" width="10" height="14" rx="2"/><path d="M3 9v6M21 9v6M5 7v10M19 7v10" opacity=".55"/></svg></button>
       <button class="ib" id="lightBtn" title="Light"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
       <button class="ib" id="snapBtn" title="Save picture"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
@@ -152,6 +155,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 <div id="sheet"><div class="box">
   <h2>Kalejdo</h2>
   <div class="line"><span>Tilt to tumble<small>Gravity follows how you hold the phone</small></span><button class="sw" id="tiltSw"></button></div>
+  <div class="line"><span>Pattern size<small>Size of the tiles in full-screen view</small></span><input id="tile" type="range" min="25" max="100" step="1" style="width:45%"></div>
   <div class="line"><span>Field of view<small>Left: close-up · right: more of the cell</small></span><input id="zoom" type="range" min="40" max="85" step="1" style="width:45%"></div>
   <button class="btn" id="fullBtn">Full-screen view</button>
   <div class="line" style="gap:8px">
@@ -179,6 +183,8 @@ const LIGHTS = [
   {name: "Night", a: "#323867", b: "#05060e"},
   {name: "Rainbow", rainbow: true},
 ];
+const ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>';
+const ICON_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5l11 7-11 7z"/></svg>';
 const EYE_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
 const EYE_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" opacity=".4"/><path d="M4 4l16 16"/></svg>';
 
@@ -193,7 +199,7 @@ const rnd = (a, b) => a + Math.random() * (b - a);
 
 function defaultLayer(mode) { return {mode, opacity: 1, visible: true, items: []}; }
 function defaultState() {
-  return {slices: 6, spin: 25, light: 0, tilt: false, zoom: 72, sel: 0, mix: true, size: 100, cat: "all",
+  return {slices: 6, spin: 25, lastSpin: 25, paused: false, tile: 55, light: 0, tilt: false, zoom: 72, sel: 0, mix: true, size: 100, cat: "all",
     layers: [defaultLayer("tumble"), defaultLayer("tumble"), defaultLayer("float"), defaultLayer("fixed")]};
 }
 function load() {
@@ -308,7 +314,14 @@ function setMode(li, mode) {
 }
 
 /* ------------------------------------------------------------------ physics */
-function omega() { return dragging ? dragging.w : S.spin / 100 * MAX_SPIN + extraSpin; }
+function omega() { return dragging ? dragging.w : (S.paused ? 0 : S.spin / 100 * MAX_SPIN) + extraSpin; }
+function running() { return !S.paused && S.spin !== 0; }
+function setRunning(on, quiet) {
+  if (on) { S.paused = false; if (!S.spin) S.spin = S.lastSpin || 25; } else S.paused = true;
+  extraSpin = 0;
+  refreshTop(); save();
+  if (!quiet) toast(on ? "Rotation on" : "Rotation stopped");
+}
 function gravity() {
   if (S.tilt && tiltG) return tiltG;
   return {x: 0, y: 1};
@@ -443,27 +456,38 @@ function wedge() {
   const L = S.zoom / 100;
   return {L, apex: .98 - L, half: Math.PI / S.slices};
 }
-function drawView() {
-  const W = view.width, c = W / 2, vr = c - 2 * dpr();
-  const N = S.slices, a = TAU / N, {L, apex} = wedge(), k = vr / L;
-  vctx.setTransform(1, 0, 0, 1, 0, 0);
-  vctx.clearRect(0, 0, W, W);
-  // bakgrund under tårtbitarna så att skarvarna inte syns
-  const bg = LIGHTS[S.light] || LIGHTS[0];
-  vctx.fillStyle = bg.rainbow ? "#fff" : bg.a;
-  vctx.beginPath(); vctx.arc(c, c, vr, 0, TAU); vctx.fill();
+// Ritar kalejdoskopets tårtbitar runt (cx,cy). straight = raka ytterkanter (sex-/åttahörning) i stället för cirkelbåge.
+function drawWedges(ctx, cx, cy, R, straight) {
+  const N = S.slices, a = TAU / N, {L, apex} = wedge(), k = R / L, e = .004;
   for (let i = 0; i < N; i++) {
-    vctx.save();
-    vctx.translate(c, c);
-    vctx.rotate(i * a - Math.PI / 2);
-    if (i & 1) vctx.scale(1, -1);
-    vctx.beginPath(); vctx.moveTo(-3, 0); vctx.arc(0, 0, vr + 1, -a / 2 - .004, a / 2 + .004); vctx.closePath(); vctx.clip();
-    vctx.rotate(-Math.PI / 2);
-    vctx.scale(k, k);
-    vctx.translate(0, -apex);
-    vctx.drawImage(cham, -1, -1, 2, 2);
-    vctx.restore();
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(i * a - Math.PI / 2);
+    if (i & 1) ctx.scale(1, -1);
+    ctx.beginPath(); ctx.moveTo(-3, 0);
+    if (straight) {
+      const r = R + 2;
+      ctx.lineTo(r * Math.cos(a / 2 + e), -r * Math.sin(a / 2 + e));
+      ctx.lineTo(r * Math.cos(a / 2 + e), r * Math.sin(a / 2 + e));
+    } else ctx.arc(0, 0, R + 1, -a / 2 - e, a / 2 + e);
+    ctx.closePath(); ctx.clip();
+    ctx.rotate(-Math.PI / 2);
+    ctx.scale(k, k);
+    ctx.translate(0, -apex);
+    ctx.drawImage(cham, -1, -1, 2, 2);
+    ctx.restore();
   }
+}
+function bgColor() { const b = LIGHTS[S.light] || LIGHTS[0]; return b.rainbow ? "#fff" : b.a; }
+function drawView() {
+  if (document.body.classList.contains("full")) { drawPattern(); return; }
+  const W = view.width, c = W / 2, vr = c - 2 * dpr();
+  vctx.setTransform(1, 0, 0, 1, 0, 0);
+  vctx.clearRect(0, 0, W, view.height);
+  // bakgrund under tårtbitarna så att skarvarna inte syns
+  vctx.fillStyle = bgColor();
+  vctx.beginPath(); vctx.arc(c, c, vr, 0, TAU); vctx.fill();
+  drawWedges(vctx, c, c, vr, false);
   // vinjett och mässingskant
   const g = vctx.createRadialGradient(c, c, vr * .55, c, c, vr);
   g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(1, "rgba(0,0,0,.38)");
@@ -471,6 +495,70 @@ function drawView() {
   vctx.beginPath(); vctx.arc(c, c, vr, 0, TAU); vctx.fill();
   vctx.lineWidth = 3 * dpr(); vctx.strokeStyle = "#d98d1e";
   vctx.beginPath(); vctx.arc(c, c, vr + 0.5 * dpr(), 0, TAU); vctx.stroke();
+}
+
+/* Helskärm: kalejdoskopbilden som plattor över hela skärmen.
+   6 tårtbitar -> sexhörningar i bikakemönster.
+   8 tårtbitar -> åttahörningar med snedställda kvadrater i mellanrummen.
+   Grannarna är spegelbilder över den gemensamma kanten, så mönstret blir sömlöst. */
+const tileC = document.createElement("canvas"), tctx = tileC.getContext("2d");
+const sqC = document.createElement("canvas"), sctx = sqC.getContext("2d");
+function tileR() { return S.tile / 100 * Math.min(view.width, view.height) / 2; }
+function polygonPath(ctx, cx, cy, R, n) {
+  ctx.beginPath();
+  for (let i = 0; i < n; i++) {
+    // hörnen ligger mellan tårtbitarnas mittlinjer
+    const ang = -Math.PI / 2 + (i + .5) * TAU / n;
+    ctx.lineTo(cx + R * Math.cos(ang), cy + R * Math.sin(ang));
+  }
+  ctx.closePath();
+}
+function drawPattern() {
+  const W = view.width, H = view.height, R = tileR(), N = S.slices;
+  const T = Math.ceil(2 * R + 12), tc = T / 2;
+  if (tileC.width !== T) tileC.width = tileC.height = T;
+  tctx.setTransform(1, 0, 0, 1, 0, 0);
+  tctx.clearRect(0, 0, T, T);
+  tctx.fillStyle = bgColor();
+  polygonPath(tctx, tc, tc, R + 1.5, N); tctx.fill();
+  drawWedges(tctx, tc, tc, R, true);
+
+  vctx.setTransform(1, 0, 0, 1, 0, 0);
+  vctx.fillStyle = bgColor();
+  vctx.fillRect(0, 0, W, H);
+  const cx = W / 2, cy = H / 2;
+  if (N === 6) {
+    const dx = 1.5 * R, dy = Math.sqrt(3) * R;
+    const ni = Math.ceil(cx / dx) + 1, nj = Math.ceil(cy / dy) + 1;
+    for (let i = -ni; i <= ni; i++) {
+      const x = cx + i * dx, off = (i & 1) ? dy / 2 : 0;
+      for (let j = -nj - 1; j <= nj; j++) vctx.drawImage(tileC, x - tc, cy + j * dy + off - tc);
+    }
+  } else {
+    // åttahörning: apotem a, rutnät med steget 2a. Kvadraternas halva diagonal h.
+    const a = R * Math.cos(Math.PI / 8), d = 2 * a, h = a * (2 - Math.SQRT2);
+    const Q = Math.ceil(2 * h + 8), qc = Q / 2;
+    if (sqC.width !== Q) sqC.width = sqC.height = Q;
+    sctx.setTransform(1, 0, 0, 1, 0, 0);
+    sctx.clearRect(0, 0, Q, Q);
+    // varje fjärdedel av kvadraten är åttahörningens spegelbild över den sneda kanten
+    for (const [sx, sy] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) {
+      sctx.save();
+      sctx.translate(qc, qc); sctx.scale(sx, sy);
+      sctx.beginPath(); sctx.moveTo(.8, .8); sctx.lineTo(-h - 1.5, .8); sctx.lineTo(.8, -h - 1.5); sctx.closePath(); sctx.clip();
+      sctx.transform(0, -1, -1, 0, -h, -h);
+      sctx.drawImage(tileC, -a - tc, -a - tc);
+      sctx.restore();
+    }
+    const ni = Math.ceil(cx / d) + 1, nj = Math.ceil(cy / d) + 1;
+    for (let i = -ni; i <= ni; i++) for (let j = -nj; j <= nj; j++) {
+      vctx.setTransform((i & 1) ? -1 : 1, 0, 0, (j & 1) ? -1 : 1, cx + i * d, cy + j * d);
+      vctx.drawImage(tileC, -tc, -tc);
+    }
+    vctx.setTransform(1, 0, 0, 1, 0, 0);
+    for (let i = -ni; i <= ni; i++) for (let j = -nj; j <= nj; j++)
+      vctx.drawImage(sqC, cx + (i + .5) * d - qc, cy + (j + .5) * d - qc);
+  }
 }
 function drawCellPreview() {
   const px = cell.width;
@@ -492,17 +580,24 @@ function dpr() { return Math.min(window.devicePixelRatio || 1, 3); }
 function layout() {
   const full = document.body.classList.contains("full");
   const iw = innerWidth, ih = innerHeight - 12;
-  viewCss = Math.floor(full ? Math.min(iw, ih) - 8 : Math.min(iw - 12, Math.max(200, ih - 372)));
   const d = dpr();
-  view.style.width = view.style.height = viewCss + "px";
-  view.width = view.height = Math.min(1600, Math.round(viewCss * d));
+  if (full) {
+    const st = $("#stage"), w = st.clientWidth, h = st.clientHeight, fd = Math.min(d, 2400 / Math.max(w, h));
+    view.style.width = w + "px"; view.style.height = h + "px";
+    view.width = Math.round(w * fd); view.height = Math.round(h * fd);
+  } else {
+    viewCss = Math.floor(Math.min(iw - 12, Math.max(200, ih - 372)));
+    view.style.width = view.style.height = viewCss + "px";
+    view.width = view.height = Math.min(1600, Math.round(viewCss * d));
+  }
   cellCss = Math.max(96, Math.min(130, Math.floor((iw - 20) * .32)));
   cell.style.width = cell.style.height = cellCss + "px";
   cell.width = cell.height = Math.round(cellCss * d);
   sizeChamber();
 }
 function sizeChamber() {
-  const vr = view.width / 2, {L} = wedge();
+  const full = document.body.classList.contains("full");
+  const vr = full ? tileR() : view.width / 2, {L} = wedge();
   const px = Math.max(400, Math.min(1600, Math.round(2 * vr / L)));
   if (cham.width !== px) cham.width = cham.height = px;
 }
@@ -552,16 +647,18 @@ function attachRotate(el, onTap) {
     const dr = dragging;
     dragging = null;
     if (!dr.moved && performance.now() - dr.t0 < 350) { onTap && onTap(e); return; }
-    if (performance.now() - dr.t < 120) extraSpin = dr.w - S.spin / 100 * MAX_SPIN;
+    if (performance.now() - dr.t < 120) extraSpin = dr.w - (S.paused ? 0 : S.spin / 100 * MAX_SPIN);
     save();
   };
   el.addEventListener("pointerup", end);
   el.addEventListener("pointercancel", end);
 }
-let lastTap = 0;
+// ett tryck stoppar/startar rotationen, dubbeltryck växlar helskärm
+let lastTap = 0, tapTimer = 0;
 attachRotate(view, () => {
   const now = performance.now();
-  if (now - lastTap < 350) { toggleFull(); lastTap = 0; } else lastTap = now;
+  if (now - lastTap < 350) { clearTimeout(tapTimer); toggleFull(); lastTap = 0; }
+  else { lastTap = now; tapTimer = setTimeout(() => setRunning(!running()), 320); }
 });
 attachRotate(cell, e => {
   // tryck på en sak i cellen för att ta bort den (i valt lager)
@@ -609,6 +706,9 @@ $("#toastBtn").onclick = () => { toastFn && toastFn(); toastFn = null; $("#toast
 function refreshTop() {
   document.querySelectorAll("#slices button").forEach(b => b.classList.toggle("on", +b.dataset.n === S.slices));
   $("#spin").value = S.spin;
+  $("#pauseBtn").innerHTML = running() ? ICON_PAUSE : ICON_PLAY;
+  $("#spinBox").classList.toggle("off", !running());
+  $("#tile").value = S.tile;
   $("#mixBtn").classList.toggle("on", S.mix);
   $("#size").value = S.size;
   $("#tiltSw").classList.toggle("on", S.tilt);
@@ -643,7 +743,13 @@ $("#clearBtn").onclick = () => {
   toast(`Layer ${li + 1} emptied`, "Undo", () => { S.layers[li].items = old; refreshLayerUI(); save(); });
 };
 $("#slices").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; S.slices = +b.dataset.n; refreshTop(); save(); });
-$("#spin").oninput = e => { let v = +e.target.value; if (Math.abs(v) < 4) v = 0; S.spin = v; extraSpin = 0; save(); };
+$("#spin").oninput = e => {
+  let v = +e.target.value; if (Math.abs(v) < 6) v = 0;
+  S.spin = v; if (v) { S.lastSpin = v; S.paused = false; }
+  extraSpin = 0; refreshTop(); save();
+};
+$("#pauseBtn").onclick = () => setRunning(!running());
+$("#tile").oninput = e => { S.tile = +e.target.value; sizeChamber(); save(); };
 $("#shakeBtn").onclick = shake;
 $("#lightBtn").onclick = () => { S.light = (S.light + 1) % LIGHTS.length; toast("Light: " + LIGHTS[S.light].name); save(); };
 $("#mixBtn").onclick = () => { S.mix = !S.mix; refreshTop(); save(); toast(S.mix ? "New things get random colours" : "New things keep their own colours"); };
@@ -709,10 +815,10 @@ function starterMix() {
 }
 
 function snapshot() {
-  const W = view.width, out = document.createElement("canvas");
-  out.width = out.height = W;
+  const W = view.width, H = view.height, out = document.createElement("canvas");
+  out.width = W; out.height = H;
   const x = out.getContext("2d");
-  x.fillStyle = "#15131c"; x.fillRect(0, 0, W, W);
+  x.fillStyle = "#15131c"; x.fillRect(0, 0, W, H);
   x.drawImage(view, 0, 0);
   const url = out.toDataURL("image/png");
   const name = "kalejdo-" + new Date().toISOString().replace(/[:T]/g, "-").slice(0, 19) + ".png";

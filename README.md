@@ -8,10 +8,14 @@ ur ett bibliotek med SVG-filer, i fyra lager som fylls var för sig.
 
 ## Så fungerar det
 
-- **Kalejdoskopet** överst. Dra runt med fingret för att vrida behållaren. Dubbeltryck för helskärm
-  (dubbeltryck igen för att få tillbaka kontrollerna).
+- **Kalejdoskopet** överst. Dra runt med fingret för att vrida behållaren. Ett tryck stoppar eller
+  startar den automatiska rotationen. Dubbeltryck ger helskärm, och dubbeltryck igen tar tillbaka kontrollerna.
+- **Helskärm** fyller hela skärmen med ett sömlöst mönster av kalejdoskopbilden. Med 6 tårtbitar blir det
+  sexhörningar i bikakemönster. Med 8 tårtbitar blir det åttahörningar med snedställda kvadrater
+  emellan. Grannarna är spegelbilder av varandra. Plattornas storlek ställs in under ⋯ (*Pattern size*).
 - **6 / 8** väljer antal tårtbitar.
 - **Snurr-reglaget** vrider behållaren av sig själv, åt vänster eller höger. Mitten är stilla.
+  Play/paus-knappen bredvid stoppar och startar rotationen utan att ändra hastigheten.
 - **Skaka** ger allt löst i behållaren en knuff.
 - **Ljus** växlar bakgrundsljuset: Daylight, Warm lamp, Sky, Sunset, Night och Rainbow.
 - **Kameran** sparar bilden i *Bilder/Kalejdo* (i webbläsaren laddas den ner).
