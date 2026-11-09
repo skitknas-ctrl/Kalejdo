@@ -46,7 +46,14 @@ input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:var(
 input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--brass);border:2px solid #2a1a00}
 
 /* layers */
-#layerBox{display:flex;flex-direction:column;gap:6px}
+.row2{display:flex;gap:8px;align-items:center}
+#cellWrap{flex:none;display:grid;place-items:center}
+#cell{display:block;touch-action:none;border-radius:50%;box-shadow:0 0 0 2px var(--brass2),0 0 0 4px #0006}
+#layerBox{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+#layerBox .lrow{gap:4px}
+#layerBox .lrow .ib{width:32px;height:32px}
+#layerBox .sliders{gap:8px}
+#layerBox .op b{min-width:30px}
 #tabs{display:flex;gap:4px}
 #tabs button{flex:1;background:var(--panel2);border-radius:9px;padding:4px 0 3px;text-align:center;border:2px solid transparent;line-height:1.1}
 #tabs button b{display:block;font-size:15px}
@@ -130,6 +137,8 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
       <button class="ib" id="moreBtn" title="More"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
     </div>
 
+    <div class="row2">
+    <div id="cellWrap" title="The container: drag to turn · tap a thing to remove it"><canvas id="cell"></canvas></div>
     <div id="layerBox">
         <div id="tabs"></div>
         <div class="seg" id="modeSeg"><button data-m="tumble">Tumble</button><button data-m="float">Float</button><button data-m="fixed">Fixed</button></div>
@@ -148,6 +157,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
           <label class="op" id="speedBox" title="Speed of this layer compared with the main slider"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 18a9 9 0 1 1 16 0"/><path d="M12 15l4-5"/></svg>
             <input id="speed" type="range" min="1" max="19" step="1"><b id="speedVal">×1.0</b></label>
         </div>
+    </div>
     </div>
 
     <div id="libHead">
@@ -435,7 +445,8 @@ function shake() {
 /* ------------------------------------------------------------------ drawing */
 const view = $("#view"), vctx = view.getContext("2d");
 const cham = document.createElement("canvas"), hctx = cham.getContext("2d");
-let viewCss = 300;
+let viewCss = 300, cellCss = 96;
+const cell = $("#cell"), cctx = cell.getContext("2d");
 
 function backdrop(ctx, R) {
   const L = LIGHTS[S.light] || LIGHTS[0];
@@ -454,7 +465,7 @@ function backdrop(ctx, R) {
     ctx.fillStyle = g; ctx.fillRect(-R, -R, 2 * R, 2 * R);
   }
 }
-function drawCell(ctx, px) {
+function drawCell(ctx, px, dim) {
   const R = px / 2;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, px, px);
@@ -465,7 +476,7 @@ function drawCell(ctx, px) {
   const ct = Math.cos(theta), st = Math.sin(theta);
   S.layers.forEach((L, li) => {
     if (!L.visible || !L.items.length) return;
-    ctx.globalAlpha = L.opacity;
+    ctx.globalAlpha = L.opacity * (dim && li !== S.sel ? .3 : 1);
     const fixed = L.mode === "fixed", lt = layerTheta(L), ct = Math.cos(lt), st = Math.sin(lt);
     for (const it of L.items) {
       const c = raster(it.p, it.h);
@@ -589,6 +600,22 @@ function drawPattern() {
       vctx.drawImage(sqC, cx + (i + .5) * d - qc, cy + (j + .5) * d - qc);
   }
 }
+// Lilla behållarbilden: valt lager i full styrka, övriga nedtonade, och den tårtbit speglarna ser streckad.
+function drawCellPreview() {
+  const px = cell.width;
+  drawCell(cctx, px, true);
+  const R = px / 2, {L, apex, half} = wedge();
+  cctx.save();
+  cctx.translate(R, R); cctx.scale(R, R);
+  cctx.beginPath(); cctx.moveTo(0, apex);
+  cctx.arc(0, apex, L, Math.PI / 2 - half, Math.PI / 2 + half);
+  cctx.closePath();
+  cctx.restore();
+  cctx.lineWidth = 1.5 * dpr(); cctx.setLineDash([4 * dpr(), 3 * dpr()]);
+  cctx.strokeStyle = "rgba(255,255,255,.95)"; cctx.stroke();
+  cctx.setLineDash([]); cctx.strokeStyle = "rgba(0,0,0,.5)"; cctx.lineWidth = .7 * dpr(); cctx.stroke();
+}
+
 function dpr() { return Math.min(window.devicePixelRatio || 1, 3); }
 function layout() {
   const full = document.body.classList.contains("full");
@@ -600,6 +627,9 @@ function layout() {
     view.width = Math.round(w * fd); view.height = Math.round(h * fd);
   } else {
     viewCss = Math.floor(Math.min(iw - 12, Math.max(200, ih - 372)));
+    cellCss = Math.max(80, Math.min(108, Math.floor((iw - 20) * .25)));
+    cell.style.width = cell.style.height = cellCss + "px";
+    cell.width = cell.height = Math.round(cellCss * d);
     view.style.width = view.style.height = viewCss + "px";
     view.width = view.height = Math.min(1600, Math.round(viewCss * d));
   }
@@ -624,8 +654,9 @@ function frame(t) {
   let n = 0;
   while (acc >= STEP && n < 8) { physics(STEP); acc -= STEP; n++; }
   if (n === 8) acc = 0;
-  drawCell(hctx, cham.width);
+  drawCell(hctx, cham.width, false);
   drawView();
+  if (!document.body.classList.contains("full")) drawCellPreview();
 }
 
 /* ------------------------------------------------------------------ input */
@@ -670,10 +701,46 @@ attachRotate(view, () => {
   if (now - lastTap < 350) { clearTimeout(tapTimer); toggleFull(); lastTap = 0; }
   else { lastTap = now; tapTimer = setTimeout(() => setRunning(!running()), 320); }
 });
+attachRotate(cell, e => {
+  // tryck på en sak i behållaren för att ta bort den (i valt lager)
+  const r = cell.getBoundingClientRect();
+  const x = (e.clientX - r.left) / r.width * 2 - 1, y = (e.clientY - r.top) / r.height * 2 - 1;
+  const L = S.layers[S.sel];
+  const lt = layerTheta(L), ct = Math.cos(lt), st = Math.sin(lt);
+  let best = -1, bd = 9;
+  L.items.forEach((it, i) => {
+    let ix = it.x, iy = it.y;
+    if (L.mode === "fixed") { ix = it.x * ct - it.y * st; iy = it.x * st + it.y * ct; }
+    const d = Math.hypot(ix - x, iy - y);
+    if (d < Math.max(.08, it.s * .5) && d < bd) { bd = d; best = i; }
+  });
+  if (best < 0) { toast("Drag the container to turn it · tap a thing to remove it"); return; }
+  const [gone] = L.items.splice(best, 1);
+  const li = S.sel;
+  refreshLayerUI(); save();
+  toast(`Removed ${PROPS[gone.p] ? PROPS[gone.p].name.toLowerCase() : "thing"}`, "Undo", () => { S.layers[li].items.splice(best, 0, gone); refreshLayerUI(); save(); });
+});
+
+/* Rörelsesensorn. iPhone/iPad (Safari) kräver att användaren godkänner sensorn efter ett tryck,
+   och rapporterar dessutom axlarna med omvänt tecken jämfört med Android. */
+const IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const NEEDS_MOTION_OK = typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function";
+let motionAsked = false, motionAsk = null;
+function askMotion() { // måste anropas direkt från ett tryck
+  if (!NEEDS_MOTION_OK) return Promise.resolve(true);
+  if (!motionAsk || !motionAsked) {
+    motionAsked = true;
+    motionAsk = DeviceMotionEvent.requestPermission().then(r => r === "granted").catch(() => { motionAsked = false; return false; });
+  }
+  return motionAsk;
+}
+// var lutningen redan påslagen vid start får iPhone fråga vid första trycket
+document.addEventListener("pointerdown", () => { if (S && S.tilt && NEEDS_MOTION_OK && !motionAsked) askMotion(); }, true);
 window.addEventListener("devicemotion", e => {
   const a = e.accelerationIncludingGravity;
   if (!a || a.x == null) return;
-  let x = -a.x / 9.81, y = a.y / 9.81;
+  const sgn = IOS ? -1 : 1;
+  let x = -sgn * a.x / 9.81, y = sgn * a.y / 9.81;
   const m = Math.hypot(x, y);
   if (m > 1) { x /= m; y /= m; }
   if (!tiltG) tiltG = {x, y};
@@ -779,7 +846,11 @@ $("#closeSheet").onclick = () => $("#sheet").classList.remove("on");
 $("#sheet").addEventListener("click", e => { if (e.target.id === "sheet") $("#sheet").classList.remove("on"); });
 $("#tiltSw").onclick = () => {
   S.tilt = !S.tilt; refreshTop(); save();
-  if (S.tilt) setTimeout(() => { if (S.tilt && !tiltG) toast("No motion sensor found"); }, 1500);
+  if (!S.tilt) return;
+  askMotion().then(ok => {
+    if (!ok) { S.tilt = false; refreshTop(); save(); toast("Motion sensor not allowed"); return; }
+    setTimeout(() => { if (S.tilt && !tiltG) toast(window.isSecureContext ? "No motion sensor found" : "Tilt needs https"); }, 1500);
+  });
 };
 $("#zoom").oninput = e => { S.zoom = +e.target.value; sizeChamber(); save(); };
 $("#fullBtn").onclick = () => { $("#sheet").classList.remove("on"); toggleFull(); };

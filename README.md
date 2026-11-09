@@ -19,9 +19,14 @@ ur ett bibliotek med SVG-filer, i fyra lager som fylls var för sig.
 - **Skaka** ger allt löst i behållaren en knuff.
 - **Ljus** växlar bakgrundsljuset: Daylight, Warm lamp, Sky, Sunset, Night och Rainbow.
 - **Kameran** sparar bilden i *Bilder/Kalejdo* (i webbläsaren laddas den ner).
+- **Webbversion:** `index.html` + `props/` kan läggas på vilken webbserver som helst. Se `CLAUDE.md`.
+  *Tilt to tumble* kräver https, och på iPhone frågar Safari om lov att använda rörelsesensorn.
 
 ## Behållaren och lagren
 
+- Den lilla runda bilden till vänster är behållaren. Valt lager syns tydligt och de andra är nedtonade.
+  Den streckade tårtbiten visar vilken del speglarna ser. Dra i bilden för att vrida, och tryck på en pryl
+  för att ta bort den ur valt lager (med Ångra).
 - Behållaren har fyra lager, **1–4**. Siffran under visar hur många prylar lagret har (högst 40).
   Lager 1 ritas längst bak och lager 4 längst fram.
 - Varje lager har ett eget beteende:
