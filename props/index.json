@@ -651,6 +651,398 @@
      "file": "props/things/umbrella.svg"
     }
    ]
+  },
+  {
+   "id": "christmas",
+   "name": "Christmas",
+   "items": [
+    {
+     "id": "christmas/advent_star",
+     "name": "Advent star",
+     "file": "props/christmas/advent_star.svg"
+    },
+    {
+     "id": "christmas/bauble_blue",
+     "name": "Bauble blue",
+     "file": "props/christmas/bauble_blue.svg"
+    },
+    {
+     "id": "christmas/bauble_gold",
+     "name": "Bauble gold",
+     "file": "props/christmas/bauble_gold.svg"
+    },
+    {
+     "id": "christmas/bauble_green",
+     "name": "Bauble green",
+     "file": "props/christmas/bauble_green.svg"
+    },
+    {
+     "id": "christmas/bauble_purple",
+     "name": "Bauble purple",
+     "file": "props/christmas/bauble_purple.svg"
+    },
+    {
+     "id": "christmas/bauble_red",
+     "name": "Bauble red",
+     "file": "props/christmas/bauble_red.svg"
+    },
+    {
+     "id": "christmas/candle",
+     "name": "Candle",
+     "file": "props/christmas/candle.svg"
+    },
+    {
+     "id": "christmas/candy_cane",
+     "name": "Candy cane",
+     "file": "props/christmas/candy_cane.svg"
+    },
+    {
+     "id": "christmas/christmas_star",
+     "name": "Christmas star",
+     "file": "props/christmas/christmas_star.svg"
+    },
+    {
+     "id": "christmas/christmas_tree",
+     "name": "Christmas tree",
+     "file": "props/christmas/christmas_tree.svg"
+    },
+    {
+     "id": "christmas/gingerbread_heart",
+     "name": "Gingerbread heart",
+     "file": "props/christmas/gingerbread_heart.svg"
+    },
+    {
+     "id": "christmas/gingerbread_man",
+     "name": "Gingerbread man",
+     "file": "props/christmas/gingerbread_man.svg"
+    },
+    {
+     "id": "christmas/holly",
+     "name": "Holly",
+     "file": "props/christmas/holly.svg"
+    },
+    {
+     "id": "christmas/jingle_bells",
+     "name": "Jingle bells",
+     "file": "props/christmas/jingle_bells.svg"
+    },
+    {
+     "id": "christmas/lussekatt",
+     "name": "Lussekatt",
+     "file": "props/christmas/lussekatt.svg"
+    },
+    {
+     "id": "christmas/mitten",
+     "name": "Mitten",
+     "file": "props/christmas/mitten.svg"
+    },
+    {
+     "id": "christmas/pine_cone",
+     "name": "Pine cone",
+     "file": "props/christmas/pine_cone.svg"
+    },
+    {
+     "id": "christmas/present_blue",
+     "name": "Present blue",
+     "file": "props/christmas/present_blue.svg"
+    },
+    {
+     "id": "christmas/present_green",
+     "name": "Present green",
+     "file": "props/christmas/present_green.svg"
+    },
+    {
+     "id": "christmas/present_red",
+     "name": "Present red",
+     "file": "props/christmas/present_red.svg"
+    },
+    {
+     "id": "christmas/reindeer",
+     "name": "Reindeer",
+     "file": "props/christmas/reindeer.svg"
+    },
+    {
+     "id": "christmas/santa_hat",
+     "name": "Santa hat",
+     "file": "props/christmas/santa_hat.svg"
+    },
+    {
+     "id": "christmas/snow_globe",
+     "name": "Snow globe",
+     "file": "props/christmas/snow_globe.svg"
+    },
+    {
+     "id": "christmas/snowman",
+     "name": "Snowman",
+     "file": "props/christmas/snowman.svg"
+    },
+    {
+     "id": "christmas/stocking",
+     "name": "Stocking",
+     "file": "props/christmas/stocking.svg"
+    },
+    {
+     "id": "christmas/straw_goat",
+     "name": "Straw goat",
+     "file": "props/christmas/straw_goat.svg"
+    },
+    {
+     "id": "christmas/tomte",
+     "name": "Tomte",
+     "file": "props/christmas/tomte.svg"
+    },
+    {
+     "id": "christmas/wreath",
+     "name": "Wreath",
+     "file": "props/christmas/wreath.svg"
+    }
+   ]
+  },
+  {
+   "id": "evaq8",
+   "name": "evaQ8",
+   "items": [
+    {
+     "id": "evaq8/alarm_bell",
+     "name": "Alarm bell",
+     "file": "props/evaq8/alarm_bell.svg"
+    },
+    {
+     "id": "evaq8/assembly_point",
+     "name": "Assembly point",
+     "file": "props/evaq8/assembly_point.svg"
+    },
+    {
+     "id": "evaq8/call_point",
+     "name": "Call point",
+     "file": "props/evaq8/call_point.svg"
+    },
+    {
+     "id": "evaq8/defibrillator",
+     "name": "Defibrillator",
+     "file": "props/evaq8/defibrillator.svg"
+    },
+    {
+     "id": "evaq8/do_not_block",
+     "name": "Do not block",
+     "file": "props/evaq8/do_not_block.svg"
+    },
+    {
+     "id": "evaq8/emergency_light",
+     "name": "Emergency light",
+     "file": "props/evaq8/emergency_light.svg"
+    },
+    {
+     "id": "evaq8/emergency_phone",
+     "name": "Emergency phone",
+     "file": "props/evaq8/emergency_phone.svg"
+    },
+    {
+     "id": "evaq8/evacuation_chair",
+     "name": "Evacuation chair",
+     "file": "props/evaq8/evacuation_chair.svg"
+    },
+    {
+     "id": "evaq8/exit_arrow",
+     "name": "Exit arrow",
+     "file": "props/evaq8/exit_arrow.svg"
+    },
+    {
+     "id": "evaq8/exit_arrow_diagonal",
+     "name": "Exit arrow diagonal",
+     "file": "props/evaq8/exit_arrow_diagonal.svg"
+    },
+    {
+     "id": "evaq8/exit_arrow_up",
+     "name": "Exit arrow up",
+     "file": "props/evaq8/exit_arrow_up.svg"
+    },
+    {
+     "id": "evaq8/exit_sign",
+     "name": "Exit sign",
+     "file": "props/evaq8/exit_sign.svg"
+    },
+    {
+     "id": "evaq8/exit_sign_left",
+     "name": "Exit sign left",
+     "file": "props/evaq8/exit_sign_left.svg"
+    },
+    {
+     "id": "evaq8/exit_stairs",
+     "name": "Exit stairs",
+     "file": "props/evaq8/exit_stairs.svg"
+    },
+    {
+     "id": "evaq8/eyewash",
+     "name": "Eyewash",
+     "file": "props/evaq8/eyewash.svg"
+    },
+    {
+     "id": "evaq8/fire_alarm_sign",
+     "name": "Fire alarm sign",
+     "file": "props/evaq8/fire_alarm_sign.svg"
+    },
+    {
+     "id": "evaq8/fire_axe",
+     "name": "Fire axe",
+     "file": "props/evaq8/fire_axe.svg"
+    },
+    {
+     "id": "evaq8/fire_blanket",
+     "name": "Fire blanket",
+     "file": "props/evaq8/fire_blanket.svg"
+    },
+    {
+     "id": "evaq8/fire_bucket",
+     "name": "Fire bucket",
+     "file": "props/evaq8/fire_bucket.svg"
+    },
+    {
+     "id": "evaq8/fire_door",
+     "name": "Fire door",
+     "file": "props/evaq8/fire_door.svg"
+    },
+    {
+     "id": "evaq8/fire_extinguisher",
+     "name": "Fire extinguisher",
+     "file": "props/evaq8/fire_extinguisher.svg"
+    },
+    {
+     "id": "evaq8/fire_extinguisher_sign",
+     "name": "Fire extinguisher sign",
+     "file": "props/evaq8/fire_extinguisher_sign.svg"
+    },
+    {
+     "id": "evaq8/fire_hose_sign",
+     "name": "Fire hose sign",
+     "file": "props/evaq8/fire_hose_sign.svg"
+    },
+    {
+     "id": "evaq8/fire_hydrant",
+     "name": "Fire hydrant",
+     "file": "props/evaq8/fire_hydrant.svg"
+    },
+    {
+     "id": "evaq8/fire_ladder_sign",
+     "name": "Fire ladder sign",
+     "file": "props/evaq8/fire_ladder_sign.svg"
+    },
+    {
+     "id": "evaq8/fire_phone_sign",
+     "name": "Fire phone sign",
+     "file": "props/evaq8/fire_phone_sign.svg"
+    },
+    {
+     "id": "evaq8/fire_truck",
+     "name": "Fire truck",
+     "file": "props/evaq8/fire_truck.svg"
+    },
+    {
+     "id": "evaq8/firefighter_helmet",
+     "name": "Firefighter helmet",
+     "file": "props/evaq8/firefighter_helmet.svg"
+    },
+    {
+     "id": "evaq8/first_aid",
+     "name": "First aid",
+     "file": "props/evaq8/first_aid.svg"
+    },
+    {
+     "id": "evaq8/flame",
+     "name": "Flame",
+     "file": "props/evaq8/flame.svg"
+    },
+    {
+     "id": "evaq8/flashlight",
+     "name": "Flashlight",
+     "file": "props/evaq8/flashlight.svg"
+    },
+    {
+     "id": "evaq8/hi_vis_vest",
+     "name": "Hi vis vest",
+     "file": "props/evaq8/hi_vis_vest.svg"
+    },
+    {
+     "id": "evaq8/mandatory_fire_door_closed",
+     "name": "Mandatory fire door closed",
+     "file": "props/evaq8/mandatory_fire_door_closed.svg"
+    },
+    {
+     "id": "evaq8/megaphone",
+     "name": "Megaphone",
+     "file": "props/evaq8/megaphone.svg"
+    },
+    {
+     "id": "evaq8/no_entry",
+     "name": "No entry",
+     "file": "props/evaq8/no_entry.svg"
+    },
+    {
+     "id": "evaq8/no_lift_in_fire",
+     "name": "No lift in fire",
+     "file": "props/evaq8/no_lift_in_fire.svg"
+    },
+    {
+     "id": "evaq8/no_open_flame",
+     "name": "No open flame",
+     "file": "props/evaq8/no_open_flame.svg"
+    },
+    {
+     "id": "evaq8/no_smoking",
+     "name": "No smoking",
+     "file": "props/evaq8/no_smoking.svg"
+    },
+    {
+     "id": "evaq8/safety_shower",
+     "name": "Safety shower",
+     "file": "props/evaq8/safety_shower.svg"
+    },
+    {
+     "id": "evaq8/smoke_cloud",
+     "name": "Smoke cloud",
+     "file": "props/evaq8/smoke_cloud.svg"
+    },
+    {
+     "id": "evaq8/smoke_detector",
+     "name": "Smoke detector",
+     "file": "props/evaq8/smoke_detector.svg"
+    },
+    {
+     "id": "evaq8/sprinkler",
+     "name": "Sprinkler",
+     "file": "props/evaq8/sprinkler.svg"
+    },
+    {
+     "id": "evaq8/warning_electric",
+     "name": "Warning electric",
+     "file": "props/evaq8/warning_electric.svg"
+    },
+    {
+     "id": "evaq8/warning_explosive",
+     "name": "Warning explosive",
+     "file": "props/evaq8/warning_explosive.svg"
+    },
+    {
+     "id": "evaq8/warning_fire",
+     "name": "Warning fire",
+     "file": "props/evaq8/warning_fire.svg"
+    },
+    {
+     "id": "evaq8/warning_general",
+     "name": "Warning general",
+     "file": "props/evaq8/warning_general.svg"
+    },
+    {
+     "id": "evaq8/warning_smoke",
+     "name": "Warning smoke",
+     "file": "props/evaq8/warning_smoke.svg"
+    },
+    {
+     "id": "evaq8/you_are_here",
+     "name": "You are here",
+     "file": "props/evaq8/you_are_here.svg"
+    }
+   ]
   }
  ]
 }

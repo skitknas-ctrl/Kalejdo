@@ -45,12 +45,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:var(--line)}
 input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--brass);border:2px solid #2a1a00}
 
-/* cell + layers */
-.row2{display:flex;gap:10px;align-items:stretch}
-#cellWrap{flex:none;position:relative}
-#cell{display:block;touch-action:none;border-radius:50%;box-shadow:0 0 0 3px var(--brass2),0 0 0 6px #0006}
-#cellLbl{position:absolute;left:0;right:0;bottom:-2px;text-align:center;font-size:10px;color:var(--dim);pointer-events:none}
-#layerBox{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+/* layers */
+#layerBox{display:flex;flex-direction:column;gap:6px}
 #tabs{display:flex;gap:4px}
 #tabs button{flex:1;background:var(--panel2);border-radius:9px;padding:4px 0 3px;text-align:center;border:2px solid transparent;line-height:1.1}
 #tabs button b{display:block;font-size:15px}
@@ -66,6 +62,13 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 .lrow .ib svg{width:19px;height:19px}
 .op{flex:1;display:flex;align-items:center;gap:4px;min-width:0}
 .op svg{width:16px;height:16px;flex:none;color:var(--dim)}
+.lrow .gap{flex:1}
+.sliders{display:flex;gap:12px;align-items:center}
+.op b{font-size:12px;color:var(--brass);min-width:34px;text-align:right;font-variant-numeric:tabular-nums}
+.op.off{opacity:.4}
+#revBtn svg{transition:transform .2s}
+#revBtn.on{background:#ffd28a;color:#2a1a00}
+#revBtn.on svg{transform:scaleX(-1)}
 
 /* library */
 #libHead{display:flex;flex-direction:column;gap:6px}
@@ -127,20 +130,24 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
       <button class="ib" id="moreBtn" title="More"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
     </div>
 
-    <div class="row2">
-      <div id="cellWrap"><canvas id="cell"></canvas></div>
-      <div id="layerBox">
+    <div id="layerBox">
         <div id="tabs"></div>
         <div class="seg" id="modeSeg"><button data-m="tumble">Tumble</button><button data-m="float">Float</button><button data-m="fixed">Fixed</button></div>
         <div class="lrow">
           <button class="ib" id="eyeBtn" title="Show/hide layer"></button>
           <button class="ib" id="lockBtn" title="Lock this layer: it stops turning"></button>
-          <label class="op" title="Opacity"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a9 9 0 1 0 0 18z"/><path d="M12 3a9 9 0 0 1 0 18" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-            <input id="opacity" type="range" min="15" max="100" step="1"></label>
+          <button class="ib" id="revBtn" title="Turn this layer the opposite way"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v4h-4"/></svg></button>
+          <span class="gap"></span>
+          <button class="ib" id="undoBtn" title="Remove the last thing added to this layer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 5H9l-6 7 6 7h12z"/><path d="M12 9l6 6M18 9l-6 6"/></svg></button>
           <button class="ib" id="fillBtn" title="Fill with random things"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.3" fill="currentColor"/><circle cx="15" cy="15" r="1.3" fill="currentColor"/><circle cx="15" cy="9" r="1.3" fill="currentColor"/><circle cx="9" cy="15" r="1.3" fill="currentColor"/></svg></button>
           <button class="ib" id="clearBtn" title="Empty layer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button>
         </div>
-      </div>
+        <div class="sliders">
+          <label class="op" title="Opacity"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a9 9 0 1 0 0 18z"/><path d="M12 3a9 9 0 0 1 0 18" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            <input id="opacity" type="range" min="15" max="100" step="1"></label>
+          <label class="op" id="speedBox" title="Speed of this layer compared with the main slider"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 18a9 9 0 1 1 16 0"/><path d="M12 15l4-5"/></svg>
+            <input id="speed" type="range" min="1" max="19" step="1"><b id="speedVal">×1.0</b></label>
+        </div>
     </div>
 
     <div id="libHead">
@@ -159,7 +166,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
   <h2>Kalejdo</h2>
   <div class="line"><span>Tilt to tumble<small>Gravity follows how you hold the phone</small></span><button class="sw" id="tiltSw"></button></div>
   <div class="line"><span>Pattern size<small>Size of the tiles in full-screen view</small></span><input id="tile" type="range" min="25" max="100" step="1" style="width:45%"></div>
-  <div class="line"><span>Field of view<small>Left: close-up · right: more of the cell</small></span><input id="zoom" type="range" min="40" max="85" step="1" style="width:45%"></div>
+  <div class="line"><span>Field of view<small>Left: close-up · right: more of the container</small></span><input id="zoom" type="range" min="40" max="85" step="1" style="width:45%"></div>
   <button class="btn" id="fullBtn">Full-screen view</button>
   <div class="line" style="gap:8px">
     <button class="btn" id="emptyAllBtn" style="flex:1">Empty all layers</button>
@@ -176,8 +183,10 @@ const $ = s => document.querySelector(s);
 const TAU = Math.PI * 2;
 const LAYERS = 4, MAX_PER_LAYER = 40, G = 2.6, MAX_SPIN = 1.3;
 const STORE = "kalejdo.v1";
-const CAT_SIZE = {glass: .22, gems: .17, shapes: .18, nature: .19, food: .19, critters: .2, things: .18};
-const MODE_INFO = {tumble: "things fall and roll as the cell turns", float: "things drift weightlessly", fixed: "things stay put and turn with the cell"};
+const CAT_SIZE = {glass: .22, gems: .17, shapes: .18, nature: .19, food: .19, critters: .2, things: .18, christmas: .19, evaq8: .19};
+// säkerhetsskyltarnas färger betyder något, så de får aldrig slumpad färgton
+const KEEP_COLOURS = new Set(["evaq8"]);
+const MODE_INFO = {tumble: "things fall and roll as the container turns", float: "things drift weightlessly", fixed: "things stay put and turn with the container"};
 const LIGHTS = [
   {name: "Daylight", a: "#fffef8", b: "#ddd6c4"},
   {name: "Warm lamp", a: "#fff4d6", b: "#eea052"},
@@ -202,9 +211,11 @@ let dragging = null;
 let tiltG = null;
 const rnd = (a, b) => a + Math.random() * (b - a);
 
-function defaultLayer(mode) { return {mode, opacity: 1, visible: true, locked: false, lockTheta: 0, items: []}; }
-// Vinkeln ett lager i läget Fixed ritas med. Ett låst lager står still i den vinkel det hade när det låstes.
-function layerTheta(L) { return L.locked ? L.lockTheta : theta; }
+function defaultLayer(mode) { return {mode, opacity: 1, visible: true, locked: false, speed: 1, rev: false, th: 0, items: []}; }
+// Varje lager har en egen vinkel som vrids med huvudhastigheten × lagrets faktor (negativ = motsatt håll).
+// Ett låst lager står helt still.
+function layerK(L) { return L.locked ? 0 : (L.speed || 1) * (L.rev ? -1 : 1); }
+function layerTheta(L) { return L.th || 0; }
 function defaultState() {
   return {slices: 6, spin: 25, lastSpin: 25, paused: false, tile: 55, light: 0, tilt: false, zoom: 72, sel: 0, mix: true, size: 100, cat: "all",
     layers: [defaultLayer("tumble"), defaultLayer("tumble"), defaultLayer("float"), defaultLayer("fixed")]};
@@ -264,7 +275,7 @@ function raster(id, hue) {
 function catOf(id) { return id.split("/")[0]; }
 function makeItem(id, layer) {
   const base = CAT_SIZE[catOf(id)] || .22;
-  const it = {p: id, h: S.mix ? Math.round(rnd(0, 360)) : 0, s: base * S.size / 100 * rnd(.88, 1.12),
+  const it = {p: id, h: S.mix && !KEEP_COLOURS.has(catOf(id)) ? Math.round(rnd(0, 360)) : 0, s: base * S.size / 100 * rnd(.88, 1.12),
     x: 0, y: 0, vx: 0, vy: 0, a: rnd(0, TAU), va: rnd(-1, 1), w: rnd(0, TAU)};
   placeItem(it, layer);
   return it;
@@ -305,14 +316,7 @@ function addItem(id, li = S.sel, quiet) {
 function setLocked(li, on) {
   const L = S.layers[li];
   if (!!L.locked === on) return;
-  if (on) {
-    L.lockTheta = theta;
-  } else {
-    if (L.mode === "fixed") { // fortsätt från där lagret står nu
-      const d = L.lockTheta - theta, c = Math.cos(d), s = Math.sin(d);
-      for (const it of L.items) { [it.x, it.y] = [it.x * c - it.y * s, it.x * s + it.y * c]; it.a += d; }
-    } else for (const it of L.items) { it.vx = it.vy = 0; it.va = 0; }
-  }
+  if (!on && L.mode !== "fixed") for (const it of L.items) { it.vx = it.vy = 0; it.va = 0; }
   L.locked = on;
   refreshLayerUI(); save();
   toast(on ? `Layer ${li + 1} locked: it stands still while the rest turns` : `Layer ${li + 1} turns again`);
@@ -320,7 +324,7 @@ function setLocked(li, on) {
 function setMode(li, mode) {
   const L = S.layers[li];
   if (L.mode === mode) return;
-  const lt = layerTheta(L), c = Math.cos(lt), s = Math.sin(lt), w = L.locked ? 0 : omega();
+  const lt = layerTheta(L), c = Math.cos(lt), s = Math.sin(lt), w = omega() * layerK(L);
   for (const it of L.items) {
     if (L.mode === "fixed") { // lokal -> värld
       [it.x, it.y] = [it.x * c - it.y * s, it.x * s + it.y * c];
@@ -349,12 +353,16 @@ function gravity() {
   return {x: 0, y: 1};
 }
 function physics(dt) {
-  const w = omega();
-  theta += w * dt;
-  if (!dragging) extraSpin *= Math.exp(-1.6 * dt);
+  const w0 = omega();
+  if (!dragging) { // under ett drag vrids vinklarna direkt av fingret
+    theta += w0 * dt;
+    for (const L of S.layers) L.th = (L.th || 0) + w0 * layerK(L) * dt;
+    extraSpin *= Math.exp(-1.6 * dt);
+  }
   const g = gravity();
   for (const L of S.layers) {
     if (L.mode === "fixed" || L.locked || !L.items.length) continue;
+    const w = w0 * layerK(L);
     const float = L.mode === "float", its = L.items, n = its.length;
     const k = float ? 1.1 : .55;
     for (const it of its) {
@@ -426,9 +434,8 @@ function shake() {
 
 /* ------------------------------------------------------------------ drawing */
 const view = $("#view"), vctx = view.getContext("2d");
-const cell = $("#cell"), cctx = cell.getContext("2d");
 const cham = document.createElement("canvas"), hctx = cham.getContext("2d");
-let viewCss = 300, cellCss = 120;
+let viewCss = 300;
 
 function backdrop(ctx, R) {
   const L = LIGHTS[S.light] || LIGHTS[0];
@@ -447,7 +454,7 @@ function backdrop(ctx, R) {
     ctx.fillStyle = g; ctx.fillRect(-R, -R, 2 * R, 2 * R);
   }
 }
-function drawCell(ctx, px, dim) {
+function drawCell(ctx, px) {
   const R = px / 2;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, px, px);
@@ -458,7 +465,7 @@ function drawCell(ctx, px, dim) {
   const ct = Math.cos(theta), st = Math.sin(theta);
   S.layers.forEach((L, li) => {
     if (!L.visible || !L.items.length) return;
-    ctx.globalAlpha = L.opacity * (dim && li !== S.sel ? .3 : 1);
+    ctx.globalAlpha = L.opacity;
     const fixed = L.mode === "fixed", lt = layerTheta(L), ct = Math.cos(lt), st = Math.sin(lt);
     for (const it of L.items) {
       const c = raster(it.p, it.h);
@@ -582,22 +589,6 @@ function drawPattern() {
       vctx.drawImage(sqC, cx + (i + .5) * d - qc, cy + (j + .5) * d - qc);
   }
 }
-function drawCellPreview() {
-  const px = cell.width;
-  drawCell(cctx, px, true);
-  // markera vilken del av cellen speglarna ser
-  const R = px / 2, {L, apex, half} = wedge();
-  cctx.save();
-  cctx.translate(R, R); cctx.scale(R, R);
-  cctx.beginPath(); cctx.moveTo(0, apex);
-  cctx.arc(0, apex, L, Math.PI / 2 - half, Math.PI / 2 + half);
-  cctx.closePath();
-  cctx.restore();
-  cctx.lineWidth = 1.5 * dpr(); cctx.setLineDash([4 * dpr(), 3 * dpr()]);
-  cctx.strokeStyle = "rgba(255,255,255,.95)"; cctx.stroke();
-  cctx.setLineDash([]); cctx.strokeStyle = "rgba(0,0,0,.5)"; cctx.lineWidth = .7 * dpr(); cctx.stroke();
-}
-
 function dpr() { return Math.min(window.devicePixelRatio || 1, 3); }
 function layout() {
   const full = document.body.classList.contains("full");
@@ -612,9 +603,6 @@ function layout() {
     view.style.width = view.style.height = viewCss + "px";
     view.width = view.height = Math.min(1600, Math.round(viewCss * d));
   }
-  cellCss = Math.max(96, Math.min(130, Math.floor((iw - 20) * .32)));
-  cell.style.width = cell.style.height = cellCss + "px";
-  cell.width = cell.height = Math.round(cellCss * d);
   sizeChamber();
 }
 function sizeChamber() {
@@ -636,9 +624,8 @@ function frame(t) {
   let n = 0;
   while (acc >= STEP && n < 8) { physics(STEP); acc -= STEP; n++; }
   if (n === 8) acc = 0;
-  drawCell(hctx, cham.width, false);
+  drawCell(hctx, cham.width);
   drawView();
-  if (!document.body.classList.contains("full")) drawCellPreview();
 }
 
 /* ------------------------------------------------------------------ input */
@@ -660,6 +647,7 @@ function attachRotate(el, onTap) {
     if (d > Math.PI) d -= TAU; else if (d < -Math.PI) d += TAU;
     const now = performance.now(), dt = Math.max(.008, (now - dragging.t) / 1000);
     theta += d;
+    for (const L of S.layers) L.th = (L.th || 0) + d * layerK(L);
     dragging.w = dragging.w * .6 + (d / dt) * .4;
     if (dragging.w > 8) dragging.w = 8; else if (dragging.w < -8) dragging.w = -8;
     dragging.ang = a; dragging.t = now;
@@ -682,26 +670,6 @@ attachRotate(view, () => {
   if (now - lastTap < 350) { clearTimeout(tapTimer); toggleFull(); lastTap = 0; }
   else { lastTap = now; tapTimer = setTimeout(() => setRunning(!running()), 320); }
 });
-attachRotate(cell, e => {
-  // tryck på en sak i cellen för att ta bort den (i valt lager)
-  const r = cell.getBoundingClientRect();
-  const x = (e.clientX - r.left) / r.width * 2 - 1, y = (e.clientY - r.top) / r.height * 2 - 1;
-  const L = S.layers[S.sel];
-  const lt = layerTheta(L), ct = Math.cos(lt), st = Math.sin(lt);
-  let best = -1, bd = 9;
-  L.items.forEach((it, i) => {
-    let ix = it.x, iy = it.y;
-    if (L.mode === "fixed") { ix = it.x * ct - it.y * st; iy = it.x * st + it.y * ct; }
-    const d = Math.hypot(ix - x, iy - y);
-    if (d < Math.max(.08, it.s * .5) && d < bd) { bd = d; best = i; }
-  });
-  if (best < 0) { toast("Drag the cell to turn it · tap a thing to remove it"); return; }
-  const [gone] = L.items.splice(best, 1);
-  const li = S.sel;
-  refreshLayerUI(); save();
-  toast(`Removed ${PROPS[gone.p] ? PROPS[gone.p].name.toLowerCase() : "thing"}`, "Undo", () => { S.layers[li].items.splice(best, 0, gone); refreshLayerUI(); save(); });
-});
-
 window.addEventListener("devicemotion", e => {
   const a = e.accelerationIncludingGravity;
   if (!a || a.x == null) return;
@@ -736,14 +704,25 @@ function refreshTop() {
   $("#tiltSw").classList.toggle("on", S.tilt);
   $("#zoom").value = S.zoom;
 }
-function refreshLayerUI() {
+function tabSpeed(L) {
+  const k = L.speed || 1;
+  return (k !== 1 || L.rev) ? `<span>${L.rev ? "↺" : ""}×${k.toFixed(1)}</span>` : "";
+}
+function refreshTabs() {
   $("#tabs").innerHTML = S.layers.map((L, i) =>
-    `<button data-i="${i}" class="${i === S.sel ? "on" : ""} ${L.visible ? "" : "hidden"}"><b>${i + 1}</b><small>${L.items.length}${L.locked ? STOP_MINI : ""}</small></button>`).join("");
+    `<button data-i="${i}" class="${i === S.sel ? "on" : ""} ${L.visible ? "" : "hidden"}"><b>${i + 1}</b><small>${L.items.length}${L.locked ? STOP_MINI : tabSpeed(L)}</small></button>`).join("");
+}
+function refreshLayerUI() {
+  refreshTabs();
   const L = S.layers[S.sel];
   document.querySelectorAll("#modeSeg button").forEach(b => b.classList.toggle("on", b.dataset.m === L.mode));
   $("#eyeBtn").innerHTML = L.visible ? EYE_ON : EYE_OFF;
   $("#lockBtn").innerHTML = STOP_SIGN;
   $("#lockBtn").classList.toggle("off", !L.locked);
+  $("#revBtn").classList.toggle("on", !!L.rev);
+  $("#speed").value = Math.round((L.speed || 1) * 10);
+  $("#speedVal").textContent = "×" + (L.speed || 1).toFixed(1);
+  $("#speedBox").classList.toggle("off", !!L.locked);
   $("#opacity").value = Math.round(L.opacity * 100);
   $("#dropInfo").textContent = `Tap a thing to drop it in layer ${S.sel + 1}`;
 }
@@ -752,6 +731,21 @@ $("#tabs").addEventListener("click", e => {
   S.sel = +b.dataset.i; refreshLayerUI(); save();
 });
 $("#modeSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (b) setMode(S.sel, b.dataset.m); });
+$("#revBtn").onclick = () => {
+  const L = S.layers[S.sel]; L.rev = !L.rev; refreshLayerUI(); save();
+  toast(L.rev ? `Layer ${S.sel + 1} turns the opposite way` : `Layer ${S.sel + 1} turns with the main slider`);
+};
+$("#speed").oninput = e => {
+  const L = S.layers[S.sel]; L.speed = +e.target.value / 10;
+  $("#speedVal").textContent = "×" + L.speed.toFixed(1);
+  refreshTabs(); save();
+};
+$("#undoBtn").onclick = () => {
+  const L = S.layers[S.sel], li = S.sel;
+  if (!L.items.length) { toast(`Layer ${li + 1} is empty`); return; }
+  const gone = L.items.pop(); refreshLayerUI(); save();
+  toast(`Removed ${PROPS[gone.p] ? PROPS[gone.p].name.toLowerCase() : "thing"}`, "Undo", () => { S.layers[li].items.push(gone); refreshLayerUI(); save(); });
+};
 $("#lockBtn").onclick = () => setLocked(S.sel, !S.layers[S.sel].locked);
 $("#eyeBtn").onclick = () => { const L = S.layers[S.sel]; L.visible = !L.visible; refreshLayerUI(); save(); };
 $("#opacity").oninput = e => { S.layers[S.sel].opacity = e.target.value / 100; save(); };
@@ -877,7 +871,12 @@ window.addEventListener("resize", layout);
   S = saved || defaultState();
   theta = saved && saved.theta || 0;
   // ta bort saker vars SVG inte längre finns
-  for (const L of S.layers) L.items = L.items.filter(it => PROPS[it.p]);
+  for (const L of S.layers) {
+    L.items = L.items.filter(it => PROPS[it.p]);
+    if (L.th == null) L.th = L.locked && L.lockTheta != null ? L.lockTheta : theta;
+    if (!L.speed) L.speed = 1;
+    delete L.lockTheta;
+  }
   refreshTop();
   buildLibrary();
   layout();

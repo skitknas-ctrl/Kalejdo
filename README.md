@@ -22,18 +22,20 @@ ur ett bibliotek med SVG-filer, i fyra lager som fylls var för sig.
 
 ## Behållaren och lagren
 
-- Den lilla runda bilden till vänster är behållaren. Den streckade tårtbiten visar vilken del speglarna ser.
-  Dra i den för att vrida, tryck på en pryl för att ta bort den (i valt lager, med Ångra).
-- Det finns fyra lager, **1–4**. Siffran under visar hur många prylar lagret har (högst 40).
+- Behållaren har fyra lager, **1–4**. Siffran under visar hur många prylar lagret har (högst 40).
   Lager 1 ritas längst bak och lager 4 längst fram.
 - Varje lager har ett eget beteende:
   - **Tumble:** prylarna faller, rullar och studsar när behållaren vrids.
   - **Float:** prylarna svävar tyngdlöst och följer långsamt med vätskan.
-  - **Fixed:** prylarna sitter fast och vrids med behållaren.
-- **STOP-märket** bredvid ögat låser lagret: det står helt still medan resten av kalejdoskopet vrids.
-  Ett litet rött märke på lagrets flik visar att det är låst. Tryck igen så vrids lagret med igen från där det står.
-- Ögat döljer eller visar lagret, reglaget ändrar genomskinligheten, tärningen fyller på med
-  tio slumpvisa prylar (ur vald kategori) och papperskorgen tömmer lagret.
+  - **Fixed:** prylarna sitter fast och vrids med lagret.
+- **Hastighet per lager:** hastighetsreglaget (×0,1–1,9) anger hur fort lagret vrids jämfört med huvudreglaget.
+  Pilknappen får lagret att vridas åt motsatt håll. Fliken visar t.ex. *↺×0.6* när lagret avviker
+  från huvudreglaget.
+- **STOP-märket** låser lagret, så att det står helt still medan resten vrids. Ett litet rött märke på fliken
+  visar att lagret är låst. Tryck igen så vrids lagret med igen från där det står.
+- Ögat döljer eller visar lagret. Det vänstra reglaget ändrar genomskinligheten. ⌫ tar bort den senast
+  tillagda prylen (med Ångra). Tärningen fyller på med tio slumpvisa prylar ur vald kategori, och
+  papperskorgen tömmer lagret.
 - Allt sparas i telefonen, så kalejdoskopet ser likadant ut nästa gång.
 
 ## Biblioteket
@@ -46,8 +48,10 @@ ur ett bibliotek med SVG-filer, i fyra lager som fylls var för sig.
 
 ## Egna prylar
 
-Prylarna är vanliga SVG-filer i `props/<kategori>/`. Det finns 122 stycken i sju kategorier:
-glas och pärlor, ädelstenar, former, natur, mat, djur och saker.
+Prylarna är vanliga SVG-filer i `props/<kategori>/`. Det finns 198 stycken i nio kategorier:
+glas och pärlor, ädelstenar, former, natur, mat, djur, saker, Christmas (julpynt, bl.a. julbock, lussekatt
+och tomte) och evaQ8 (utrymningsskyltar, brandskyltar, förbuds- och varningsskyltar samt brand- och
+utrymningsutrustning). evaQ8-prylarna behåller alltid sina färger, även när *Mix colours* är på.
 
 - Lägg till en pryl genom att ladda upp en `.svg` i en kategorimapp, t.ex. `props/food/taco.svg`.
   Filnamnet blir namnet i biblioteket (`taco` → *Taco*).

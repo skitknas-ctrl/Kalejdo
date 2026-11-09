@@ -15,7 +15,7 @@ import re
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "props")
 
 # kategorier i den här ordningen först, övriga i bokstavsordning efter
-ORDER = ["glass", "gems", "shapes", "nature", "food", "critters", "things"]
+ORDER = ["glass", "gems", "shapes", "nature", "food", "critters", "things", "christmas", "evaq8"]
 NAMES = {
     "glass": "Glass & beads",
     "gems": "Gems",
@@ -24,6 +24,8 @@ NAMES = {
     "food": "Food",
     "critters": "Critters",
     "things": "Things",
+    "christmas": "Christmas",
+    "evaq8": "evaQ8",
 }
 
 
