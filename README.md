@@ -30,6 +30,8 @@ ur ett bibliotek med SVG-filer, i fyra lager som fylls var för sig.
   - **Tumble:** prylarna faller, rullar och studsar när behållaren vrids.
   - **Float:** prylarna svävar tyngdlöst och följer långsamt med vätskan.
   - **Fixed:** prylarna sitter fast och vrids med behållaren.
+- **STOP-märket** bredvid ögat låser lagret: det står helt still medan resten av kalejdoskopet vrids.
+  Ett litet rött märke på lagrets flik visar att det är låst. Tryck igen så vrids lagret med igen från där det står.
 - Ögat döljer eller visar lagret, reglaget ändrar genomskinligheten, tärningen fyller på med
   tio slumpvisa prylar (ur vald kategori) och papperskorgen tömmer lagret.
 - Allt sparas i telefonen, så kalejdoskopet ser likadant ut nästa gång.
