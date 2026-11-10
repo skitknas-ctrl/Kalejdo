@@ -1,0 +1,7 @@
+# Enhetliga radslut oavsett om man arbetar på Windows eller Linux
+* text=auto eol=lf
+*.bat text eol=crlf
+*.jar binary
+*.keystore binary
+*.png binary
+*.apk binary
