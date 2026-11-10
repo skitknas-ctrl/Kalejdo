@@ -18,7 +18,7 @@ tools/build_index.py  bygger om props/index.json från mapparna i props/
 CLAUDE.md             den här filen
 ```
 
-Kategorimapparna är: `glass`, `gems`, `shapes`, `nature`, `food`, `critters`, `things`, `christmas`
+Kategorimapparna är: `glass`, `gems`, `shapes`, `nature`, `food`, `critters`, `things`, `electro`, `christmas`
 och `evaq8`. Visningsnamn och ordning finns i `tools/build_index.py`, och en mapp kan också ha en
 `_category.txt` med sitt namn.
 
@@ -87,6 +87,9 @@ Kategorin `evaq8` (utrymnings- och brandsäkerhetssymboler) ritas alltid med ori
 - Behållaren har fyra lager med lägena *Tumble*, *Float* och *Fixed*. Varje lager har en egen vinkel
   (`L.th`), vrids med huvudhastigheten × lagrets faktor (`L.speed`, 0,1–1,9) och kan gå åt motsatt
   håll (`L.rev`) eller vara låst (`L.locked`).
+- Huvudreglaget (`S.spin`, 0–100) styr bara farten via `spinSpeed()`. Riktningen ligger i `S.dir` (1/-1).
+  *Spin inertia* (`S.inertia`, 1–10) dämpar hur fort prylarna snurrar runt sin egen axel, och *Gravity*
+  (`S.grav`, procent) skalar tyngdkraften i Tumble-lager.
 - Fysiken körs i fast takt (120 Hz) i `physics()`. Bilden ritas i `frame()`: först behållaren på en
   dold canvas (`cham`), sedan speglas den i tårtbitar på `#view`, och dessutom ritas den lilla
   behållarbilden `#cell`.

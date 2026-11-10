@@ -39,6 +39,8 @@ body.full #view{position:absolute;left:0;top:0;border-radius:0}
 .spin button{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;flex:none;color:var(--brass)}
 .spin button svg{width:18px;height:18px}
 .spin.off input{opacity:.45}
+#dirBtn svg{transition:transform .2s}
+#dirBtn.ccw svg{transform:scaleX(-1)}
 input[type=range]{-webkit-appearance:none;appearance:none;width:100%;min-width:0;height:28px;background:none;margin:0}
 input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:var(--line)}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--brass);margin-top:-8px;border:2px solid #2a1a00}
@@ -129,7 +131,8 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
       <div class="seg" id="slices"><button data-n="6">6</button><button data-n="8">8</button></div>
       <div class="spin" id="spinBox" title="Auto-rotate">
         <button id="pauseBtn" title="Stop/start rotation"></button>
-        <input id="spin" type="range" min="-100" max="100" step="1">
+        <input id="spin" type="range" min="0" max="100" step="1">
+        <button id="dirBtn" title="Turning direction"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v4h-4"/></svg></button>
       </div>
       <button class="ib" id="shakeBtn" title="Shake"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="5" width="10" height="14" rx="2"/><path d="M3 9v6M21 9v6M5 7v10M19 7v10" opacity=".55"/></svg></button>
       <button class="ib" id="lightBtn" title="Light"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
@@ -176,6 +179,8 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
   <h2>Kalejdo</h2>
   <div class="line"><span>Tilt to tumble<small>Gravity follows how you hold the phone</small></span><button class="sw" id="tiltSw"></button></div>
   <div class="line"><span>Pattern size<small>Size of the tiles in full-screen view</small></span><input id="tile" type="range" min="25" max="100" step="1" style="width:45%"></div>
+  <div class="line"><span>Spin inertia<small>Left: things twirl easily · right: heavy and slow</small></span><input id="inertia" type="range" min="1" max="10" step="1" style="width:45%"></div>
+  <div class="line"><span>Gravity<small>How hard things fall in Tumble layers</small></span><input id="grav" type="range" min="10" max="300" step="5" style="width:45%"></div>
   <div class="line"><span>Field of view<small>Left: close-up · right: more of the container</small></span><input id="zoom" type="range" min="40" max="85" step="1" style="width:45%"></div>
   <button class="btn" id="fullBtn">Full-screen view</button>
   <div class="line" style="gap:8px">
@@ -192,8 +197,14 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 const $ = s => document.querySelector(s);
 const TAU = Math.PI * 2;
 const LAYERS = 4, MAX_PER_LAYER = 40, G = 2.6, MAX_SPIN = 1.3;
+// Huvudreglagets fart (0–100) i rad/s. Jämfört med första versionen är farten 80 % lägre längst
+// ner på reglaget och 60 % lägre längst upp (faktor 0,2 -> 0,4 längs reglaget).
+function spinSpeed(v) { const t = v / 100; return t * MAX_SPIN * (0.2 + 0.2 * t); }
+// Tröghet (1–10) och gravitation (procent) från inställningarna
+function inertia() { return S.inertia || 4; }
+function gravScale() { return (S.grav == null ? 100 : S.grav) / 100; }
 const STORE = "kalejdo.v1";
-const CAT_SIZE = {glass: .22, gems: .17, shapes: .18, nature: .19, food: .19, critters: .2, things: .18, christmas: .19, evaq8: .19};
+const CAT_SIZE = {glass: .22, gems: .17, shapes: .18, nature: .19, food: .19, critters: .2, things: .18, electro: .2, christmas: .19, evaq8: .19};
 // säkerhetsskyltarnas färger betyder något, så de får aldrig slumpad färgton
 const KEEP_COLOURS = new Set(["evaq8"]);
 const MODE_INFO = {tumble: "things fall and roll as the container turns", float: "things drift weightlessly", fixed: "things stay put and turn with the container"};
@@ -227,7 +238,7 @@ function defaultLayer(mode) { return {mode, opacity: 1, visible: true, locked: f
 function layerK(L) { return L.locked ? 0 : (L.speed || 1) * (L.rev ? -1 : 1); }
 function layerTheta(L) { return L.th || 0; }
 function defaultState() {
-  return {slices: 6, spin: 25, lastSpin: 25, paused: false, tile: 55, light: 0, tilt: false, zoom: 72, sel: 0, mix: true, size: 100, cat: "all",
+  return {slices: 6, spin: 50, lastSpin: 50, dir: 1, paused: false, inertia: 4, grav: 100, tile: 55, light: 0, tilt: false, zoom: 72, sel: 0, mix: true, size: 100, cat: "all",
     layers: [defaultLayer("tumble"), defaultLayer("tumble"), defaultLayer("float"), defaultLayer("fixed")]};
 }
 function load() {
@@ -286,7 +297,7 @@ function catOf(id) { return id.split("/")[0]; }
 function makeItem(id, layer) {
   const base = CAT_SIZE[catOf(id)] || .22;
   const it = {p: id, h: S.mix && !KEEP_COLOURS.has(catOf(id)) ? Math.round(rnd(0, 360)) : 0, s: base * S.size / 100 * rnd(.88, 1.12),
-    x: 0, y: 0, vx: 0, vy: 0, a: rnd(0, TAU), va: rnd(-1, 1), w: rnd(0, TAU)};
+    x: 0, y: 0, vx: 0, vy: 0, a: rnd(0, TAU), va: rnd(-1, 1) / inertia(), w: rnd(0, TAU)};
   placeItem(it, layer);
   return it;
 }
@@ -350,7 +361,8 @@ function setMode(li, mode) {
 }
 
 /* ------------------------------------------------------------------ physics */
-function omega() { return dragging ? dragging.w : (S.paused ? 0 : S.spin / 100 * MAX_SPIN) + extraSpin; }
+function baseOmega() { return S.paused ? 0 : spinSpeed(S.spin) * (S.dir || 1); }
+function omega() { return dragging ? dragging.w : baseOmega() + extraSpin; }
 function running() { return !S.paused && S.spin !== 0; }
 function setRunning(on, quiet) {
   if (on) { S.paused = false; if (!S.spin) S.spin = S.lastSpin || 25; } else S.paused = true;
@@ -374,7 +386,7 @@ function physics(dt) {
     if (L.mode === "fixed" || L.locked || !L.items.length) continue;
     const w = w0 * layerK(L);
     const float = L.mode === "float", its = L.items, n = its.length;
-    const k = float ? 1.1 : .55;
+    const k = float ? 1.1 : .55, I = inertia(), GG = G * gravScale(), vaMax = 12 / I;
     for (const it of its) {
       // vätskan i cellen roterar med cellen och drar med sig sakerna
       it.vx += (-w * it.y - it.vx) * k * dt;
@@ -382,15 +394,15 @@ function physics(dt) {
       if (float) {
         it.w += rnd(-3, 3) * dt;
         it.vx += Math.cos(it.w) * .16 * dt; it.vy += Math.sin(it.w) * .16 * dt;
-        it.va += (w - it.va) * .6 * dt;
+        it.va += (w - it.va) * .6 * dt / I;
       } else {
-        it.vx += g.x * G * dt; it.vy += g.y * G * dt;
+        it.vx += g.x * GG * dt; it.vy += g.y * GG * dt;
       }
       const v = Math.hypot(it.vx, it.vy);
       if (v > 4) { it.vx *= 4 / v; it.vy *= 4 / v; }
       it.x += it.vx * dt; it.y += it.vy * dt;
       it.va *= 1 - 1.2 * dt;
-      if (it.va > 12) it.va = 12; else if (it.va < -12) it.va = -12;
+      if (it.va > vaMax) it.va = vaMax; else if (it.va < -vaMax) it.va = -vaMax;
       it.a += it.va * dt;
     }
     for (let pass = 0; pass < 2; pass++) {
@@ -409,7 +421,7 @@ function physics(dt) {
             const J = -1.25 * vn * .5;
             A.vx -= J * nx; A.vy -= J * ny; B.vx += J * nx; B.vy += J * ny;
             const vt = (B.vx - A.vx) * -ny + (B.vy - A.vy) * nx;
-            A.va -= vt * .25 / ra; B.va -= vt * .25 / (B.s * .42);
+            A.va -= vt * .25 / ra / I; B.va -= vt * .25 / (B.s * .42) / I;
           }
         }
       }
@@ -424,7 +436,8 @@ function physics(dt) {
         // friktion mot den roterande väggen
         const tx = -ny, ty = nx, vt = it.vx * tx + it.vy * ty, rel = vt - w * lim, f = Math.min(1, 7 * dt);
         it.vx -= tx * rel * f; it.vy -= ty * rel * f;
-        it.va += (-vt / r * .5 - it.va) * f;
+        // rullning mot väggen; högre tröghet = långsammare och lugnare snurr
+        it.va += (-vt / r * .5 / Math.sqrt(I) - it.va) * Math.min(1, 7 * dt / I);
       }
     }
   }
@@ -436,7 +449,7 @@ function shake() {
     for (const it of L.items) {
       const up = L.mode === "tumble" ? rnd(1.2, 2.6) : 0;
       it.vx += rnd(-1.6, 1.6) - g.x * up; it.vy += rnd(-1.6, 1.6) - g.y * up;
-      it.va += rnd(-10, 10);
+      it.va += rnd(-10, 10) / inertia();
     }
   }
   if (navigator.vibrate) try { navigator.vibrate(30); } catch (e) {}
@@ -688,7 +701,7 @@ function attachRotate(el, onTap) {
     const dr = dragging;
     dragging = null;
     if (!dr.moved && performance.now() - dr.t0 < 350) { onTap && onTap(e); return; }
-    if (performance.now() - dr.t < 120) extraSpin = dr.w - (S.paused ? 0 : S.spin / 100 * MAX_SPIN);
+    if (performance.now() - dr.t < 120) extraSpin = dr.w - baseOmega();
     save();
   };
   el.addEventListener("pointerup", end);
@@ -763,6 +776,9 @@ $("#toastBtn").onclick = () => { toastFn && toastFn(); toastFn = null; $("#toast
 function refreshTop() {
   document.querySelectorAll("#slices button").forEach(b => b.classList.toggle("on", +b.dataset.n === S.slices));
   $("#spin").value = S.spin;
+  $("#dirBtn").classList.toggle("ccw", (S.dir || 1) < 0);
+  $("#inertia").value = inertia();
+  $("#grav").value = S.grav == null ? 100 : S.grav;
   $("#pauseBtn").innerHTML = running() ? ICON_PAUSE : ICON_PLAY;
   $("#spinBox").classList.toggle("off", !running());
   $("#tile").value = S.tile;
@@ -830,9 +846,13 @@ $("#clearBtn").onclick = () => {
 };
 $("#slices").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; S.slices = +b.dataset.n; refreshTop(); save(); });
 $("#spin").oninput = e => {
-  let v = +e.target.value; if (Math.abs(v) < 6) v = 0;
+  let v = +e.target.value; if (v < 2) v = 0;
   S.spin = v; if (v) { S.lastSpin = v; S.paused = false; }
   extraSpin = 0; refreshTop(); save();
+};
+$("#dirBtn").onclick = () => {
+  S.dir = (S.dir || 1) > 0 ? -1 : 1; extraSpin = 0; refreshTop(); save();
+  toast(S.dir > 0 ? "Turning clockwise" : "Turning anticlockwise");
 };
 $("#pauseBtn").onclick = () => setRunning(!running());
 $("#tile").oninput = e => { S.tile = +e.target.value; sizeChamber(); save(); };
@@ -852,6 +872,8 @@ $("#tiltSw").onclick = () => {
     setTimeout(() => { if (S.tilt && !tiltG) toast(window.isSecureContext ? "No motion sensor found" : "Tilt needs https"); }, 1500);
   });
 };
+$("#inertia").oninput = e => { S.inertia = +e.target.value; save(); };
+$("#grav").oninput = e => { S.grav = +e.target.value; save(); };
 $("#zoom").oninput = e => { S.zoom = +e.target.value; sizeChamber(); save(); };
 $("#fullBtn").onclick = () => { $("#sheet").classList.remove("on"); toggleFull(); };
 $("#emptyAllBtn").onclick = () => {
@@ -942,6 +964,10 @@ window.addEventListener("resize", layout);
   S = saved || defaultState();
   theta = saved && saved.theta || 0;
   // ta bort saker vars SVG inte längre finns
+  // äldre sparningar: negativ fart betydde motsatt riktning
+  if (S.spin < 0) { S.spin = -S.spin; S.dir = -1; }
+  if (S.lastSpin < 0) S.lastSpin = -S.lastSpin;
+  if (!S.dir) S.dir = 1;
   for (const L of S.layers) {
     L.items = L.items.filter(it => PROPS[it.p]);
     if (L.th == null) L.th = L.locked && L.lockTheta != null ? L.lockTheta : theta;

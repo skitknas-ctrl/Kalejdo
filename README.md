@@ -14,8 +14,8 @@ ur ett bibliotek med SVG-filer, i fyra lager som fylls var för sig.
   sexhörningar i bikakemönster. Med 8 tårtbitar blir det åttahörningar med snedställda kvadrater
   emellan. Grannarna är spegelbilder av varandra. Plattornas storlek ställs in under ⋯ (*Pattern size*).
 - **6 / 8** väljer antal tårtbitar.
-- **Snurr-reglaget** vrider behållaren av sig själv, åt vänster eller höger. Mitten är stilla.
-  Play/paus-knappen bredvid stoppar och startar rotationen utan att ändra hastigheten.
+- **Snurr-reglaget** styr bara farten. Längst till vänster är stilla. Pilknappen till höger om reglaget
+  växlar riktning, och play/paus-knappen till vänster stoppar och startar rotationen utan att ändra farten.
 - **Skaka** ger allt löst i behållaren en knuff.
 - **Ljus** växlar bakgrundsljuset: Daylight, Warm lamp, Sky, Sunset, Night och Rainbow.
 - **Kameran** sparar bilden i *Bilder/Kalejdo* (i webbläsaren laddas den ner).
@@ -48,13 +48,16 @@ ur ett bibliotek med SVG-filer, i fyra lager som fylls var för sig.
 - Tryck på en pryl för att släppa ner den i valt lager.
 - **Mix colours** ger varje ny pryl en slumpad färgton. Stäng av för originalfärgerna.
 - Storleksreglaget gäller nya prylar.
+- Under **⋯** finns även *Spin inertia* (hur trögt prylarna snurrar runt sin egen axel) och *Gravity*
+  (hur hårt prylarna i Tumble-lager faller).
 - Under **⋯** finns *Tilt to tumble* (tyngdkraften följer hur man håller telefonen), *Field of view*
   (hur stor del av behållaren speglarna ser), helskärm, töm allt och startblandningen.
 
 ## Egna prylar
 
-Prylarna är vanliga SVG-filer i `props/<kategori>/`. Det finns 198 stycken i nio kategorier:
-glas och pärlor, ädelstenar, former, natur, mat, djur, saker, Christmas (julpynt, bl.a. julbock, lussekatt
+Prylarna är vanliga SVG-filer i `props/<kategori>/`. Det finns 235 stycken i tio kategorier:
+glas och pärlor, ädelstenar, former, natur, mat, djur, saker, Electro (motstånd, kondensatorer, spolar,
+IC-kretsar, transistorer, lysdioder m.m.), Christmas (julpynt, bl.a. julbock, lussekatt
 och tomte) och evaQ8 (utrymningsskyltar, brandskyltar, förbuds- och varningsskyltar samt brand- och
 utrymningsutrustning). evaQ8-prylarna behåller alltid sina färger, även när *Mix colours* är på.
 

@@ -653,6 +653,197 @@
    ]
   },
   {
+   "id": "electro",
+   "name": "Electro",
+   "items": [
+    {
+     "id": "electro/air_coil",
+     "name": "Air coil",
+     "file": "props/electro/air_coil.svg"
+    },
+    {
+     "id": "electro/battery_9v",
+     "name": "Battery 9v",
+     "file": "props/electro/battery_9v.svg"
+    },
+    {
+     "id": "electro/battery_aa",
+     "name": "Battery aa",
+     "file": "props/electro/battery_aa.svg"
+    },
+    {
+     "id": "electro/buzzer",
+     "name": "Buzzer",
+     "file": "props/electro/buzzer.svg"
+    },
+    {
+     "id": "electro/ceramic_cap",
+     "name": "Ceramic cap",
+     "file": "props/electro/ceramic_cap.svg"
+    },
+    {
+     "id": "electro/crystal",
+     "name": "Crystal",
+     "file": "props/electro/crystal.svg"
+    },
+    {
+     "id": "electro/diode",
+     "name": "Diode",
+     "file": "props/electro/diode.svg"
+    },
+    {
+     "id": "electro/electrolytic_cap",
+     "name": "Electrolytic cap",
+     "file": "props/electro/electrolytic_cap.svg"
+    },
+    {
+     "id": "electro/film_cap",
+     "name": "Film cap",
+     "file": "props/electro/film_cap.svg"
+    },
+    {
+     "id": "electro/fuse",
+     "name": "Fuse",
+     "file": "props/electro/fuse.svg"
+    },
+    {
+     "id": "electro/ic_555",
+     "name": "Ic 555",
+     "file": "props/electro/ic_555.svg"
+    },
+    {
+     "id": "electro/ic_dip16",
+     "name": "Ic dip16",
+     "file": "props/electro/ic_dip16.svg"
+    },
+    {
+     "id": "electro/ic_qfp",
+     "name": "Ic qfp",
+     "file": "props/electro/ic_qfp.svg"
+    },
+    {
+     "id": "electro/inductor_axial",
+     "name": "Inductor axial",
+     "file": "props/electro/inductor_axial.svg"
+    },
+    {
+     "id": "electro/led_blue",
+     "name": "Led blue",
+     "file": "props/electro/led_blue.svg"
+    },
+    {
+     "id": "electro/led_green",
+     "name": "Led green",
+     "file": "props/electro/led_green.svg"
+    },
+    {
+     "id": "electro/led_red",
+     "name": "Led red",
+     "file": "props/electro/led_red.svg"
+    },
+    {
+     "id": "electro/led_yellow",
+     "name": "Led yellow",
+     "file": "props/electro/led_yellow.svg"
+    },
+    {
+     "id": "electro/pcb",
+     "name": "Pcb",
+     "file": "props/electro/pcb.svg"
+    },
+    {
+     "id": "electro/potentiometer",
+     "name": "Potentiometer",
+     "file": "props/electro/potentiometer.svg"
+    },
+    {
+     "id": "electro/relay",
+     "name": "Relay",
+     "file": "props/electro/relay.svg"
+    },
+    {
+     "id": "electro/resistor_10k_metal",
+     "name": "Resistor 10k metal",
+     "file": "props/electro/resistor_10k_metal.svg"
+    },
+    {
+     "id": "electro/resistor_220",
+     "name": "Resistor 220",
+     "file": "props/electro/resistor_220.svg"
+    },
+    {
+     "id": "electro/resistor_4k7",
+     "name": "Resistor 4k7",
+     "file": "props/electro/resistor_4k7.svg"
+    },
+    {
+     "id": "electro/seven_segment",
+     "name": "Seven segment",
+     "file": "props/electro/seven_segment.svg"
+    },
+    {
+     "id": "electro/symbol_ground",
+     "name": "Symbol ground",
+     "file": "props/electro/symbol_ground.svg"
+    },
+    {
+     "id": "electro/symbol_opamp",
+     "name": "Symbol opamp",
+     "file": "props/electro/symbol_opamp.svg"
+    },
+    {
+     "id": "electro/symbol_resistor",
+     "name": "Symbol resistor",
+     "file": "props/electro/symbol_resistor.svg"
+    },
+    {
+     "id": "electro/tactile_switch",
+     "name": "Tactile switch",
+     "file": "props/electro/tactile_switch.svg"
+    },
+    {
+     "id": "electro/tantalum_cap",
+     "name": "Tantalum cap",
+     "file": "props/electro/tantalum_cap.svg"
+    },
+    {
+     "id": "electro/toggle_switch",
+     "name": "Toggle switch",
+     "file": "props/electro/toggle_switch.svg"
+    },
+    {
+     "id": "electro/toroid_coil",
+     "name": "Toroid coil",
+     "file": "props/electro/toroid_coil.svg"
+    },
+    {
+     "id": "electro/transformer",
+     "name": "Transformer",
+     "file": "props/electro/transformer.svg"
+    },
+    {
+     "id": "electro/transistor_to220",
+     "name": "Transistor to220",
+     "file": "props/electro/transistor_to220.svg"
+    },
+    {
+     "id": "electro/transistor_to92",
+     "name": "Transistor to92",
+     "file": "props/electro/transistor_to92.svg"
+    },
+    {
+     "id": "electro/trimmer",
+     "name": "Trimmer",
+     "file": "props/electro/trimmer.svg"
+    },
+    {
+     "id": "electro/zener_diode",
+     "name": "Zener diode",
+     "file": "props/electro/zener_diode.svg"
+    }
+   ]
+  },
+  {
    "id": "christmas",
    "name": "Christmas",
    "items": [
