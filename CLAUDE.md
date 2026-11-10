@@ -62,7 +62,8 @@ Kontrollera med `git status` före varje commit att inget därifrån följer med
 ### Första gången: gör mappen till en git-arbetskopia
 
 Filerna i den här mappen kopierades hit utan git-historik. Vissa kopior (SVG-filer och PNG) fick dessutom
-automatiskt ett metadata-block (C2PA) under kopieringen och skiljer sig därför från GitHub. Allt som finns
+automatiskt ett metadata-block (C2PA) under kopieringen och skiljer sig därför från GitHub. Mappen `.github/`
+(byggflödet) gick inte att kopiera hit alls. Allt som finns
 här finns också på GitHub, utom `butik-kalla/`. Koppla därför mappen till repot och ta GitHubs versioner:
 
 ```
