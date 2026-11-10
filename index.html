@@ -39,8 +39,6 @@ body.full #view{position:absolute;left:0;top:0;border-radius:0}
 .spin button{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;flex:none;color:var(--brass)}
 .spin button svg{width:18px;height:18px}
 .spin.off input{opacity:.45}
-#dirBtn svg{transition:transform .2s}
-#dirBtn.ccw svg{transform:scaleX(-1)}
 input[type=range]{-webkit-appearance:none;appearance:none;width:100%;min-width:0;height:28px;background:none;margin:0}
 input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:var(--line)}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--brass);margin-top:-8px;border:2px solid #2a1a00}
@@ -98,13 +96,45 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 #lib button.pop{transform:scale(.82)}
 
 /* sheet + toast */
-#sheet{position:fixed;inset:0;background:#0008;display:none;align-items:flex-end;z-index:5}
-#sheet.on{display:flex}
-#sheet .box{width:100%;background:var(--panel);border-radius:18px 18px 0 0;padding:14px 16px calc(16px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px}
-#sheet h2{margin:0;font-size:18px}
-#sheet .line{display:flex;align-items:center;gap:10px}
-#sheet .line span{flex:1}
-#sheet .line small{display:block;color:var(--dim);font-size:12px}
+.sheet{position:fixed;inset:0;background:#0008;display:none;align-items:flex-end;z-index:5}
+.sheet.on{display:flex}
+.sheet .box{width:100%;max-height:88vh;overflow-y:auto;background:var(--panel);border-radius:18px 18px 0 0;padding:14px 16px calc(16px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px}
+.sheet h2{margin:0;font-size:18px}
+.sheet .line{display:flex;align-items:center;gap:10px}
+.sheet .line span{flex:1}
+.sheet .line small{display:block;color:var(--dim);font-size:12px}
+.sheet .lead{margin:-6px 0 0;color:var(--dim);font-size:13px}
+.txt{flex:1;min-width:0;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text);font:inherit;outline:none;user-select:text;-webkit-user-select:text}
+.txt:focus{border-color:var(--brass)}
+.empty{color:var(--dim);font-size:13px;text-align:center;padding:18px 0}
+#savesList{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:10px}
+.sv{position:relative;background:var(--panel2);border-radius:12px;padding:10px 6px 8px;text-align:center}
+.sv img{width:74px;height:74px;border-radius:50%;display:block;margin:0 auto 6px;box-shadow:0 0 0 2px var(--brass2);background:#15131c}
+.sv b{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sv small{font-size:10px;color:var(--dim)}
+.sv .del{position:absolute;top:3px;right:3px;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:var(--dim);background:#0004}
+.sv .del svg{width:16px;height:16px}
+#shopList{display:flex;flex-direction:column;gap:10px}
+.pk{background:var(--panel2);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:9px}
+.pk .top{display:flex;gap:10px;align-items:center}
+.pk .pv{display:grid;grid-template-columns:repeat(2,30px);gap:3px;flex:none;background:#0004;border-radius:10px;padding:5px}
+.pk .pv img{width:30px;height:30px}
+.pk .pi{flex:1;min-width:0}
+.pk .pi b{font-size:15px}
+.pk .pi small{display:block;color:var(--dim);font-size:12px}
+.pk .pi p{margin:3px 0 0;font-size:12px;color:var(--dim)}
+.price{flex:none;align-self:flex-start;font-weight:700;font-size:12px;padding:4px 9px;border-radius:12px;background:#ffd28a;color:#2a1a00;white-space:nowrap}
+.price.free{background:#2fbf6a;color:#03240f}
+.price.own{background:var(--line);color:var(--text)}
+.pk .acts{display:flex;gap:8px}
+.pk .btn{background:var(--line);padding:8px 10px}
+.pk .btn.brass{background:var(--brass)}
+.pk .acts .btn{flex:1}
+.pk .code{display:none;gap:8px}
+.pk.coding .code{display:flex}
+.pk.busy{opacity:.6;pointer-events:none}
+.chip.shop{background:#ffd28a;color:#2a1a00;font-weight:600;display:inline-flex;align-items:center;gap:5px}
+.chip.shop svg{width:15px;height:15px}
 .btn{background:var(--panel2);border-radius:10px;padding:10px 14px;text-align:center}
 .btn.brass{background:var(--brass);color:#2a1a00;font-weight:600}
 .sw{width:46px;height:28px;border-radius:14px;background:var(--line);position:relative;flex:none;transition:background .2s}
@@ -132,10 +162,10 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
       <div class="spin" id="spinBox" title="Auto-rotate">
         <button id="pauseBtn" title="Stop/start rotation"></button>
         <input id="spin" type="range" min="0" max="100" step="1">
-        <button id="dirBtn" title="Turning direction"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v4h-4"/></svg></button>
       </div>
       <button class="ib" id="shakeBtn" title="Shake"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="5" width="10" height="14" rx="2"/><path d="M3 9v6M21 9v6M5 7v10M19 7v10" opacity=".55"/></svg></button>
       <button class="ib" id="lightBtn" title="Light"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+      <button class="ib" id="savesBtn" title="My kaleidoscopes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 10v6M9 13h6" stroke-linecap="round"/></svg></button>
       <button class="ib" id="snapBtn" title="Save picture"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
       <button class="ib" id="moreBtn" title="More"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
     </div>
@@ -175,19 +205,36 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
   </div>
 </div>
 
-<div id="sheet"><div class="box">
+<div id="sheet" class="sheet"><div class="box">
   <h2>Kalejdo</h2>
   <div class="line"><span>Tilt to tumble<small>Gravity follows how you hold the phone</small></span><button class="sw" id="tiltSw"></button></div>
   <div class="line"><span>Pattern size<small>Size of the tiles in full-screen view</small></span><input id="tile" type="range" min="25" max="100" step="1" style="width:45%"></div>
   <div class="line"><span>Spin inertia<small>Left: things twirl easily · right: heavy and slow</small></span><input id="inertia" type="range" min="1" max="10" step="1" style="width:45%"></div>
   <div class="line"><span>Gravity<small>How hard things fall in Tumble layers</small></span><input id="grav" type="range" min="10" max="300" step="5" style="width:45%"></div>
   <div class="line"><span>Field of view<small>Left: close-up · right: more of the container</small></span><input id="zoom" type="range" min="40" max="85" step="1" style="width:45%"></div>
+  <div class="line" style="gap:8px">
+    <button class="btn" id="openSavesBtn" style="flex:1">My kaleidoscopes</button>
+    <button class="btn" id="openShopBtn" style="flex:1">Shop</button>
+  </div>
   <button class="btn" id="fullBtn">Full-screen view</button>
   <div class="line" style="gap:8px">
     <button class="btn" id="emptyAllBtn" style="flex:1">Empty all layers</button>
     <button class="btn" id="starterBtn" style="flex:1">Starter mix</button>
   </div>
   <button class="btn brass" id="closeSheet">Done</button>
+</div></div>
+<div id="savesSheet" class="sheet"><div class="box">
+  <h2>My kaleidoscopes</h2>
+  <p class="lead">Save the kaleidoscope as it looks now and open it again later.</p>
+  <div class="line"><input class="txt" id="saveName" maxlength="40" placeholder="Name"><button class="btn brass" id="saveNowBtn">Save</button></div>
+  <div id="savesList"></div>
+  <button class="btn" id="closeSaves">Close</button>
+</div></div>
+<div id="shopSheet" class="sheet"><div class="box">
+  <h2>Shop</h2>
+  <p class="lead">New categories of things for the library – some free, some paid.</p>
+  <div id="shopList"></div>
+  <button class="btn" id="closeShop">Close</button>
 </div></div>
 <div id="toast"><span id="toastMsg"></span><button id="toastBtn"></button></div>
 <div id="loading">KALEJDO</div>
@@ -238,7 +285,7 @@ function defaultLayer(mode) { return {mode, opacity: 1, visible: true, locked: f
 function layerK(L) { return L.locked ? 0 : (L.speed || 1) * (L.rev ? -1 : 1); }
 function layerTheta(L) { return L.th || 0; }
 function defaultState() {
-  return {slices: 6, spin: 50, lastSpin: 50, dir: 1, paused: false, inertia: 4, grav: 100, tile: 55, light: 0, tilt: false, zoom: 72, sel: 0, mix: true, size: 100, cat: "all",
+  return {slices: 6, spin: 50, lastSpin: 50, paused: false, inertia: 4, grav: 100, tile: 55, light: 0, tilt: false, zoom: 72, sel: 0, mix: true, size: 100, cat: "all",
     layers: [defaultLayer("tumble"), defaultLayer("tumble"), defaultLayer("float"), defaultLayer("fixed")]};
 }
 function load() {
@@ -262,7 +309,8 @@ const RASTER = 192;
 function loadImage(id) {
   if (images.has(id)) return images.get(id);
   const p = PROPS[id];
-  const pr = !p ? Promise.resolve(null) : fetch(p.file).then(r => r.text()).then(t => {
+  const src = !p ? null : p.svg ? Promise.resolve(p.svg) : fetch(p.file).then(r => r.text());
+  const pr = !src ? Promise.resolve(null) : src.then(t => {
     // SVG utan width/height får ingen naturlig storlek – lägg till det
     const head = t.match(/<svg[^>]*>/i);
     if (head && !/\swidth\s*=/.test(head[0])) t = t.replace(/<svg/i, '<svg width="256" height="256"');
@@ -361,7 +409,7 @@ function setMode(li, mode) {
 }
 
 /* ------------------------------------------------------------------ physics */
-function baseOmega() { return S.paused ? 0 : spinSpeed(S.spin) * (S.dir || 1); }
+function baseOmega() { return S.paused ? 0 : spinSpeed(S.spin); }
 function omega() { return dragging ? dragging.w : baseOmega() + extraSpin; }
 function running() { return !S.paused && S.spin !== 0; }
 function setRunning(on, quiet) {
@@ -776,7 +824,6 @@ $("#toastBtn").onclick = () => { toastFn && toastFn(); toastFn = null; $("#toast
 function refreshTop() {
   document.querySelectorAll("#slices button").forEach(b => b.classList.toggle("on", +b.dataset.n === S.slices));
   $("#spin").value = S.spin;
-  $("#dirBtn").classList.toggle("ccw", (S.dir || 1) < 0);
   $("#inertia").value = inertia();
   $("#grav").value = S.grav == null ? 100 : S.grav;
   $("#pauseBtn").innerHTML = running() ? ICON_PAUSE : ICON_PLAY;
@@ -850,10 +897,7 @@ $("#spin").oninput = e => {
   S.spin = v; if (v) { S.lastSpin = v; S.paused = false; }
   extraSpin = 0; refreshTop(); save();
 };
-$("#dirBtn").onclick = () => {
-  S.dir = (S.dir || 1) > 0 ? -1 : 1; extraSpin = 0; refreshTop(); save();
-  toast(S.dir > 0 ? "Turning clockwise" : "Turning anticlockwise");
-};
+
 $("#pauseBtn").onclick = () => setRunning(!running());
 $("#tile").oninput = e => { S.tile = +e.target.value; sizeChamber(); save(); };
 $("#shakeBtn").onclick = shake;
@@ -863,7 +907,7 @@ $("#size").oninput = e => { S.size = +e.target.value; save(); };
 $("#snapBtn").onclick = snapshot;
 $("#moreBtn").onclick = () => $("#sheet").classList.add("on");
 $("#closeSheet").onclick = () => $("#sheet").classList.remove("on");
-$("#sheet").addEventListener("click", e => { if (e.target.id === "sheet") $("#sheet").classList.remove("on"); });
+document.querySelectorAll(".sheet").forEach(sh => sh.addEventListener("click", e => { if (e.target === sh) sh.classList.remove("on"); }));
 $("#tiltSw").onclick = () => {
   S.tilt = !S.tilt; refreshTop(); save();
   if (!S.tilt) return;
@@ -890,10 +934,16 @@ function toggleFull() {
   if (on) { $("#hint").classList.add("on"); setTimeout(() => $("#hint").classList.remove("on"), 2200); }
 }
 
+const BAG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2" stroke-linecap="round"/></svg>';
+function renderChips() {
+  $("#chips").innerHTML = `<button class="chip shop" data-c="__shop">${BAG}Shop</button>`
+    + [{id: "all", name: "All"}].concat(CATS).map(c => `<button class="chip" data-c="${c.id}">${esc(c.name)}</button>`).join("");
+}
 function buildLibrary() {
-  $("#chips").innerHTML = [{id: "all", name: "All"}].concat(CATS).map(c => `<button class="chip" data-c="${c.id}">${c.name}</button>`).join("");
+  renderChips();
   $("#chips").addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.c === "__shop") { openShop(); return; }
     S.cat = b.dataset.c; showCat(); save();
   });
   $("#lib").addEventListener("click", e => {
@@ -907,7 +957,7 @@ function showCat() {
   if (S.cat !== "all" && !CATS.some(c => c.id === S.cat)) S.cat = "all";
   document.querySelectorAll("#chips .chip").forEach(b => b.classList.toggle("on", b.dataset.c === S.cat));
   const items = S.cat === "all" ? Object.values(PROPS) : CATS.find(c => c.id === S.cat).items;
-  $("#lib").innerHTML = items.map(it => `<button data-id="${it.id}" title="${it.name}"><img src="${it.file}" alt="${it.name}" loading="lazy" decoding="async"></button>`).join("");
+  $("#lib").innerHTML = items.map(it => `<button data-id="${esc(it.id)}" title="${esc(it.name)}"><img src="${esc(it.file)}" alt="${esc(it.name)}" loading="lazy" decoding="async"></button>`).join("");
   $("#lib").scrollTop = 0;
 }
 
@@ -946,6 +996,239 @@ function snapshot() {
   view.animate && view.animate([{filter: "brightness(2)"}, {filter: "brightness(1)"}], {duration: 300});
 }
 
+
+function esc(t) { return String(t).replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c])); }
+function readJSON(k, def) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? def : v; } catch (e) { return def; } }
+function writeJSON(k, v) {
+  try { localStorage.setItem(k, JSON.stringify(v, (kk, vv) => typeof vv === "number" ? Math.round(vv * 1e4) / 1e4 : vv)); return true; }
+  catch (e) { toast("The phone's storage for Kalejdo is full"); return false; }
+}
+
+/* ------------------------------------------------------------------ sparade kalejdoskop
+   Sparas i localStorage under "kalejdo.saves.v1" som en lista med {id, name, t, thumb, state}.
+   state innehåller allt som behövs för att återskapa kalejdoskopet (lager, prylar, vinklar, inställningar). */
+const SAVES = "kalejdo.saves.v1";
+const SAVE_FIELDS = ["slices", "spin", "lastSpin", "paused", "light", "zoom", "tile", "inertia", "grav"];
+function readSaves() { const a = readJSON(SAVES, []); return Array.isArray(a) ? a : []; }
+function captureState() {
+  const st = {theta, layers: JSON.parse(JSON.stringify(S.layers))};
+  for (const k of SAVE_FIELDS) st[k] = S[k];
+  return st;
+}
+function applyState(st) {
+  for (const k of SAVE_FIELDS) if (st[k] !== undefined) S[k] = st[k];
+  S.layers = JSON.parse(JSON.stringify(st.layers));
+  theta = st.theta || 0;
+  extraSpin = 0;
+  let missing = 0;
+  for (const L of S.layers) { const n = L.items.length; L.items = L.items.filter(it => PROPS[it.p]); missing += n - L.items.length; }
+  S.layers.forEach(L => L.items.forEach(it => loadImage(it.p)));
+  refreshTop(); refreshLayerUI(); sizeChamber(); save();
+  return missing;
+}
+function makeThumb() {
+  const N = 128, c = document.createElement("canvas"); c.width = c.height = N;
+  const x = c.getContext("2d"), W = view.width, H = view.height, m = Math.min(W, H);
+  x.fillStyle = "#15131c"; x.fillRect(0, 0, N, N);
+  x.drawImage(view, (W - m) / 2, (H - m) / 2, m, m, 0, 0, N, N);
+  try { return c.toDataURL("image/jpeg", .75); } catch (e) { return ""; }
+}
+function nextSaveName() { return "Kaleidoscope " + (readSaves().length + 1); }
+function renderSaves() {
+  const list = readSaves();
+  $("#savesList").innerHTML = list.length ? list.map(v => `<div class="sv" data-id="${esc(v.id)}">
+      <button class="del" data-del="${esc(v.id)}" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <img src="${esc(v.thumb || "")}" alt=""><b>${esc(v.name)}</b><small>${new Date(v.t).toLocaleDateString()}</small></div>`).join("")
+    : '<div class="empty" style="grid-column:1/-1">Nothing saved yet</div>';
+}
+function openSaves() { $("#saveName").value = nextSaveName(); renderSaves(); $("#savesSheet").classList.add("on"); }
+$("#savesBtn").onclick = openSaves;
+$("#openSavesBtn").onclick = () => { $("#sheet").classList.remove("on"); openSaves(); };
+$("#closeSaves").onclick = () => $("#savesSheet").classList.remove("on");
+$("#saveNowBtn").onclick = () => {
+  const name = $("#saveName").value.trim() || nextSaveName();
+  const list = readSaves();
+  list.unshift({id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name, t: Date.now(), thumb: makeThumb(), state: captureState()});
+  if (!writeJSON(SAVES, list)) return;
+  toast(`Saved “${name}”`);
+  $("#saveName").value = nextSaveName();
+  renderSaves();
+};
+$("#saveName").addEventListener("keydown", e => { if (e.key === "Enter") $("#saveNowBtn").click(); });
+$("#savesList").addEventListener("click", e => {
+  const del = e.target.closest("[data-del]");
+  const list = readSaves();
+  if (del) {
+    const i = list.findIndex(v => v.id === del.dataset.del); if (i < 0) return;
+    const [gone] = list.splice(i, 1); writeJSON(SAVES, list); renderSaves();
+    toast(`Deleted “${gone.name}”`, "Undo", () => { const l = readSaves(); l.splice(i, 0, gone); writeJSON(SAVES, l); renderSaves(); });
+    return;
+  }
+  const card = e.target.closest(".sv"); if (!card) return;
+  const v = list.find(x => x.id === card.dataset.id); if (!v) return;
+  const prev = captureState();
+  const missing = applyState(v.state);
+  $("#savesSheet").classList.remove("on");
+  toast(missing ? `Opened “${v.name}” – ${missing} things need a pack from the shop` : `Opened “${v.name}”`, "Undo", () => applyState(prev));
+});
+
+/* ------------------------------------------------------------------ butiken
+   Katalogen store/catalog.json listar paket. Varje paket är en JSON-fil med prylarnas SVG-kod.
+   Betalda paket är krypterade (AES-GCM, nyckel från en upplåsningskod via PBKDF2) och låses upp med koden.
+   Installerade paket sparas i localStorage ("kalejdo.packs.v1") och fungerar sedan utan nät.
+   STORE_REMOTE: sätt till t.ex. "https://example.se/kalejdo/store/" så hämtar appen nya paket därifrån
+   (servern måste då skicka Access-Control-Allow-Origin för store/). Tomt = butiken som följer med sidan/appen. */
+const STORE_REMOTE = "";
+const STORE_LOCAL = "store/";
+const PACKS = "kalejdo.packs.v1", CODES = "kalejdo.codes.v1";
+let catalog = null, storeBase = STORE_LOCAL;
+function slug(t) { return String(t).toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "") || "x"; }
+function pretty(t) { const x = String(t).replace(/[_\-]+/g, " ").trim(); return x.charAt(0).toUpperCase() + x.slice(1); }
+function packCat(packId) { return "pack-" + slug(packId); }
+function registerPack(pk) {
+  const cid = packCat(pk.id);
+  unregisterPack(pk.id, true);
+  const cat = {id: cid, name: pk.name, pack: pk.id, items: []};
+  const seen = new Set();
+  pk.items.forEach((it, i) => {
+    if (!it || typeof it.svg !== "string") return;
+    let key = slug(it.name || "thing_" + i);
+    while (seen.has(key)) key += "_";
+    seen.add(key);
+    const id = `${cid}/${key}`;
+    const p = {id, name: pretty(it.name || key), svg: it.svg, cat: cid,
+      file: URL.createObjectURL(new Blob([it.svg], {type: "image/svg+xml"}))};
+    cat.items.push(p); PROPS[id] = p;
+  });
+  CATS.push(cat);
+  if (pk.keepColours) KEEP_COLOURS.add(cid);
+  if (pk.size) CAT_SIZE[cid] = pk.size;
+}
+function unregisterPack(packId, keepItems) {
+  const cid = packCat(packId), i = CATS.findIndex(c => c.id === cid);
+  if (i < 0) return 0;
+  for (const p of CATS[i].items) { delete PROPS[p.id]; images.delete(p.id); try { URL.revokeObjectURL(p.file); } catch (e) {} }
+  for (const k of [...rasters.keys()]) if (k.startsWith(cid + "/")) rasters.delete(k);
+  CATS.splice(i, 1);
+  let removed = 0;
+  if (!keepItems) for (const L of S.layers) { const n = L.items.length; L.items = L.items.filter(it => PROPS[it.p]); removed += n - L.items.length; }
+  return removed;
+}
+async function loadCatalog() {
+  for (const base of STORE_REMOTE ? [STORE_REMOTE, STORE_LOCAL] : [STORE_LOCAL]) {
+    try {
+      const r = await fetch(base + "catalog.json", {cache: "no-cache"});
+      if (r.ok) { const c = await r.json(); if (c && Array.isArray(c.packs)) { catalog = c; storeBase = base; return c; } }
+    } catch (e) {}
+  }
+  catalog = null;
+  return null;
+}
+function svgURL(svg) { return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg); }
+function renderShop() {
+  if (!catalog) { $("#shopList").innerHTML = '<div class="empty">The shop can’t be reached right now</div>'; return; }
+  const inst = readJSON(PACKS, {});
+  $("#shopList").innerHTML = catalog.packs.map(pk => {
+    const mine = inst[pk.id], paid = pk.price > 0, upd = mine && (pk.version || 1) > (mine.version || 1);
+    const price = mine ? '<span class="price own">Installed</span>'
+      : paid ? `<span class="price">${esc(pk.price)} ${esc(pk.currency || "kr")}</span>` : '<span class="price free">Free</span>';
+    const acts = mine
+      ? `${upd ? '<button class="btn brass" data-act="get">Update</button>' : '<button class="btn" data-act="show">Show</button>'}<button class="btn" data-act="remove">Remove</button>`
+      : paid ? '<button class="btn brass" data-act="buy">Buy</button><button class="btn" data-act="code">I have a code</button>'
+      : '<button class="btn brass" data-act="get">Get</button>';
+    return `<div class="pk" data-id="${esc(pk.id)}">
+      <div class="top"><div class="pv">${(pk.preview || []).slice(0, 4).map(v => `<img src="${svgURL(v)}" alt="">`).join("")}</div>
+        <div class="pi"><b>${esc(pk.name)}</b><small>${esc(pk.items || "")} things${pk.version > 1 ? " · v" + esc(pk.version) : ""}</small><p>${esc(pk.description || "")}</p></div>${price}</div>
+      <div class="acts">${acts}</div>
+      <div class="code"><input class="txt" placeholder="Unlock code" autocomplete="off" autocapitalize="characters"><button class="btn brass" data-act="unlock">Unlock</button></div>
+    </div>`;
+  }).join("") || '<div class="empty">The shop is empty</div>';
+}
+async function openShop() {
+  $("#sheet").classList.remove("on");
+  $("#shopSheet").classList.add("on");
+  $("#shopList").innerHTML = '<div class="empty">Opening the shop…</div>';
+  await loadCatalog();
+  renderShop();
+}
+function b64(t) { return Uint8Array.from(atob(t), c => c.charCodeAt(0)); }
+function normCode(c) { return String(c).toUpperCase().replace(/[^A-Z0-9]/g, ""); }
+async function decryptPack(enc, code) {
+  if (!window.crypto || !crypto.subtle) { toast("Unlocking needs a secure (https) page"); return null; }
+  try {
+    const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(normCode(code)), "PBKDF2", false, ["deriveKey"]);
+    const key = await crypto.subtle.deriveKey({name: "PBKDF2", salt: b64(enc.salt), iterations: enc.iter, hash: "SHA-256"},
+      base, {name: "AES-GCM", length: 256}, false, ["decrypt"]);
+    const plain = await crypto.subtle.decrypt({name: "AES-GCM", iv: b64(enc.iv)}, key, b64(enc.data));
+    return JSON.parse(new TextDecoder().decode(plain));
+  } catch (e) { return null; }
+}
+async function installPack(pk, code) {
+  let data;
+  try {
+    const r = await fetch(storeBase + pk.file, {cache: "no-cache"});
+    if (!r.ok) throw 0;
+    data = await r.json();
+  } catch (e) { toast("Could not download the pack"); return false; }
+  if (data.encrypted) {
+    const codes = readJSON(CODES, {});
+    code = code || codes[pk.id];
+    if (!code) return "code";
+    data = await decryptPack(data.encrypted, code);
+    if (!data) { toast("That code doesn’t fit this pack"); return "code"; }
+    codes[pk.id] = normCode(code); writeJSON(CODES, codes);
+  }
+  if (!data || !Array.isArray(data.items) || !data.items.length) { toast("The pack is broken"); return false; }
+  const rec = {id: pk.id, name: pk.name, version: pk.version || 1, keepColours: !!pk.keepColours, size: pk.size || 0,
+    items: data.items.filter(it => it && typeof it.svg === "string").map(it => ({name: String(it.name || ""), svg: it.svg}))};
+  const inst = readJSON(PACKS, {}); inst[pk.id] = rec;
+  if (!writeJSON(PACKS, inst)) return false;
+  registerPack(rec);
+  renderChips(); showCat();
+  S.layers.forEach(L => L.items.forEach(it => loadImage(it.p)));
+  toast(`${pk.name} is in the library`);
+  return true;
+}
+function openExternal(url) {
+  if (window.KalejdoApp && KalejdoApp.openUrl) { try { if (KalejdoApp.openUrl(url)) return; } catch (e) {} }
+  window.open(url, "_blank", "noopener");
+}
+$("#openShopBtn").onclick = openShop;
+$("#closeShop").onclick = () => $("#shopSheet").classList.remove("on");
+$("#shopList").addEventListener("click", async e => {
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  const card = b.closest(".pk"), pk = catalog && catalog.packs.find(x => x.id === card.dataset.id); if (!pk) return;
+  const act = b.dataset.act;
+  if (act === "code") { card.classList.toggle("coding"); card.querySelector(".code input").focus(); return; }
+  if (act === "buy") {
+    if (pk.buyUrl) openExternal(pk.buyUrl);
+    else toast("Buying isn’t open yet – ask for an unlock code");
+    card.classList.add("coding");
+    return;
+  }
+  if (act === "show") { S.cat = packCat(pk.id); showCat(); save(); $("#shopSheet").classList.remove("on"); return; }
+  if (act === "remove") {
+    const inst = readJSON(PACKS, {}), rec = inst[pk.id], before = JSON.parse(JSON.stringify(S.layers));
+    delete inst[pk.id]; writeJSON(PACKS, inst);
+    const removed = unregisterPack(pk.id);
+    renderChips(); showCat(); refreshLayerUI(); save(); renderShop();
+    toast(`Removed ${pk.name}${removed ? ` (and ${removed} things from the layers)` : ""}`, "Undo", () => {
+      const i2 = readJSON(PACKS, {}); i2[pk.id] = rec; writeJSON(PACKS, i2);
+      registerPack(rec); S.layers = before; renderChips(); showCat(); refreshLayerUI(); save(); renderShop();
+    });
+    return;
+  }
+  if (act === "get" || act === "unlock") {
+    const code = act === "unlock" ? card.querySelector(".code input").value.trim() : "";
+    if (act === "unlock" && !code) { toast("Type the code first"); return; }
+    card.classList.add("busy");
+    const res = await installPack(pk, code);
+    card.classList.remove("busy");
+    if (res === "code") { card.classList.add("coding"); return; }
+    if (res) renderShop();
+  }
+});
+
 document.addEventListener("visibilitychange", () => { if (document.hidden) save(true); });
 window.addEventListener("pagehide", () => save(true));
 window.addEventListener("resize", layout);
@@ -960,14 +1243,18 @@ window.addEventListener("resize", layout);
     $("#loading").textContent = "Could not load the library";
     return;
   }
+  for (const pk of Object.values(readJSON(PACKS, {}))) { try { registerPack(pk); } catch (e) {} }
   const saved = load();
   S = saved || defaultState();
   theta = saved && saved.theta || 0;
   // ta bort saker vars SVG inte längre finns
-  // äldre sparningar: negativ fart betydde motsatt riktning
-  if (S.spin < 0) { S.spin = -S.spin; S.dir = -1; }
+  // äldre sparningar: negativ fart eller S.dir = -1 betydde motsatt riktning för hela kalejdoskopet.
+  // Riktningen finns nu bara per lager, så den vänds på varje lager i stället.
+  let flip = S.dir === -1;
+  if (S.spin < 0) { S.spin = -S.spin; flip = true; }
   if (S.lastSpin < 0) S.lastSpin = -S.lastSpin;
-  if (!S.dir) S.dir = 1;
+  if (flip) S.layers.forEach(L => L.rev = !L.rev);
+  delete S.dir;
   for (const L of S.layers) {
     L.items = L.items.filter(it => PROPS[it.p]);
     if (L.th == null) L.th = L.locked && L.lockTheta != null ? L.lockTheta : theta;

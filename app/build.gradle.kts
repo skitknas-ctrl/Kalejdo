@@ -5,12 +5,13 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
-// Kalejdoskopet ligger i index.html och props/ i repots rot (så att GitHub Pages kan köra det direkt).
+// Kalejdoskopet ligger i index.html, props/ och store/ i repots rot (så att GitHub Pages kan köra det direkt).
 // Här kopieras de in som app-assets vid varje bygge.
 val webAssets = layout.buildDirectory.dir("webassets")
 val copyWeb by tasks.registering(Copy::class) {
     from(rootProject.file("index.html"))
     from(rootProject.file("props")) { into("props") }
+    from(rootProject.file("store")) { into("store") }
     into(webAssets)
 }
 

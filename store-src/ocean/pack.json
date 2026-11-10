@@ -1,0 +1,11 @@
+{
+  "id": "ocean",
+  "name": "Ocean",
+  "description": "Fish, coral, shells and bubbles from the deep blue sea.",
+  "price": 0,
+  "currency": "kr",
+  "version": 1,
+  "buyUrl": "",
+  "keepColours": false,
+  "preview": ["clownfish", "coral", "seahorse", "bubbles"]
+}

@@ -14,13 +14,25 @@ ur ett bibliotek med SVG-filer, i fyra lager som fylls var för sig.
   sexhörningar i bikakemönster. Med 8 tårtbitar blir det åttahörningar med snedställda kvadrater
   emellan. Grannarna är spegelbilder av varandra. Plattornas storlek ställs in under ⋯ (*Pattern size*).
 - **6 / 8** väljer antal tårtbitar.
-- **Snurr-reglaget** styr bara farten. Längst till vänster är stilla. Pilknappen till höger om reglaget
-  växlar riktning, och play/paus-knappen till vänster stoppar och startar rotationen utan att ändra farten.
+- **Snurr-reglaget** styr bara farten. Längst till vänster är stilla. Play/paus-knappen stoppar och startar
+  rotationen utan att ändra farten. Riktningen ställs in per lager.
 - **Skaka** ger allt löst i behållaren en knuff.
 - **Ljus** växlar bakgrundsljuset: Daylight, Warm lamp, Sky, Sunset, Night och Rainbow.
 - **Kameran** sparar bilden i *Bilder/Kalejdo* (i webbläsaren laddas den ner).
 - **Webbversion:** `index.html` + `props/` kan läggas på vilken webbserver som helst. Se `CLAUDE.md`.
   *Tilt to tumble* kräver https, och på iPhone frågar Safari om lov att använda rörelsesensorn.
+
+## Spara och öppna
+
+- Mappknappen (📁+) öppnar **My kaleidoscopes**. Där sparar du kalejdoskopet som det ser ut just nu,
+  med namn och miniatyrbild, och kan öppna det igen senare. Du kan ångra om du öppnar fel. Sparningarna
+  ligger i telefonen/webbläsaren.
+
+## Butiken
+
+- Chipet **Shop** först i biblioteket öppnar butiken, med nya kategorier att installera. Vissa är gratis,
+  andra kostar pengar och låses upp med en kod. Exempel just nu: *Ocean* (gratis) och *Space* (19 kr).
+- Hur paket byggs, krypteras och publiceras står i `CLAUDE.md` och `tools/build_pack.py`.
 
 ## Behållaren och lagren
 

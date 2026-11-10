@@ -11,3 +11,6 @@
 *.apk
 !app/debug.keystore
 release.keystore
+
+# Källfiler och koder för betalda butikspaket – får aldrig hamna i det publika repot
+butik-kalla/

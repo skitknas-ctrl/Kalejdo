@@ -2,6 +2,8 @@ package io.github.skitknasctrl.kalejdo
 
 import android.annotation.SuppressLint
 import android.content.ContentValues
+import android.content.Intent
+import android.net.Uri
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Environment
@@ -72,8 +74,21 @@ class MainActivity : AppCompatActivity() {
         web.loadUrl("https://appassets.androidplatform.net/assets/index.html")
     }
 
-    /** Det enda sidan får anropa från JavaScript: spara en bild i Bilder/Kalejdo. */
+    /** Det sidan får anropa från JavaScript: spara en bild i Bilder/Kalejdo och öppna en köplänk i webbläsaren. */
     inner class AppBridge {
+        @JavascriptInterface
+        fun openUrl(url: String): Boolean {
+            val uri = Uri.parse(url)
+            if (uri.scheme != "https" && uri.scheme != "http") return false
+            runOnUiThread {
+                try {
+                    startActivity(Intent(Intent.ACTION_VIEW, uri).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                } catch (_: Exception) {
+                }
+            }
+            return true
+        }
+
         @JavascriptInterface
         fun saveImage(base64Png: String, fileName: String): Boolean = try {
             val bytes = Base64.decode(base64Png, Base64.DEFAULT)
