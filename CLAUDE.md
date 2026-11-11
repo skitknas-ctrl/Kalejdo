@@ -239,7 +239,12 @@ utgångspunkt för nya prylar i samma stil. Kör dem inte rakt av, eftersom de s
 
 - Appen har en kopia av `store/` inbyggd, så butiken fungerar utan nät men visar bara de paket
   som fanns när appen byggdes.
-- För att appen ska hämta nya paket från webbservern: sätt `STORE_REMOTE` i `index.html` till t.ex.
+- Sedan 2026-11-11 pekar `STORE_REMOTE` på `https://gr8eam.com/Kalejdo/api/store.php?f=` (katalog och paket byggs ur
+  gr8eam_db för kategorier som admin bockat "Erbjud i Android-appens butik"). `loadCatalog()` slår ihop den inbyggda
+  butiken med serverns; varje paket minns sin `base`. Serverns paket är gratis; versionen är en tidsstämpel som växer
+  vid ändringar, så appen visar Update. Hela paketet sparas i localStorage, så håll paketen under ett par MB.
+- Mix colours togs bort 2026-11-11 (Dick): prylar visas alltid i sina egna färger (`raster()` ignorerar hue, `keepColours` är utan verkan).
+- Så här var det tänkt före 2026-11-11: sätt `STORE_REMOTE` i `index.html` till t.ex.
   `"https://<domän>/kalejdo/store/"`, committa och pusha. Servern måste då tillåta CORS för `store/`,
   eftersom appens sidor har ursprunget `https://appassets.androidplatform.net`:
 

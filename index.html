@@ -197,7 +197,6 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
       <div id="chips"></div>
       <div class="opts">
         <span class="grow" id="dropInfo"></span>
-        <button class="tog" id="mixBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="9" r="5"/><circle cx="15" cy="9" r="5"/><circle cx="12" cy="15" r="5"/></svg>Mix colours</button>
         <label class="sz" title="Size of new things"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg><input id="size" type="range" min="60" max="160" step="5"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><circle cx="12" cy="12" r="9"/></svg></label>
       </div>
     </div>
@@ -285,7 +284,7 @@ function defaultLayer(mode) { return {mode, opacity: 1, visible: true, locked: f
 function layerK(L) { return L.locked ? 0 : (L.speed || 1) * (L.rev ? -1 : 1); }
 function layerTheta(L) { return L.th || 0; }
 function defaultState() {
-  return {slices: 6, spin: 50, lastSpin: 50, paused: false, inertia: 4, grav: 100, tile: 55, light: 0, tilt: false, zoom: 72, sel: 0, mix: true, size: 100, cat: "all",
+  return {slices: 6, spin: 50, lastSpin: 50, paused: false, inertia: 4, grav: 100, tile: 55, light: 0, tilt: false, zoom: 72, sel: 0, size: 100, cat: "all",
     layers: [defaultLayer("tumble"), defaultLayer("tumble"), defaultLayer("float"), defaultLayer("fixed")]};
 }
 function load() {
@@ -326,6 +325,7 @@ function loadImage(id) {
   return pr;
 }
 function raster(id, hue) {
+  hue = 0;  // Mix colours togs bort 2026-11-11: prylar visas alltid i sina egna färger
   const key = id + "|" + hue;
   let c = rasters.get(key);
   if (c) return c;
@@ -344,7 +344,7 @@ function raster(id, hue) {
 function catOf(id) { return id.split("/")[0]; }
 function makeItem(id, layer) {
   const base = CAT_SIZE[catOf(id)] || .22;
-  const it = {p: id, h: S.mix && !KEEP_COLOURS.has(catOf(id)) ? Math.round(rnd(0, 360)) : 0, s: base * S.size / 100 * rnd(.88, 1.12),
+  const it = {p: id, h: 0, s: base * S.size / 100 * rnd(.88, 1.12),
     x: 0, y: 0, vx: 0, vy: 0, a: rnd(0, TAU), va: rnd(-1, 1) / inertia(), w: rnd(0, TAU)};
   placeItem(it, layer);
   return it;
@@ -829,7 +829,6 @@ function refreshTop() {
   $("#pauseBtn").innerHTML = running() ? ICON_PAUSE : ICON_PLAY;
   $("#spinBox").classList.toggle("off", !running());
   $("#tile").value = S.tile;
-  $("#mixBtn").classList.toggle("on", S.mix);
   $("#size").value = S.size;
   $("#tiltSw").classList.toggle("on", S.tilt);
   $("#zoom").value = S.zoom;
@@ -902,7 +901,6 @@ $("#pauseBtn").onclick = () => setRunning(!running());
 $("#tile").oninput = e => { S.tile = +e.target.value; sizeChamber(); save(); };
 $("#shakeBtn").onclick = shake;
 $("#lightBtn").onclick = () => { S.light = (S.light + 1) % LIGHTS.length; toast("Light: " + LIGHTS[S.light].name); save(); };
-$("#mixBtn").onclick = () => { S.mix = !S.mix; refreshTop(); save(); toast(S.mix ? "New things get random colours" : "New things keep their own colours"); };
 $("#size").oninput = e => { S.size = +e.target.value; save(); };
 $("#snapBtn").onclick = snapshot;
 $("#moreBtn").onclick = () => $("#sheet").classList.add("on");
@@ -964,14 +962,11 @@ function showCat() {
 function starterMix() {
   const pick = cat => { const c = CATS.find(x => x.id === cat); return c ? c.items.map(i => i.id) : []; };
   const any = arr => arr[Math.floor(Math.random() * arr.length)];
-  const mix = S.mix;
   S.layers = [defaultLayer("tumble"), defaultLayer("tumble"), defaultLayer("float"), defaultLayer("fixed")];
-  S.mix = false;
   const glass = pick("glass"), gems = pick("gems").concat(pick("shapes")), fun = pick("critters").concat(pick("food"), pick("things"), pick("nature"));
   for (let i = 0; i < 28 && glass.length; i++) addItem(any(glass), 0, true);
   for (let i = 0; i < 15 && gems.length; i++) addItem(any(gems), 1, true);
   for (let i = 0; i < 7 && fun.length; i++) addItem(any(fun), 2, true);
-  S.mix = mix;
   S.layers[3].opacity = .9;
   refreshLayerUI(); save();
 }
@@ -1076,9 +1071,9 @@ $("#savesList").addEventListener("click", e => {
    Katalogen store/catalog.json listar paket. Varje paket är en JSON-fil med prylarnas SVG-kod.
    Betalda paket är krypterade (AES-GCM, nyckel från en upplåsningskod via PBKDF2) och låses upp med koden.
    Installerade paket sparas i localStorage ("kalejdo.packs.v1") och fungerar sedan utan nät.
-   STORE_REMOTE: sätt till t.ex. "https://example.se/kalejdo/store/" så hämtar appen nya paket därifrån
-   (servern måste då skicka Access-Control-Allow-Origin för store/). Tomt = butiken som följer med sidan/appen. */
-const STORE_REMOTE = "";
+   STORE_REMOTE: webbserverns butik (gr8eam.com/Kalejdo/api/store.php, kategorier som admin bockat "Erbjud i appens butik").
+   Den slås ihop med den inbyggda butiken (store/): samma id från servern vinner. Servern skickar Access-Control-Allow-Origin. */
+const STORE_REMOTE = "https://gr8eam.com/Kalejdo/api/store.php?f=";
 const STORE_LOCAL = "store/";
 const PACKS = "kalejdo.packs.v1", CODES = "kalejdo.codes.v1";
 let catalog = null, storeBase = STORE_LOCAL;
@@ -1115,14 +1110,23 @@ function unregisterPack(packId, keepItems) {
   return removed;
 }
 async function loadCatalog() {
-  for (const base of STORE_REMOTE ? [STORE_REMOTE, STORE_LOCAL] : [STORE_LOCAL]) {
+  // inbyggd butik + webbserverns butik; varje paket minns varifrån det kom (base)
+  const packs = [];
+  for (const base of STORE_REMOTE ? [STORE_LOCAL, STORE_REMOTE] : [STORE_LOCAL]) {
     try {
       const r = await fetch(base + "catalog.json", {cache: "no-cache"});
-      if (r.ok) { const c = await r.json(); if (c && Array.isArray(c.packs)) { catalog = c; storeBase = base; return c; } }
+      if (!r.ok) continue;
+      const c = await r.json();
+      if (!c || !Array.isArray(c.packs)) continue;
+      for (const pk of c.packs) {
+        const i = packs.findIndex(x => x.id === pk.id);
+        const rec = Object.assign({}, pk, {base});
+        if (i >= 0) packs[i] = rec; else packs.push(rec);
+      }
     } catch (e) {}
   }
-  catalog = null;
-  return null;
+  catalog = packs.length ? {packs} : null;
+  return catalog;
 }
 function svgURL(svg) { return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg); }
 function renderShop() {
@@ -1166,7 +1170,7 @@ async function decryptPack(enc, code) {
 async function installPack(pk, code) {
   let data;
   try {
-    const r = await fetch(storeBase + pk.file, {cache: "no-cache"});
+    const r = await fetch((pk.base || storeBase) + pk.file, {cache: "no-cache"});
     if (!r.ok) throw 0;
     data = await r.json();
   } catch (e) { toast("Could not download the pack"); return false; }
