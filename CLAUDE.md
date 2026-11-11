@@ -220,7 +220,7 @@ utgångspunkt för nya prylar i samma stil. Kör dem inte rakt av, eftersom de s
 - Det finns ingen server som kontrollerar köp. Alla köpare av ett paket får samma kod.
   Riktig köpkontroll per kund kräver en backend (Dick har diskuterat ett PHP + databas-API på VPS:en
   där servern kontrollerar koden och bara då lämnar ut SVG-filerna) eller Google Play Billing.
-- Paket just nu: **Ocean** (gratis, 16 prylar, källa i `store-src/ocean/`) och **Space** (19 kr, 14 prylar,
+- Paket just nu: **Ocean** (gratis, 27 prylar sedan version 2 2026-11-11, ritade av `tools/generators/make_ocean.py`, källa i `store-src/ocean/`) och **Space** (19 kr, 14 prylar,
   källa och kod i `butik-kalla/`).
 
 ### Lägga till eller uppdatera ett paket
