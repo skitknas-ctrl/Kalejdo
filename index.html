@@ -17,6 +17,13 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
 #app{display:flex;flex-direction:column;height:100%;padding-top:env(safe-area-inset-top)}
 #stage{flex:none;position:relative;display:flex;justify-content:center;align-items:center;padding:6px 0}
+/* flikarna Kaleidoscope/Overview (2026-11-11): samma plats, en i taget */
+#stageTabs{align-self:center;margin-top:4px}
+#stageTabs button{padding:5px 14px;font-size:12.5px}
+body.full #stageTabs{display:none}
+body.over #view{display:none}
+body:not(.over) #cellWrap{display:none}
+body.full #cellWrap{display:none}
 #view{display:block;touch-action:none;border-radius:50%}
 #panel{flex:1;min-height:0;display:flex;flex-direction:column;background:var(--panel);
   border-radius:18px 18px 0 0;padding:8px 10px calc(4px + env(safe-area-inset-bottom));gap:8px}
@@ -152,8 +159,10 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 </head>
 <body>
 <div id="app">
+  <div class="seg" id="stageTabs"><button data-v="kal">Kaleidoscope</button><button data-v="over">Overview</button></div>
   <div id="stage">
     <canvas id="view"></canvas>
+    <div id="cellWrap" title="The container: drag to turn · tap a thing to remove it"><canvas id="cell"></canvas></div>
     <div id="hint">Tap: stop/start · double-tap: controls</div>
   </div>
   <div id="panel">
@@ -171,7 +180,6 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     </div>
 
     <div class="row2">
-    <div id="cellWrap" title="The container: drag to turn · tap a thing to remove it"><canvas id="cell"></canvas></div>
     <div id="layerBox">
         <div id="tabs"></div>
         <div class="seg" id="modeSeg"><button data-m="tumble">Tumble</button><button data-m="float">Float</button><button data-m="fixed">Fixed</button></div>
@@ -687,10 +695,10 @@ function layout() {
     view.style.width = w + "px"; view.style.height = h + "px";
     view.width = Math.round(w * fd); view.height = Math.round(h * fd);
   } else {
-    viewCss = Math.floor(Math.min(iw - 12, Math.max(200, ih - 372)));
-    cellCss = Math.max(80, Math.min(108, Math.floor((iw - 20) * .25)));
+    viewCss = Math.floor(Math.min(iw - 12, Math.max(200, ih - 404)));   // 404 = panelen + flikraden
+    cellCss = viewCss;   // översikten är lika stor som kalejdoskopet och ligger bakom en egen flik
     cell.style.width = cell.style.height = cellCss + "px";
-    cell.width = cell.height = Math.round(cellCss * d);
+    cell.width = cell.height = Math.min(1600, Math.round(cellCss * d));
     view.style.width = view.style.height = viewCss + "px";
     view.width = view.height = Math.min(1600, Math.round(viewCss * d));
   }
@@ -716,8 +724,9 @@ function frame(t) {
   while (acc >= STEP && n < 8) { physics(STEP); acc -= STEP; n++; }
   if (n === 8) acc = 0;
   drawCell(hctx, cham.width, false);
-  drawView();
-  if (!document.body.classList.contains("full")) drawCellPreview();
+  const full = document.body.classList.contains("full");
+  if (full || !document.body.classList.contains("over")) drawView();
+  else drawCellPreview();
 }
 
 /* ------------------------------------------------------------------ input */
@@ -899,6 +908,15 @@ $("#spin").oninput = e => {
 
 $("#pauseBtn").onclick = () => setRunning(!running());
 $("#tile").oninput = e => { S.tile = +e.target.value; sizeChamber(); save(); };
+$("#stageTabs").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  document.body.classList.toggle("over", b.dataset.v === "over");
+  document.querySelectorAll("#stageTabs button").forEach(x => x.classList.toggle("on", x === b));
+  try { localStorage.setItem("kalejdo.stageTab", b.dataset.v); } catch (e) {}
+});
+(() => { let v = "kal"; try { v = localStorage.getItem("kalejdo.stageTab") || "kal"; } catch (e) {}
+  document.body.classList.toggle("over", v === "over");
+  document.querySelectorAll("#stageTabs button").forEach(x => x.classList.toggle("on", x.dataset.v === v)); })();
 $("#shakeBtn").onclick = shake;
 $("#lightBtn").onclick = () => { S.light = (S.light + 1) % LIGHTS.length; toast("Light: " + LIGHTS[S.light].name); save(); };
 $("#size").oninput = e => { S.size = +e.target.value; save(); };
