@@ -277,3 +277,9 @@ location /kalejdo/store/ {
   ligger i minnet (`PROPS[id].svg`) i stället för som fil.
 - iPhone: rörelsesensorns axlar har omvänt tecken mot Android (`IOS` i koden), och sensorn kräver
   `requestPermission()` efter ett tryck.
+
+## Flikar Kaleidoscope / Overview (2026-11-11)
+Ovanför scenen ligger segmentet #stageTabs. Kalejdoskopet (#view) och översikten (#cellWrap/#cell) ligger båda i #stage,
+lika stora, och bara en visas (body.over). Valet sparas i localStorage "kalejdo.stageTab". I helskärm döljs flikarna och
+översikten. frame() ritar bara den synliga.
+
