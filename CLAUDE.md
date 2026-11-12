@@ -281,6 +281,6 @@ location /kalejdo/store/ {
 ## Vyval Kaleidoscope / Overview (2026-11-12)
 Kalejdoskopet (#view) och översikten (#cellWrap/#cell) ligger båda i #stage, lika stora, och bara en visas (body.over).
 Valet görs med två ikonknappar (#stageTabs) i scenens nedre vänstra hörn, i tomrummet mellan cirkeln och kvadraten;
-helskärmsknappen #stageFull ligger i nedre högra hörnet. De låg först som flikrad ovanför scenen men hamnade bakom
+helskärmsknappen #stageFull ligger i nedre högra hörnet och döljs när översikten visas (helskärm gäller bara kalejdoskopet). De låg först som flikrad ovanför scenen men hamnade bakom
 statusfältet på Dicks telefon. Valet sparas i localStorage "kalejdo.stageTab". I helskärm döljs knapparna och översikten.
 frame() ritar bara den synliga.
