@@ -1327,7 +1327,7 @@ function renderSaves() {
 }
 function openSaves() { $("#saveName").value = nextSaveName(); renderSaves(); loadPub(); $("#savesSheet").classList.add("on"); }
 /* Delning (2026-11-12, kräver Pro): kalejdoskopet sparas på kontot (api/konto.php delat_spara) och får länken
-   gr8eam.com/Kalejdo/?k=<nyckel>, som skickas vidare med Androids delningsruta. Länken slutar fungera när prenumerationen upphör. */
+   kalejdo.app/?k=<nyckel>, som skickas vidare med Androids delningsruta. Länken slutar fungera när prenumerationen upphör. */
 function makeShareImage() {
   const W = 1200, H = 630, c = document.createElement("canvas"); c.width = W; c.height = H;
   const x = c.getContext("2d");
@@ -1402,14 +1402,14 @@ $("#savesList").addEventListener("click", e => {
 });
 
 /* ------------------------------------------------------------------ Pro (2026-11-12, ersätter butiken)
-   Två nivåer: gratis (samma kategorier som besökare ser på gr8eam.com/Kalejdo) och Pro (månadsprenumeration i Google Play,
+   Två nivåer: gratis (samma kategorier som besökare ser på kalejdo.app) och Pro (månadsprenumeration i Google Play,
    första månaden gratis för nya prenumeranter). När prenumerationen upphör svarar servern pro = false och Pro-kategorierna,
    det egna biblioteket, delningen och den levande bakgrunden låses igen.
    Appen skapar ett anonymt konto på servern (id + hemlighet i localStorage). Köpet sköts av Android-skalet
    (KalejdoApp.proBuy), som skickar köpkvittot hit (window.kalejdoPurchase); servern kontrollerar det mot Google Play
    och märker kontot som Pro. Biblioteket hämtas sedan för kontots nivå: Pro-kategorierna och det egna biblioteket
    (som byggs på webben) följer med. Webben låses upp genom att appen skannar sidans QR-kod (KalejdoApp.scanQr). */
-const LIB_URL = "https://gr8eam.com/Kalejdo/", LIB_CACHE = "kalejdo.lib.v1";
+const LIB_URL = "https://kalejdo.app/", LIB_CACHE = "kalejdo.lib.v1";
 const KONTO = "kalejdo.konto.v1", PROKEY = "kalejdo.pro.v1";
 let PRO = false, proPrice = "", proTrial = false;
 try { PRO = localStorage.getItem(PROKEY) === "1"; } catch (e) {}
@@ -1439,7 +1439,7 @@ async function asKonto(action, data) {
 function refreshPro() {
   $("#openProBtn").textContent = PRO ? "Sign in on the web" : "Kalejdo Pro";
   $("#proLead").textContent = PRO
-    ? "Pro is active. To use Pro in a web browser too, open gr8eam.com/Kalejdo on a computer, choose More and Show QR code, then scan the code here. On the web you can also build your own library of pictures – it shows up in this app."
+    ? "Pro is active. To use Pro in a web browser too, open kalejdo.app on a computer, choose More and Show QR code, then scan the code here. On the web you can also build your own library of pictures – it shows up in this app."
     : "All libraries, your own library of pictures, sharing, live wallpaper, and the same libraries in a web browser. "
       + (proTrial ? "The first month is free, then " : "") + (proPrice ? proPrice + " per month. " : (proTrial ? "a monthly subscription. " : "Monthly subscription. ")) + "Cancel any time in Google Play.";
   $("#proBuy").hidden = $("#proRestore").hidden = PRO;
@@ -1505,7 +1505,7 @@ window.addEventListener("pagehide", () => save(true));
 window.addEventListener("resize", layout);
 
 /* ------------------------------------------------------------------ start */
-/* Biblioteket hämtas från webben vid varje start, för kontots nivå (gratis eller Pro), så att admin på gr8eam.com styr
+/* Biblioteket hämtas från webben vid varje start, för kontots nivå (gratis eller Pro), så att admin på kalejdo.app styr
    vilka kategorier som syns. Går inte kontot att nå hämtas gratisbiblioteket öppet. Utan nät används senast hämtade
    biblioteket, och i sista hand de inbyggda gratiskategorierna i props/index.json.
    Inbyggda prylar som inte längre syns på webben behålls dolt (it.hidden) så att sparade kalejdoskop fortsätter fungera. */

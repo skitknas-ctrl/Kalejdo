@@ -342,3 +342,7 @@ frame() ritar bara den synliga.
   INTE PROVAD PÅ TELEFON när den skrevs.
 - Samma gränssnittsändringar som webben: standardlager, värden vid reglagen, bakgrundsfärg i panelen, Duplicate,
   10 slumpade saker på varje lager.
+- 2026-11-12 (egen domän): webben har flyttat från gr8eam.com/Kalejdo till **https://kalejdo.app/** (egen Docker-stack och
+  databas kalejdo_db på VPS:en, lokal kod `C:\Users\dick\kod\kalejdo.app`). `LIB_URL` pekar dit; API, delningslänkar
+  (`https://kalejdo.app/?k=…`), QR-inloggning och integritetssidan (`https://kalejdo.app/privacy.html`) ligger där.
+  Äldre rader ovan som nämner gr8eam.com/Kalejdo gäller numera kalejdo.app. Paketnamnet `com.gr8eam.kalejdo` är oförändrat.

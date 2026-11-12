@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.VIBRATE" />
-    <!-- biblioteket och Pro-kontot hämtas från gr8eam.com -->
+    <!-- biblioteket och Pro-kontot hämtas från kalejdo.app -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-feature android:name="android.software.live_wallpaper" android:required="false" />
 
