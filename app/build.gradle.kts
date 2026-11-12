@@ -19,7 +19,8 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "io.github.skitknasctrl.kalejdo"
+        // Paketnamnet på Google Play (Gr8eam AB), valt av Dick 2026-11-12. Går inte att ändra efter första uppladdningen.
+        applicationId = "com.gr8eam.kalejdo"
         minSdk = 29 // Android 10: bilder kan sparas i Bilder/ utan behörighetsfråga
         targetSdk = 36
         // CI skickar -PbuildNumber=<körningsnummer>; testbyggen får då versionen 0.1.0-test.<n>
