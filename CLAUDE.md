@@ -297,3 +297,13 @@ frame() ritar bara den synliga.
 - 2026-11-12 (helskärm i appen): KalejdoApp.setFullscreen(on) i MainActivity döljer/visar systemfälten (statusfält +
   navigeringsknappar) med WindowInsetsControllerCompat; svep från kanten visar dem tillfälligt. Anropas från toggleFull().
   Insets-lyssnaren ger då 0 i padding så sidan får hela skärmen. Helskärmsmenyns knapp ligger 14 px + safe-area från kanten.
+- 2026-11-12 (omgång 3, webb + app): helskärmsmenyn har reglage Hue/Saturation/Lightness för den sparade bakgrundsfärgen
+  (plus färgrutan); reglagen skrivs inte om under drag. Ögat har tre lägen i S.view ("all"/"only"/"others", ej i sparningar;
+  layerShown(i)); ikonen eyeIcon() visar fyra ögon med valt lagers öga på mässing. L.visible används inte längre.
+  Lägesknappen #modeBtn (Tumble/Fixed, mässing) ersätter #modeSeg och ligger i knappraden, som nu är 38 px hög:
+  öga, stopp, riktning, läge, fyll, töm | töm alla.
+- 2026-11-12 (biblioteket från webben): loadLibrary() hämtar https://gr8eam.com/Kalejdo/api/bibliotek.php?action=index vid varje
+  start (8 s timeout; API:et och svg.php svarar med Access-Control-Allow-Origin: *). Admin på webben styr via Synlig vilka
+  kategorier appen visar. Utan nät: senast hämtade index i localStorage kalejdo.lib.v1, annars props/index.json. SVG:er cachas
+  i Cache API "kalejdo-svg" (fetchSvg). Inbyggda prylar som inte finns i webbindexet läggs in dolt (it.hidden) så att sparade
+  kalejdoskop fungerar; de visas inte i biblioteket eller i "Fill". Butikspaket (PACKS) fungerar som förut.

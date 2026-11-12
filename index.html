@@ -51,7 +51,7 @@ body.full #view{position:absolute;left:0;top:0;border-radius:0}
 body.full #fullMenuBtn{display:grid}
 #fullMenuBtn svg{width:22px;height:22px}
 #fullMenu{display:none;position:absolute;right:14px;top:calc(60px + env(safe-area-inset-top));z-index:4;background:#2c2839;border:1px solid var(--line);border-radius:12px;padding:6px;
-  flex-direction:column;min-width:210px;box-shadow:0 6px 20px #0008}
+  flex-direction:column;min-width:240px;box-shadow:0 6px 20px #0008}
 body.full #fullMenu.on{display:flex}
 #fullMenu button{text-align:left;padding:9px 12px;border-radius:8px}
 #fullMenu button:hover{background:var(--panel2)}
@@ -81,7 +81,6 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 #ctx label b{color:var(--text)}
 #layerBox{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
 #layerBox .lrow{gap:4px}
-#layerBox .lrow .ib{width:32px;height:32px}
 #layerBox .sliders{gap:8px}
 #layerBox .op b{min-width:30px}
 #tabs{display:flex;gap:4px}
@@ -92,11 +91,11 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 #lockBtn.off svg{opacity:.4;filter:grayscale(1)}
 #tabs button.on{border-color:var(--sel)}
 #tabs button.hidden b{opacity:.4;text-decoration:line-through}
-#modeSeg{width:100%}
-#modeSeg button{flex:1;font-size:12px;padding:6px 4px}
 .lrow{display:flex;gap:6px;align-items:center}
-.lrow .ib{width:34px;height:34px}
-.lrow .ib svg{width:19px;height:19px}
+/* knappraden för valt lager (2026-11-12): samma höjd som skakknappen; lägesknappen Tumble/Fixed i mässing */
+.lrow .ib{width:38px;height:38px}
+.lrow .ib svg{width:22px;height:22px}
+.lrow .ib.mode{width:auto;padding:0 12px;font-weight:600;font-size:12.5px;background:var(--brass);color:#2a1a00}
 .op{flex:1;display:flex;align-items:center;gap:4px;min-width:0}
 .op svg{width:16px;height:16px;flex:none;color:var(--dim)}
 .lrow .gap{flex:1}
@@ -195,6 +194,9 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     <div id="fullMenu">
       <button id="fmSave">Save picture (seamless tile)</button>
       <label><b>Background colour</b><input type="color" id="fmColor"></label>
+      <label><b>Hue</b><input type="range" id="fmHue" min="0" max="360" step="1"></label>
+      <label><b>Saturation</b><input type="range" id="fmSat" min="0" max="100" step="1"></label>
+      <label><b>Lightness</b><input type="range" id="fmLum" min="0" max="100" step="1"></label>
       <label><b>Centre brightness</b><input type="range" id="fmLight" min="0" max="100" step="1"></label>
       <button id="fmPreset">Light</button>
       <button id="fmExit">Exit full-screen</button>
@@ -216,14 +218,14 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     <div class="row2">
     <div id="layerBox">
         <div id="tabs"></div>
-        <div class="seg" id="modeSeg"><button data-m="tumble">Tumble</button><button data-m="fixed">Fixed</button></div>
         <div class="lrow">
-          <button class="ib" id="eyeBtn" title="Show/hide layer"></button>
+          <button class="ib" id="eyeBtn" title="Which layers are shown"></button>
           <button class="ib" id="lockBtn" title="Lock this layer: it stops turning"></button>
           <button class="ib" id="revBtn" title="Turn this layer the opposite way"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v4h-4"/></svg></button>
-          <span class="gap"></span>
+          <button class="ib mode" id="modeBtn" title="Tumble: things fall and roll · Fixed: things stay put">Tumble</button>
           <button class="ib" id="fillBtn" title="Fill with random things"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.3" fill="currentColor"/><circle cx="15" cy="15" r="1.3" fill="currentColor"/><circle cx="15" cy="9" r="1.3" fill="currentColor"/><circle cx="9" cy="15" r="1.3" fill="currentColor"/></svg></button>
           <button class="ib" id="clearBtn" title="Empty layer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button>
+          <span class="gap"></span>
           <button class="ib" id="clearAllBtn" title="Empty all layers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8h12M6 8V5.5h4V8M3.5 8l.9 12h7.2l.9-12M7.3 11.5v5.5M10.7 11.5v5.5"/><path d="M14.5 7.5h2.3l-.7 10.5h-1.6M17.5 6.5h2.3l-.7 10.5h-1.6M20.5 5.5h2.3l-.7 10.5h-1.6" opacity=".6"/></svg></button>
         </div>
         <div class="sliders">
@@ -309,6 +311,22 @@ const ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="
 const ICON_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5l11 7-11 7z"/></svg>';
 const STOP_SIGN = '<svg viewBox="0 0 24 24"><polygon points="7.4,1 16.6,1 23,7.4 23,16.6 16.6,23 7.4,23 1,16.6 1,7.4" fill="#fff"/><polygon points="8,2.6 16,2.6 21.4,8 21.4,16 16,21.4 8,21.4 2.6,16 2.6,8" fill="#d7141a"/><text x="12" y="14.6" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="900" font-size="7.2" fill="#fff" letter-spacing="-.2">STOP</text></svg>';
 const STOP_MINI = '<svg viewBox="0 0 24 24"><polygon points="7,1 17,1 23,7 23,17 17,23 7,23 1,17 1,7" fill="#d7141a" stroke="#fff" stroke-width="2"/></svg>';
+/* Ögat (2026-11-12) har tre lägen i S.view: "all" = alla lager, "only" = bara valt lager, "others" = alla utom valt.
+   Ikonen visar fyra ögon (ett per lager), det valda lagrets öga på mässingsbakgrund. */
+function layerShown(i) { const v = S.view || "all"; return v === "all" || (v === "only") === (i === S.sel); }
+function eyeIcon(sel, view) {
+  const pos = [[6.5, 7], [17.5, 7], [6.5, 17], [17.5, 17]];
+  let out = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">';
+  pos.forEach(([x, y], i) => {
+    const open = view === "all" || (view === "only") === (i === sel), me = i === sel;
+    if (me) out += `<rect x="${x - 5.5}" y="${y - 5.2}" width="11" height="10.4" rx="3" fill="var(--brass)" stroke="none"/>`;
+    const col = me ? ' stroke="#2a1a00"' : '';
+    if (open) out += `<path${col} d="M${x - 4.3} ${y}c2.9-4.2 5.7-4.2 8.6 0c-2.9 4.2-5.7 4.2-8.6 0z"/><circle cx="${x}" cy="${y}" r="1.3" fill="${me ? "#2a1a00" : "currentColor"}" stroke="none"/>`;
+    else out += `<path${col} d="M${x - 4.3} ${y - 1.2}c2.9 4.2 5.7 4.2 8.6 0"/>`;
+  });
+  return out + "</svg>";
+}
+const VIEW_NAMES = {all: "all layers", only: "only this layer", others: "the other layers"};
 const EYE_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
 const EYE_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" opacity=".4"/><path d="M4 4l16 16"/></svg>';
 
@@ -364,10 +382,20 @@ function save(now) {
 const images = new Map();   // prop id -> Promise<HTMLImageElement|null>
 const rasters = new Map();  // id|hue -> canvas
 const RASTER = 192;
+// SVG-filerna från webben sparas i Cache API så att de finns kvar utan nät (v-parametern i adressen byts när prylen ändras)
+async function fetchSvg(url) {
+  let c = null;
+  try { c = window.caches ? await caches.open("kalejdo-svg") : null; } catch (e) {}
+  if (c) { try { const hit = await c.match(url); if (hit) return hit.text(); } catch (e) {} }
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(r.status);
+  if (c) { try { await c.put(url, r.clone()); } catch (e) {} }
+  return r.text();
+}
 function loadImage(id) {
   if (images.has(id)) return images.get(id);
   const p = PROPS[id];
-  const src = !p ? null : p.svg ? Promise.resolve(p.svg) : fetch(p.file).then(r => r.text());
+  const src = !p ? null : p.svg ? Promise.resolve(p.svg) : fetchSvg(p.file);
   const pr = !src ? Promise.resolve(null) : src.then(t => {
     // SVG utan width/height får ingen naturlig storlek – lägg till det
     const head = t.match(/<svg[^>]*>/i);
@@ -437,7 +465,7 @@ function addItem(id, li = S.sel, quiet) {
   if (L.items.length >= MAX_PER_LAYER) { if (!quiet) toast(`Layer ${li + 1} is full (${MAX_PER_LAYER} things)`); return false; }
   loadImage(id);
   L.items.push(makeItem(id, L));
-  if (!L.visible && !quiet) { L.visible = true; }
+  if (!layerShown(li)) S.view = "all";   // en nylagd sak ska synas
   refreshLayerUI(); save();
   return true;
 }
@@ -611,7 +639,7 @@ function drawCell(ctx, px, dim) {
   backdrop(ctx, R);
   const ct = Math.cos(theta), st = Math.sin(theta);
   S.layers.forEach((L, li) => {
-    if (!L.visible || !L.items.length) return;
+    if (!layerShown(li) || !L.items.length) return;
     ctx.globalAlpha = L.opacity * (dim && li !== S.sel ? .3 : 1);
     const fixed = isFixed(L), lt = layerTheta(L), ct = Math.cos(lt), st = Math.sin(lt);
     for (const it of L.items) {
@@ -990,13 +1018,14 @@ function tabSpeed(L) {
 }
 function refreshTabs() {
   $("#tabs").innerHTML = S.layers.map((L, i) =>
-    `<button data-i="${i}" class="${i === S.sel ? "on" : ""} ${L.visible ? "" : "hidden"}"><b>${i + 1}</b><small>${L.items.length}${L.locked ? STOP_MINI : tabSpeed(L)}</small></button>`).join("");
+    `<button data-i="${i}" class="${i === S.sel ? "on" : ""} ${layerShown(i) ? "" : "hidden"}"><b>${i + 1}</b><small>${L.items.length}${L.locked ? STOP_MINI : tabSpeed(L)}</small></button>`).join("");
 }
 function refreshLayerUI() {
   refreshTabs();
   const L = S.layers[S.sel];
-  document.querySelectorAll("#modeSeg button").forEach(b => b.classList.toggle("on", b.dataset.m === L.mode));
-  $("#eyeBtn").innerHTML = L.visible ? EYE_ON : EYE_OFF;
+  $("#modeBtn").textContent = L.mode === "fixed" ? "Fixed" : "Tumble";
+  $("#eyeBtn").innerHTML = eyeIcon(S.sel, S.view || "all");
+  $("#eyeBtn").title = "Showing " + VIEW_NAMES[S.view || "all"] + " · tap to change";
   $("#lockBtn").innerHTML = STOP_SIGN;
   $("#lockBtn").classList.toggle("off", !L.locked);
   $("#revBtn").classList.toggle("on", !!L.rev);
@@ -1010,7 +1039,7 @@ $("#tabs").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   S.sel = +b.dataset.i; refreshLayerUI(); save();
 });
-$("#modeSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (b) setMode(S.sel, b.dataset.m); });
+$("#modeBtn").onclick = () => setMode(S.sel, S.layers[S.sel].mode === "fixed" ? "tumble" : "fixed");
 $("#revBtn").onclick = () => {
   const L = S.layers[S.sel]; L.rev = !L.rev; refreshLayerUI(); save();
   toast(L.rev ? `Layer ${S.sel + 1} turns the opposite way` : `Layer ${S.sel + 1} turns with the main slider`);
@@ -1021,10 +1050,13 @@ $("#speed").oninput = e => {
   refreshTabs(); save();
 };
 $("#lockBtn").onclick = () => setLocked(S.sel, !S.layers[S.sel].locked);
-$("#eyeBtn").onclick = () => { const L = S.layers[S.sel]; L.visible = !L.visible; refreshLayerUI(); save(); };
+$("#eyeBtn").onclick = () => {
+  S.view = {all: "only", only: "others", others: "all"}[S.view || "all"];
+  refreshLayerUI(); save(); toast("Showing " + VIEW_NAMES[S.view]);
+};
 $("#opacity").oninput = e => { S.layers[S.sel].opacity = e.target.value / 100; save(); };
 $("#fillBtn").onclick = () => {
-  const pool = (S.cat === "all" ? Object.keys(PROPS) : (CATS.find(c => c.id === S.cat) || {items: []}).items.map(i => i.id));
+  const pool = (S.cat === "all" ? Object.keys(PROPS).filter(id => !PROPS[id].hidden) : (CATS.find(c => c.id === S.cat) || {items: []}).items.map(i => i.id));
   let n = 0;
   for (let i = 0; i < 10 && pool.length; i++) if (addItem(pool[Math.floor(Math.random() * pool.length)], S.sel, true)) n++;
   toast(n ? `Added ${n} random things to layer ${S.sel + 1}` : `Layer ${S.sel + 1} is full`);
@@ -1085,17 +1117,25 @@ $("#emptyAllBtn").onclick = () => { $("#sheet").classList.remove("on"); emptyAll
 const fullMenu = $("#fullMenu");
 function closeFullMenu() { fullMenu.classList.remove("on"); }
 function refreshFullMenu() {
-  const bg = S.bg || {c: "#ffffff", l: 92};
+  const bg = S.bg || {c: "#ffffff", l: 92}, [h, sat, l] = hexToHsl(bg.c);
   $("#fmColor").value = bg.c; $("#fmLight").value = bg.l;
+  $("#fmHue").value = Math.round(h); $("#fmSat").value = Math.round(sat * 100); $("#fmLum").value = Math.round(l * 100);
   $("#fmPreset").textContent = "Light: " + (S.light < 0 ? "custom colour" : LIGHTS[S.light].name) + " \u203a";
 }
-function setBg(patch) { S.bg = Object.assign({c: "#ffffff", l: 92}, S.bg, patch); S.light = -1; refreshFullMenu(); save(); }
+// reglagen uppdateras inte medan man drar i dem (bara färgrutan), så den sparade färgen går att justera i små steg
+function setBg(patch) {
+  S.bg = Object.assign({c: "#ffffff", l: 92}, S.bg, patch); S.light = -1; save();
+  $("#fmColor").value = S.bg.c;
+  $("#fmPreset").textContent = "Light: custom colour \u203a";
+}
+function bgFromSliders() { setBg({c: hslToHex(+$("#fmHue").value, +$("#fmSat").value / 100, +$("#fmLum").value / 100)}); }
+$("#fmHue").oninput = $("#fmSat").oninput = $("#fmLum").oninput = bgFromSliders;
 $("#fullMenuBtn").onclick = () => { refreshFullMenu(); fullMenu.classList.toggle("on"); };
 view.addEventListener("pointerdown", closeFullMenu);
 $("#fmSave").onclick = () => { closeFullMenu(); snapshot(); };
 $("#fmExit").onclick = () => { closeFullMenu(); toggleFull(); };
 $("#fmPreset").onclick = () => { S.light = (S.light + 1) % LIGHTS.length; refreshFullMenu(); toast("Light: " + LIGHTS[S.light].name); save(); };
-$("#fmColor").oninput = e => setBg({c: e.target.value});
+$("#fmColor").oninput = e => { setBg({c: e.target.value}); const [h, sat, l] = hexToHsl(S.bg.c); $("#fmHue").value = Math.round(h); $("#fmSat").value = Math.round(sat * 100); $("#fmLum").value = Math.round(l * 100); };
 $("#fmLight").oninput = e => setBg({l: +e.target.value});
 $("#starterBtn").onclick = () => { starterMix(); $("#sheet").classList.remove("on"); toast("Starter mix"); };
 
@@ -1130,7 +1170,7 @@ function buildLibrary() {
 function showCat() {
   if (S.cat !== "all" && !CATS.some(c => c.id === S.cat)) S.cat = "all";
   document.querySelectorAll("#chips .chip").forEach(b => b.classList.toggle("on", b.dataset.c === S.cat));
-  const items = S.cat === "all" ? Object.values(PROPS) : CATS.find(c => c.id === S.cat).items;
+  const items = S.cat === "all" ? Object.values(PROPS).filter(it => !it.hidden) : CATS.find(c => c.id === S.cat).items;
   $("#lib").innerHTML = items.map(it => `<button data-id="${esc(it.id)}" title="${esc(it.name)}"><img src="${esc(it.file)}" alt="${esc(it.name)}" loading="lazy" decoding="async"></button>`).join("");
   $("#lib").scrollTop = 0;
 }
@@ -1422,11 +1462,36 @@ window.addEventListener("pagehide", () => save(true));
 window.addEventListener("resize", layout);
 
 /* ------------------------------------------------------------------ start */
+/* Biblioteket (2026-11-12): hämtas från webben vid varje start, så att admin på gr8eam.com styr vilka kategorier
+   som syns i appen (Synlig). Utan nät används senast hämtade biblioteket, och i sista hand det inbyggda props/index.json.
+   Inbyggda prylar som inte längre syns på webben behålls dolt (it.hidden) så att sparade kalejdoskop fortsätter fungera. */
+const LIB_URL = "https://gr8eam.com/Kalejdo/", LIB_CACHE = "kalejdo.lib.v1";
+async function loadLibrary() {
+  let idx = null, src = "web";
+  try {
+    const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 8000);
+    idx = await fetch(LIB_URL + "api/bibliotek.php?action=index", {cache: "no-store", signal: ctl.signal})
+      .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+    clearTimeout(t);
+    if (!Array.isArray(idx.categories)) throw new Error("bad index");
+    for (const c of idx.categories) for (const it of c.items) if (!/^https?:/.test(it.file)) it.file = LIB_URL + it.file;
+    try { localStorage.setItem(LIB_CACHE, JSON.stringify(idx)); } catch (e) {}
+  } catch (e) { idx = readJSON(LIB_CACHE, null); src = idx ? "cache" : "bundled"; }
+  const bundled = await fetch("props/index.json").then(r => r.json()).catch(() => ({categories: []}));
+  if (!idx) idx = bundled;
+  CATS = idx.categories || [];
+  for (const c of CATS) {
+    if (typeof c.size === "number" && c.size > 0) CAT_SIZE[c.id] = c.size;
+    if (c.keep === true) KEEP_COLOURS.add(c.id); else if (c.keep === false) KEEP_COLOURS.delete(c.id);
+    for (const it of c.items) { it.cat = c.id; PROPS[it.id] = it; }
+  }
+  for (const c of bundled.categories || []) for (const it of c.items) if (!PROPS[it.id]) { it.cat = c.id; it.hidden = true; PROPS[it.id] = it; }
+  return src;
+}
 (async function start() {
   try {
-    const idx = await fetch("props/index.json").then(r => r.json());
-    CATS = idx.categories || [];
-    for (const c of CATS) for (const it of c.items) { it.cat = c.id; PROPS[it.id] = it; }
+    await loadLibrary();
+    if (!CATS.length) throw new Error("empty");
   } catch (e) {
     $("#loading").textContent = "Could not load the library";
     return;
