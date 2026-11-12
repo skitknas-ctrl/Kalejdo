@@ -55,7 +55,16 @@ body.full #fullMenuBtn{display:grid}
 body.full #fullMenu.on{display:flex}
 #fullMenu button{text-align:left;padding:9px 12px;border-radius:8px}
 #fullMenu button:hover{background:var(--panel2)}
-#fullMenu label{display:flex;flex-direction:column;gap:4px;padding:8px 12px;font-size:12px;color:var(--dim)}
+/* reglage i menyer (2026-11-12): namn till vänster, värdet till höger, reglaget under */
+#fullMenu label,#bgPop label,#ctx label{display:grid;grid-template-columns:1fr auto;gap:4px 8px;padding:8px 12px;font-size:12px;color:var(--dim)}
+#fullMenu label input,#bgPop label input,#ctx label input{grid-column:1/-1;grid-row:2}
+#bgPop{position:fixed;z-index:8;background:#2c2839;border:1px solid var(--line);border-radius:12px;padding:6px;min-width:250px;box-shadow:0 6px 20px #0008;display:none}
+#bgPop.on{display:block}
+#bgPop h4{margin:6px 12px 0;font-size:12px;color:var(--text)}
+#bgPop label b{color:var(--text)}
+/* värdet bredvid varje reglage */
+.rv{font-size:12px;font-weight:700;color:var(--brass)!important;min-width:34px;text-align:right;font-variant-numeric:tabular-nums;flex:none}
+label .rv{grid-row:1;grid-column:2}
 #fullMenu label b{color:var(--text)}
 #fullMenu hr{border:0;border-top:1px solid var(--line);margin:4px 6px}
 #fullMenu h4{margin:6px 12px 0;font-size:12px;color:var(--text)}
@@ -81,7 +90,6 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 #ctx{position:fixed;z-index:8;background:#2c2839;border:1px solid var(--line);border-radius:10px;padding:4px;box-shadow:0 6px 20px #0008;display:none;flex-direction:column;min-width:150px}
 #ctx.on{display:flex}
 #ctx button{text-align:left;padding:8px 12px;border-radius:7px}
-#ctx label{display:flex;flex-direction:column;gap:4px;padding:8px 12px;font-size:12px;color:var(--dim)}
 #ctx label b{color:var(--text)}
 #layerBox{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
 #layerBox .lrow{gap:4px}
@@ -121,7 +129,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 .tog{display:flex;align-items:center;gap:5px;padding:4px 8px;border-radius:14px;background:var(--panel2);color:var(--dim);flex:none}
 .tog.on{color:#2a1a00;background:#ffd28a}
 .tog svg{width:15px;height:15px}
-.sz{display:flex;align-items:center;gap:2px;width:96px;flex:none}
+.sz{display:flex;align-items:center;gap:2px;width:150px;flex:none}
 #lib{flex:1;min-height:0;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));
   gap:6px;align-content:start;padding-bottom:6px;scrollbar-width:thin}
 #lib button{aspect-ratio:1;border-radius:12px;background:var(--panel2);display:grid;place-items:center;transition:transform .15s}
@@ -181,6 +189,11 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 #toast button{color:var(--brass);font-weight:700}
 #loading{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg);z-index:20;font-size:22px;letter-spacing:.2em;color:var(--brass)}
 #loading.gone{display:none}
+body.wall #fullMenuBtn,body.wall #hint,body.wall #toast,body.wall #loading,body.wall #stageFull{display:none!important}
+.sv .lnk{position:absolute;top:3px;left:3px;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:var(--dim);background:#0004}
+.sv .lnk svg{width:16px;height:16px}
+#pubList{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:10px}
+.sheet h3{margin:6px 0 0;font-size:14px;color:var(--brass)}
 </style>
 </head>
 <body>
@@ -197,11 +210,11 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     <button id="fullMenuBtn" title="Menu"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
     <div id="fullMenu">
       <label><b>Zoom</b><input type="range" id="fmZoom" min="25" max="100" step="1"></label>
-      <h4>Background colour</h4>
+      <div id="bgCtl"><h4>Background colour</h4>
       <label>Hue<input type="range" id="fmHue" min="0" max="360" step="1"></label>
       <label>Saturation<input type="range" id="fmSat" min="0" max="100" step="1"></label>
       <label>Lightness<input type="range" id="fmLum" min="0" max="100" step="1"></label>
-      <label>Centre brightness<input type="range" id="fmLight" min="0" max="100" step="1"></label>
+      <label>Centre brightness<input type="range" id="fmLight" min="0" max="100" step="1"></label></div>
       <button id="fmSave">Save picture (seamless tile)</button>
       <hr>
       <button id="fmExit">Exit full-screen</button>
@@ -215,7 +228,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
         <input id="spin" type="range" min="0" max="100" step="1">
       </div>
       <button class="ib" id="shakeBtn" title="Shake"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="5" width="10" height="14" rx="2"/><path d="M3 9v6M21 9v6M5 7v10M19 7v10" opacity=".55"/></svg></button>
-      <button class="ib" id="lightBtn" title="Light"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+      <button class="ib" id="lightBtn" title="Background colour"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
       <button class="ib" id="savesBtn" title="My kaleidoscopes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 10v6M9 13h6" stroke-linecap="round"/></svg></button>
       <button class="ib" id="moreBtn" title="More"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
     </div>
@@ -231,13 +244,14 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
           <button class="ib" id="fillBtn" title="Fill with random things"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.3" fill="currentColor"/><circle cx="15" cy="15" r="1.3" fill="currentColor"/><circle cx="15" cy="9" r="1.3" fill="currentColor"/><circle cx="9" cy="15" r="1.3" fill="currentColor"/></svg></button>
           <button class="ib" id="clearBtn" title="Empty layer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button>
           <span class="gap"></span>
+          <button class="ib" id="fillAllBtn" title="Add 10 random things to every layer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="13" height="13" rx="2.5"/><circle cx="6" cy="11" r="1.1" fill="currentColor"/><circle cx="11" cy="16" r="1.1" fill="currentColor"/><circle cx="11" cy="11" r="1.1" fill="currentColor"/><circle cx="6" cy="16" r="1.1" fill="currentColor"/><path d="M17.5 6.5v11M20 5.5v11M22.5 4.5v11" opacity=".6"/></svg></button>
           <button class="ib" id="clearAllBtn" title="Empty all layers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8h12M6 8V5.5h4V8M3.5 8l.9 12h7.2l.9-12M7.3 11.5v5.5M10.7 11.5v5.5"/><path d="M14.5 7.5h2.3l-.7 10.5h-1.6M17.5 6.5h2.3l-.7 10.5h-1.6M20.5 5.5h2.3l-.7 10.5h-1.6" opacity=".6"/></svg></button>
         </div>
         <div class="sliders">
           <label class="op" title="Opacity"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a9 9 0 1 0 0 18z"/><path d="M12 3a9 9 0 0 1 0 18" fill="none" stroke="currentColor" stroke-width="2"/></svg>
             <input id="opacity" type="range" min="15" max="100" step="1"></label>
           <label class="op" id="speedBox" title="Speed of this layer compared with the main slider"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 18a9 9 0 1 1 16 0"/><path d="M12 15l4-5"/></svg>
-            <input id="speed" type="range" min="1" max="19" step="1"><b id="speedVal">×1.0</b></label>
+            <input id="speed" type="range" min="1" max="19" step="1"></label>
         </div>
     </div>
     </div>
@@ -264,29 +278,34 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     <button class="btn" id="openSavesBtn" style="flex:1">My kaleidoscopes</button>
     <button class="btn" id="openProBtn" style="flex:1">Kalejdo Pro</button>
   </div>
-  <button class="btn" id="fullBtn">Full-screen view</button>
   <div class="line" style="gap:8px">
-    <button class="btn" id="emptyAllBtn" style="flex:1">Empty all layers</button>
-    <button class="btn" id="starterBtn" style="flex:1">Starter mix</button>
+    <button class="btn" id="wallBtn" style="flex:1">Use as live wallpaper</button>
+    <button class="btn" id="privacyBtn" style="flex:1">Privacy</button>
   </div>
   <button class="btn brass" id="closeSheet">Done</button>
 </div></div>
 <div id="savesSheet" class="sheet"><div class="box">
   <h2>My kaleidoscopes</h2>
   <p class="lead">Save the kaleidoscope as it looks now and open it again later.</p>
-  <div class="line"><input class="txt" id="saveName" maxlength="40" placeholder="Name"><button class="btn brass" id="saveNowBtn">Save</button></div>
+  <div class="line"><input class="txt" id="saveName" maxlength="40" placeholder="Name"><button class="btn brass" id="saveNowBtn">Save</button><button class="btn" id="shareNowBtn" title="Share a link to this kaleidoscope (Pro)">Share</button></div>
   <div id="savesList"></div>
+  <div id="pubBox" hidden>
+    <h3>Shared – anyone with the link can open these while your Pro subscription is active</h3>
+    <div id="pubList" style="margin-top:8px"></div>
+  </div>
   <button class="btn" id="closeSaves">Close</button>
 </div></div>
 <div id="proSheet" class="sheet"><div class="box">
   <h2>Kalejdo Pro</h2>
   <p class="lead" id="proLead"></p>
   <button class="btn brass" id="proBuy">Get Pro</button>
-  <button class="btn" id="proRestore">Restore purchase</button>
+  <button class="btn" id="proRestore">Restore subscription</button>
+  <button class="btn" id="proManage">Manage subscription</button>
   <button class="btn brass" id="proScan">Sign in on the web</button>
   <button class="btn" id="closePro">Close</button>
 </div></div>
 <div id="ctx"></div>
+<div id="bgPop"></div>
 <div id="toast"><span id="toastMsg"></span><button id="toastBtn"></button></div>
 <div id="loading">KALEJDO</div>
 
@@ -302,6 +321,9 @@ function spinSpeed(v) { const t = v / 100; return t * MAX_SPIN * (0.2 + 0.2 * t)
 function inertia() { return S.inertia || 4; }
 function gravScale() { return (S.grav == null ? 100 : S.grav) / 100; }
 const STORE = "kalejdo.v1";
+/* Levande bakgrund (2026-11-12): Android-skalets bakgrundstjänst (KalejdoWallpaper) laddar sidan med ?wallpaper=1.
+   Då visas bara mönstret i helskärm, inget sparas, och kalejdoskopet hämtas ur WKEY (det användaren valde som bakgrund). */
+const WALL = new URLSearchParams(location.search).has("wallpaper"), WKEY = "kalejdo.wallpaper.v1";
 const CAT_SIZE = {glass: .22, gems: .17, shapes: .18, nature: .19, food: .19, critters: .2, things: .18, electro: .2, christmas: .19, evaq8: .19};
 // säkerhetsskyltarnas färger betyder något, så de får aldrig slumpad färgton
 const KEEP_COLOURS = new Set(["evaq8"]);
@@ -347,6 +369,9 @@ let tiltG = null;
 const rnd = (a, b) => a + Math.random() * (b - a);
 
 function defaultLayer(mode) { return {mode, opacity: 1, visible: true, locked: false, speed: 1, rev: false, th: 0, items: []}; }
+// Standardlager (2026-11-12): fart ×0,7 / ×1,1 / ×1,3 / ×1,7, lager 2 och 4 åt motsatt håll, Fixed på 1 och 4, Tumble på 2 och 3.
+const LAYER_DEFAULTS = [["fixed", .7, false], ["tumble", 1.1, true], ["tumble", 1.3, false], ["fixed", 1.7, true]];
+function defaultLayers() { return LAYER_DEFAULTS.map(([m, sp, rev]) => Object.assign(defaultLayer(m), {speed: sp, rev})); }
 // Varje lager har en egen vinkel som vrids med huvudhastigheten × lagrets faktor (negativ = motsatt håll).
 // Ett låst lager står helt still.
 function layerK(L) { return L.locked ? 0 : (L.speed || 1) * (L.rev ? -1 : 1); }
@@ -368,8 +393,8 @@ function migrateLayers(layers) {
   for (const L of layers) { if (L.mode === "float") L.mode = "tumble"; if (L.burst) { delete L.burst; toLocal(L); } }
 }
 function defaultState() {
-  return {slices: 6, spin: 50, lastSpin: 50, paused: false, inertia: 4, grav: 100, tile: 55, light: 0, tilt: false, zoom: 72, sel: 0, size: 100, cat: "all",
-    layers: [defaultLayer("tumble"), defaultLayer("tumble"), defaultLayer("tumble"), defaultLayer("fixed")]};
+  return {slices: 6, spin: 50, lastSpin: 50, paused: false, inertia: 4, grav: 100, tile: 55, light: 0, tilt: false, zoom: 72, sel: 0, size: 110, cat: "all",
+    layers: defaultLayers()};
 }
 function load() {
   try {
@@ -380,6 +405,7 @@ function load() {
 }
 let saveTimer = 0;
 function save(now) {
+  if (WALL) return;
   clearTimeout(saveTimer);
   const doIt = () => { try { S.theta = theta; localStorage.setItem(STORE, JSON.stringify(S, (k, v) => typeof v === "number" ? Math.round(v * 1e4) / 1e4 : v)); } catch (e) {} };
   if (now) doIt(); else saveTimer = setTimeout(doIt, 1500);
@@ -942,7 +968,7 @@ function openCtx(e) {
   const L = S.layers[S.sel], i = hitItem(e);
   if (i < 0) { closeCtx(); return; }
   ctxItem = {li: S.sel, i, it: L.items[i]};
-  ctx.innerHTML = `<button data-a="delete">Delete</button><button data-a="resize">Resize</button><button data-a="rotate">Rotate</button>`;
+  ctx.innerHTML = `<button data-a="delete">Delete</button><button data-a="duplicate">Duplicate</button><button data-a="resize">Resize</button><button data-a="rotate">Rotate</button>`;
   ctx.classList.add("on"); ctxOpen = true;
   placeCtx(e.clientX, e.clientY);
 }
@@ -954,15 +980,23 @@ ctx.addEventListener("click", e => {
     const i = L.items.indexOf(it); if (i < 0) return closeCtx();
     L.items.splice(i, 1); refreshLayerUI(); save(); closeCtx();
     toast(`Removed ${PROPS[it.p] ? PROPS[it.p].name.toLowerCase() : "thing"}`, "Undo", () => { S.layers[li].items.splice(i, 0, it); refreshLayerUI(); save(); });
+  } else if (b.dataset.a === "duplicate") {
+    // en kopia strax bredvid, i samma lager, med samma storlek och vridning
+    if (L.items.length >= MAX_PER_LAYER) { closeCtx(); toast(`Layer ${li + 1} is full (${MAX_PER_LAYER} things)`); return; }
+    const cp = Object.assign({}, it, {x: it.x + it.s * .5, y: it.y + it.s * .5, w: rnd(0, TAU)});
+    const d = Math.hypot(cp.x, cp.y), lim = 1 - cp.s * .42;
+    if (d > lim) { cp.x *= lim / d; cp.y *= lim / d; }
+    L.items.push(cp); refreshLayerUI(); save(); closeCtx();
+    toast(`Duplicated ${PROPS[it.p] ? PROPS[it.p].name.toLowerCase() : "thing"}`, "Undo", () => { const a = S.layers[li].items, i = a.indexOf(cp); if (i >= 0) a.splice(i, 1); refreshLayerUI(); save(); });
   } else if (b.dataset.a === "resize") {
-    ctx.innerHTML = `<label><b>Size</b><input type="range" min="5" max="60" step="0.5" value="${(it.s * 100).toFixed(1)}"></label>`;
+    ctx.innerHTML = `<label><b>Size</b><input type="range" data-fmt="sz" min="5" max="60" step="0.5" value="${(it.s * 100).toFixed(1)}"></label>`;
     ctx.querySelector("input").oninput = ev => { it.s = +ev.target.value / 100; save(); };
-    placeCtx(x, y);
+    rvSync(ctx); placeCtx(x, y);
   } else if (b.dataset.a === "rotate") {
     const deg = ((it.a * 180 / Math.PI) % 360 + 360) % 360;
-    ctx.innerHTML = `<label><b>Rotation</b><input type="range" min="0" max="360" step="1" value="${deg.toFixed(0)}"></label>`;
+    ctx.innerHTML = `<label><b>Rotation</b><input type="range" data-fmt="deg" min="0" max="360" step="1" value="${deg.toFixed(0)}"></label>`;
     ctx.querySelector("input").oninput = ev => { it.a = +ev.target.value * Math.PI / 180; it.va = 0; save(); };
-    placeCtx(x, y);
+    rvSync(ctx); placeCtx(x, y);
   }
 });
 document.addEventListener("pointerdown", e => { if (ctx.classList.contains("on") && !ctx.contains(e.target)) closeCtx(); }, true);
@@ -1007,6 +1041,19 @@ function toast(msg, btn, fn) {
 }
 $("#toastBtn").onclick = () => { toastFn && toastFn(); toastFn = null; $("#toast").classList.remove("on"); };
 
+/* Värde bredvid varje reglage (2026-11-12): varje input[type=range] får en siffra efter sig (b.rv) som följer reglaget. */
+const RV_FMT = {spin: v => v + "%", opacity: v => v + "%", speed: v => "×" + (v / 10).toFixed(1), size: v => v + "%", grav: v => v + "%",
+  tile: v => v + "%", fmZoom: v => v + "%", zoom: v => v + "%", inertia: v => v, fmHue: v => v + "°", fmSat: v => v + "%", fmLum: v => v + "%",
+  fmLight: v => v + "%", deg: v => Math.round(v) + "°", sz: v => Math.round(v * 10) / 10};
+function rvSync(root) {
+  (root || document).querySelectorAll("input[type=range]").forEach(inp => {
+    let b = inp.nextElementSibling;
+    if (!b || !b.classList.contains("rv")) { b = document.createElement("b"); b.className = "rv"; inp.after(b); }
+    const f = RV_FMT[inp.id] || RV_FMT[inp.dataset.fmt];
+    b.textContent = f ? f(+inp.value) : inp.value;
+  });
+}
+document.addEventListener("input", e => { if (e.target.type === "range") rvSync(e.target.parentNode); }, true);
 function refreshTop() {
   document.querySelectorAll("#slices button").forEach(b => b.classList.toggle("on", +b.dataset.n === S.slices));
   $("#spin").value = S.spin;
@@ -1018,6 +1065,7 @@ function refreshTop() {
   $("#size").value = S.size;
   $("#tiltSw").classList.toggle("on", S.tilt);
   $("#zoom").value = S.zoom;
+  rvSync();
 }
 function tabSpeed(L) {
   const k = L.speed || 1;
@@ -1037,10 +1085,10 @@ function refreshLayerUI() {
   $("#lockBtn").classList.toggle("off", !L.locked);
   $("#revBtn").classList.toggle("on", !!L.rev);
   $("#speed").value = Math.round((L.speed || 1) * 10);
-  $("#speedVal").textContent = "×" + (L.speed || 1).toFixed(1);
   $("#speedBox").classList.toggle("off", !!L.locked);
   $("#opacity").value = Math.round(L.opacity * 100);
   $("#dropInfo").textContent = `Tap a thing to drop it in layer ${S.sel + 1}`;
+  rvSync($("#layerBox"));
 }
 $("#tabs").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
@@ -1053,7 +1101,6 @@ $("#revBtn").onclick = () => {
 };
 $("#speed").oninput = e => {
   const L = S.layers[S.sel]; L.speed = +e.target.value / 10;
-  $("#speedVal").textContent = "×" + L.speed.toFixed(1);
   refreshTabs(); save();
 };
 $("#lockBtn").onclick = () => setLocked(S.sel, !S.layers[S.sel].locked);
@@ -1093,7 +1140,6 @@ $("#stageTabs").addEventListener("click", e => {
   document.body.classList.toggle("over", v === "over");
   document.querySelectorAll("#stageTabs button").forEach(x => x.classList.toggle("on", x.dataset.v === v)); })();
 $("#shakeBtn").onclick = shake;
-$("#lightBtn").onclick = () => { S.light = (S.light + 1) % LIGHTS.length; toast("Light: " + LIGHTS[S.light].name); save(); };
 $("#size").oninput = e => { S.size = +e.target.value; save(); };
 $("#moreBtn").onclick = () => $("#sheet").classList.add("on");
 $("#closeSheet").onclick = () => $("#sheet").classList.remove("on");
@@ -1109,7 +1155,6 @@ $("#tiltSw").onclick = () => {
 $("#inertia").oninput = e => { S.inertia = +e.target.value; save(); };
 $("#grav").oninput = e => { S.grav = +e.target.value; save(); };
 $("#zoom").oninput = e => { S.zoom = +e.target.value; sizeChamber(); save(); };
-$("#fullBtn").onclick = () => { $("#sheet").classList.remove("on"); toggleFull(); };
 $("#stageFull").onclick = toggleFull;
 function emptyAll() {
   const old = S.layers.map(L => L.items);
@@ -1118,30 +1163,48 @@ function emptyAll() {
   toast("All layers emptied", "Undo", () => { S.layers.forEach((L, i) => L.items = old[i]); refreshLayerUI(); save(); });
 }
 $("#clearAllBtn").onclick = emptyAll;
-$("#emptyAllBtn").onclick = () => { $("#sheet").classList.remove("on"); emptyAll(); };
+$("#fillAllBtn").onclick = () => fillAll();
 
 /* ---------- helskärmsmenyn (2026-11-12): spara sömlös platta, egen bakgrundsfärg, förinställt ljus ---------- */
 const fullMenu = $("#fullMenu");
 function closeFullMenu() { fullMenu.classList.remove("on"); }
+// färgen som gäller nu: den egna (S.bg) eller, om ett äldre förinställt ljus är valt, det ljusets färger
+function curBg() {
+  if (S.bg && S.light < 0) return S.bg;
+  const L = LIGHTS[S.light] || LIGHTS[0];
+  return L.rainbow ? {c: "#ffffff", l: 92} : {c: L.b, l: Math.round(hexToHsl(L.a)[2] * 100)};
+}
 function refreshFullMenu() {
-  const bg = S.bg || {c: "#ffffff", l: 92}, [h, sat, l] = hexToHsl(bg.c);
+  const bg = curBg(), [h, sat, l] = hexToHsl(bg.c);
   $("#fmLight").value = bg.l; $("#fmZoom").value = S.tile;
   $("#fmHue").value = Math.round(h); $("#fmSat").value = Math.round(sat * 100); $("#fmLum").value = Math.round(l * 100);
+  rvSync(fullMenu); rvSync(bgPop);
 }
 // reglagen uppdateras inte medan man drar i dem (bara färgrutan), så den sparade färgen går att justera i små steg
 function setBg(patch) {
-  S.bg = Object.assign({c: "#ffffff", l: 92}, S.bg, patch); S.light = -1; save();
+  S.bg = Object.assign({}, curBg(), patch); S.light = -1; save();
 }
 function bgFromSliders() { setBg({c: hslToHex(+$("#fmHue").value, +$("#fmSat").value / 100, +$("#fmLum").value / 100)}); }
 $("#fmHue").oninput = $("#fmSat").oninput = $("#fmLum").oninput = bgFromSliders;
-$("#fullMenuBtn").onclick = () => { refreshFullMenu(); fullMenu.classList.toggle("on"); };
+$("#fullMenuBtn").onclick = () => { fullMenu.insertBefore(bgCtl, $("#fmSave")); refreshFullMenu(); fullMenu.classList.toggle("on"); };
+/* Bakgrundsfärg i panelen (2026-11-12): knappen öppnar samma reglage som helskärmsmenyn har (blocket #bgCtl flyttas
+   mellan helskärmsmenyn och den lilla rutan #bgPop). De förinställda ljusen går inte längre att välja. */
+const bgPop = $("#bgPop"), bgCtl = $("#bgCtl");
+function closeBgPop() { bgPop.classList.remove("on"); }
+$("#lightBtn").onclick = () => {
+  if (bgPop.classList.contains("on")) { closeBgPop(); return; }
+  bgPop.appendChild(bgCtl); refreshFullMenu(); bgPop.classList.add("on");
+  const r = $("#lightBtn").getBoundingClientRect();
+  bgPop.style.left = Math.max(6, Math.min(r.right - bgPop.offsetWidth, innerWidth - bgPop.offsetWidth - 6)) + "px";
+  bgPop.style.top = Math.max(6, Math.min(r.bottom + 6, innerHeight - bgPop.offsetHeight - 6)) + "px";
+};
+document.addEventListener("pointerdown", e => { if (bgPop.classList.contains("on") && !bgPop.contains(e.target) && !e.target.closest("#lightBtn")) closeBgPop(); }, true);
 view.addEventListener("pointerdown", closeFullMenu);
 $("#fmSave").onclick = () => { closeFullMenu(); snapshot(); };
 $("#fmExit").onclick = () => { closeFullMenu(); toggleFull(); };
 // Zoom i helskärm = plattornas storlek (samma värde som Pattern size i More-arket)
 $("#fmZoom").oninput = e => { S.tile = +e.target.value; $("#tile").value = S.tile; sizeChamber(); save(); };
 $("#fmLight").oninput = e => setBg({l: +e.target.value});
-$("#starterBtn").onclick = () => { starterMix(); $("#sheet").classList.remove("on"); toast("Starter mix"); };
 
 function toggleFull() {
   const on = document.body.classList.toggle("full");
@@ -1179,16 +1242,14 @@ function showCat() {
   $("#lib").scrollTop = 0;
 }
 
-function starterMix() {
-  const pick = cat => { const c = CATS.find(x => x.id === cat); return c ? c.items.map(i => i.id) : []; };
-  const any = arr => arr[Math.floor(Math.random() * arr.length)];
-  S.layers = [defaultLayer("tumble"), defaultLayer("tumble"), defaultLayer("tumble"), defaultLayer("fixed")];
-  const glass = pick("glass"), gems = pick("gems").concat(pick("shapes")), fun = pick("critters").concat(pick("food"), pick("things"), pick("nature"));
-  for (let i = 0; i < 28 && glass.length; i++) addItem(any(glass), 0, true);
-  for (let i = 0; i < 15 && gems.length; i++) addItem(any(gems), 1, true);
-  for (let i = 0; i < 7 && fun.length; i++) addItem(any(fun), 2, true);
-  S.layers[3].opacity = .9;
+// Slumpar in tio saker på varje lager, ur vald kategori (eller hela biblioteket). Knappen bredvid "Empty all layers",
+// och det en ny användare får se vid första starten.
+function fillAll(quiet) {
+  const pool = (S.cat === "all" ? CATS : CATS.filter(c => c.id === S.cat)).reduce((a, c) => a.concat(c.items.map(i => i.id)), []);
+  let n = 0;
+  for (let li = 0; li < LAYERS; li++) for (let i = 0; i < 10 && pool.length; i++) if (addItem(pool[Math.floor(Math.random() * pool.length)], li, true)) n++;
   refreshLayerUI(); save();
+  if (!quiet) toast(n ? `Added ${n} random things, 10 to each layer` : "All layers are full");
 }
 
 /* Spara bild (2026-11-12): ett utsnitt som är exakt en period av mönstret, så att bilden kan läggas
@@ -1264,7 +1325,52 @@ function renderSaves() {
       <img src="${esc(v.thumb || "")}" alt=""><b>${esc(v.name)}</b><small>${new Date(v.t).toLocaleDateString()}</small></div>`).join("")
     : '<div class="empty" style="grid-column:1/-1">Nothing saved yet</div>';
 }
-function openSaves() { $("#saveName").value = nextSaveName(); renderSaves(); $("#savesSheet").classList.add("on"); }
+function openSaves() { $("#saveName").value = nextSaveName(); renderSaves(); loadPub(); $("#savesSheet").classList.add("on"); }
+/* Delning (2026-11-12, kräver Pro): kalejdoskopet sparas på kontot (api/konto.php delat_spara) och får länken
+   gr8eam.com/Kalejdo/?k=<nyckel>, som skickas vidare med Androids delningsruta. Länken slutar fungera när prenumerationen upphör. */
+function makeShareImage() {
+  const W = 1200, H = 630, c = document.createElement("canvas"); c.width = W; c.height = H;
+  const x = c.getContext("2d");
+  if (S.slices === 6) { const R = W / 5; x.translate(-3 * R, 0); drawPatternTo(x, W + 3 * R, H, R); }
+  else { const a = W / 4, R = a / Math.cos(Math.PI / 8), d = 2 * a; x.translate(-d, 0); drawPatternTo(x, W + d, H, R); }
+  try { return c.toDataURL("image/jpeg", .82); } catch (e) { return ""; }
+}
+function shareLink(url, name) {
+  if (native("share")) { KalejdoApp.share(url, name || "Kalejdo"); return; }
+  if (navigator.clipboard) navigator.clipboard.writeText(url).then(() => toast("Link copied"), () => toast(url)); else toast(url);
+}
+function renderPub(list) {
+  $("#pubBox").hidden = !PRO;
+  $("#pubList").innerHTML = list.length ? list.map(v => `<div class="sv" data-k="${esc(v.nyckel)}">
+      <button class="lnk" data-lnk="${esc(v.nyckel)}" data-n="${esc(v.namn)}" title="Share the link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.5 1.5"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.5-1.5"/></svg></button>
+      <button class="del" data-del="${esc(v.nyckel)}" title="Stop sharing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <img src="${esc(v.thumb || "")}" alt=""><b>${esc(v.namn)}</b><small>${esc(String(v.skapad).slice(0, 10))}</small></div>`).join("")
+    : '<div class="empty" style="grid-column:1/-1">Nothing shared yet</div>';
+}
+async function loadPub() {
+  $("#pubBox").hidden = !PRO;
+  if (!PRO) return;
+  try { const j = await asKonto("delat_list", {}); renderPub(j.delade || []); } catch (e) { renderPub([]); }
+}
+$("#shareNowBtn").onclick = async () => {
+  if (!PRO) { $("#savesSheet").classList.remove("on"); openPro(); return; }
+  const name = $("#saveName").value.trim() || nextSaveName();
+  toast("Sharing…");
+  try {
+    const j = await asKonto("delat_spara", {namn: name, state: JSON.stringify(captureState()), thumb: makeThumb(), bild: makeShareImage()});
+    renderPub(j.delade || []);
+    shareLink(j.url, j.namn);
+  } catch (e) { toast(e.message || "Could not share"); }
+};
+$("#pubList").addEventListener("click", async e => {
+  const lnk = e.target.closest("[data-lnk]"), del = e.target.closest("[data-del]"), card = e.target.closest(".sv");
+  if (del) {
+    try { const j = await asKonto("delat_radera", {nyckel: del.dataset.del}); renderPub(j.delade || []); toast("No longer shared"); } catch (err) { toast(err.message); }
+    return;
+  }
+  if (lnk) { shareLink(LIB_URL + "?k=" + encodeURIComponent(lnk.dataset.lnk), lnk.dataset.n); return; }
+  if (card) { const b = card.querySelector("[data-lnk]"); shareLink(LIB_URL + "?k=" + encodeURIComponent(card.dataset.k), b ? b.dataset.n : ""); }
+});
 $("#savesBtn").onclick = openSaves;
 $("#openSavesBtn").onclick = () => { $("#sheet").classList.remove("on"); openSaves(); };
 $("#closeSaves").onclick = () => $("#savesSheet").classList.remove("on");
@@ -1296,14 +1402,16 @@ $("#savesList").addEventListener("click", e => {
 });
 
 /* ------------------------------------------------------------------ Pro (2026-11-12, ersätter butiken)
-   Två nivåer: gratis (samma kategorier som besökare ser på gr8eam.com/Kalejdo) och Pro (ett engångsköp i Google Play).
+   Två nivåer: gratis (samma kategorier som besökare ser på gr8eam.com/Kalejdo) och Pro (månadsprenumeration i Google Play,
+   första månaden gratis för nya prenumeranter). När prenumerationen upphör svarar servern pro = false och Pro-kategorierna,
+   det egna biblioteket, delningen och den levande bakgrunden låses igen.
    Appen skapar ett anonymt konto på servern (id + hemlighet i localStorage). Köpet sköts av Android-skalet
    (KalejdoApp.proBuy), som skickar köpkvittot hit (window.kalejdoPurchase); servern kontrollerar det mot Google Play
    och märker kontot som Pro. Biblioteket hämtas sedan för kontots nivå: Pro-kategorierna och det egna biblioteket
    (som byggs på webben) följer med. Webben låses upp genom att appen skannar sidans QR-kod (KalejdoApp.scanQr). */
 const LIB_URL = "https://gr8eam.com/Kalejdo/", LIB_CACHE = "kalejdo.lib.v1";
 const KONTO = "kalejdo.konto.v1", PROKEY = "kalejdo.pro.v1";
-let PRO = false, proPrice = "";
+let PRO = false, proPrice = "", proTrial = false;
 try { PRO = localStorage.getItem(PROKEY) === "1"; } catch (e) {}
 function setPro(v) { PRO = !!v; try { localStorage.setItem(PROKEY, PRO ? "1" : "0"); } catch (e) {} }
 async function kontoPost(action, data) {
@@ -1332,10 +1440,11 @@ function refreshPro() {
   $("#openProBtn").textContent = PRO ? "Sign in on the web" : "Kalejdo Pro";
   $("#proLead").textContent = PRO
     ? "Pro is active. To use Pro in a web browser too, open gr8eam.com/Kalejdo on a computer, choose More and Show QR code, then scan the code here. On the web you can also build your own library of pictures – it shows up in this app."
-    : "All libraries, your own library of pictures, and the same libraries in a web browser. One payment, no subscription." + (proPrice ? " " + proPrice + "." : "");
+    : "All libraries, your own library of pictures, sharing, live wallpaper, and the same libraries in a web browser. "
+      + (proTrial ? "The first month is free, then " : "") + (proPrice ? proPrice + " per month. " : (proTrial ? "a monthly subscription. " : "Monthly subscription. ")) + "Cancel any time in Google Play.";
   $("#proBuy").hidden = $("#proRestore").hidden = PRO;
-  $("#proScan").hidden = !PRO;
-  $("#proBuy").textContent = proPrice ? "Get Pro – " + proPrice : "Get Pro";
+  $("#proScan").hidden = $("#proManage").hidden = !PRO;
+  $("#proBuy").textContent = proTrial ? "Try Pro free for a month" : (proPrice ? "Subscribe – " + proPrice + " per month" : "Subscribe");
 }
 function openPro() { $("#sheet").classList.remove("on"); refreshPro(); $("#proSheet").classList.add("on"); }
 const native = name => window.KalejdoApp && typeof KalejdoApp[name] === "function";
@@ -1344,9 +1453,32 @@ $("#closePro").onclick = () => $("#proSheet").classList.remove("on");
 $("#proSheet").addEventListener("click", e => { if (e.target.id === "proSheet") $("#proSheet").classList.remove("on"); });
 $("#proBuy").onclick = () => { if (native("proBuy")) KalejdoApp.proBuy(); else toast("Pro is bought in the Android app from Google Play"); };
 $("#proRestore").onclick = () => { if (native("proRestore")) KalejdoApp.proRestore(); else toast("Pro is restored in the Android app"); };
+$("#proManage").onclick = () => { if (native("openUrl")) KalejdoApp.openUrl("https://play.google.com/store/account/subscriptions?sku=pro&package=com.gr8eam.kalejdo"); };
+$("#privacyBtn").onclick = () => { if (native("openUrl")) KalejdoApp.openUrl(LIB_URL + "privacy.html"); else window.open(LIB_URL + "privacy.html"); };
+// Levande bakgrund (Pro): kalejdoskopet som det ser ut nu sparas undan, sedan öppnas Androids bakgrundsväljare
+$("#wallBtn").onclick = () => {
+  $("#sheet").classList.remove("on");
+  if (!PRO) { openPro(); return; }
+  if (!writeJSON(WKEY, {t: Date.now(), state: captureState()})) return;
+  if (native("setWallpaper")) KalejdoApp.setWallpaper(); else toast("Live wallpaper needs the Android app");
+};
+let wallT = -1;
+function wallApply(first) {
+  const w = readJSON(WKEY, null), t = w && w.t || 0;
+  if (t === wallT) return;
+  wallT = t;
+  if (w && w.state) applyState(w.state);
+  S.paused = false; if (!S.spin) S.spin = 50; S.view = "all";
+  if (first) { document.body.classList.add("full", "wall"); layout(); }
+}
+window.kalejdoWallpaperCheck = () => { if (WALL) wallApply(false); };
 $("#proScan").onclick = () => { if (native("scanQr")) KalejdoApp.scanQr(); else toast("Scanning needs the Android app"); };
 // anropas av Android-skalet
-window.kalejdoPrice = p => { proPrice = String(p || ""); refreshPro(); };
+// skalet skickar {"price": "$0.99", "trial": true} (trial = första månaden gratis erbjuds det här Google-kontot)
+window.kalejdoPrice = p => {
+  try { const o = JSON.parse(p); proPrice = String(o.price || ""); proTrial = !!o.trial; } catch (e) { proPrice = String(p || ""); proTrial = false; }
+  refreshPro();
+};
 window.kalejdoBilling = msg => toast(String(msg || ""));
 let buying = false;
 window.kalejdoPurchase = async token => {
@@ -1432,11 +1564,23 @@ async function loadLibrary() {
     if (!L.speed) L.speed = 1;
     delete L.lockTheta;
   }
+  // Nya standardvärden (2026-11-12) sätts en gång även för den som redan har ett sparat kalejdoskop: lagrens fart, riktning
+  // och läge, storleken på nya saker och grundfarten mitt på reglaget. Sakerna ligger kvar där de låg.
+  if (saved && !S.defV) {
+    S.layers.forEach((L, i) => {
+      const [m, sp, rev] = LAYER_DEFAULTS[i];
+      if (L.mode !== m) { if (L.mode === "fixed") toWorld(L); else toLocal(L); L.mode = m; }
+      L.speed = sp; L.rev = rev;
+    });
+    S.size = 110; S.spin = S.lastSpin = 50;
+  }
+  S.defV = 1;
   refreshTop();
   buildLibrary();
   layout();
-  if (!saved) starterMix();
+  if (!saved) fillAll(true);
   refreshLayerUI();
+  if (WALL) wallApply(true);
   const ids = new Set();
   S.layers.forEach(L => L.items.forEach(it => ids.add(it.p)));
   await Promise.all([...ids].map(loadImage));

@@ -22,6 +22,8 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.webkit.WebViewAssetLoader
+import android.app.WallpaperManager
+import android.content.ComponentName
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
@@ -46,11 +48,13 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var web: WebView
 
-    // Pro (2026-11-12): ett engångsköp i Google Play med produkt-id "pro". Skalet sköter bara köpflödet och skickar
+    // Pro (2026-11-12): en månadsprenumeration i Google Play med produkt-id "pro" (första månaden gratis för nya
+    // prenumeranter, som ett erbjudande på basplanen i Play Console). Skalet sköter bara köpflödet och skickar
     // köpkvittot (purchaseToken) till sidan, som låter servern kontrollera det mot Google Play och låsa upp Pro.
     private val proProduct = "pro"
     private var billing: BillingClient? = null
     private var proDetails: ProductDetails? = null
+    private var proOfferToken: String? = null
     private var pageReady = false
 
     /** Anropar window.<fn>(arg) i sidan. */
@@ -83,27 +87,33 @@ class MainActivity : AppCompatActivity() {
     /** Hämtar produkten (pris m.m.) och skickar priset till sidan. */
     private fun queryPro() {
         val params = QueryProductDetailsParams.newBuilder().setProductList(listOf(
-            QueryProductDetailsParams.Product.newBuilder().setProductId(proProduct).setProductType(BillingClient.ProductType.INAPP).build()
+            QueryProductDetailsParams.Product.newBuilder().setProductId(proProduct).setProductType(BillingClient.ProductType.SUBS).build()
         )).build()
         billing?.queryProductDetailsAsync(params) { result, details ->
             if (result.responseCode != BillingClient.BillingResponseCode.OK) return@queryProductDetailsAsync
             val d = details.productDetailsList.firstOrNull { it.productId == proProduct } ?: return@queryProductDetailsAsync
+            val offers = d.subscriptionOfferDetails ?: return@queryProductDetailsAsync
+            // Google Play listar bara de erbjudanden kontot har rätt till. Finns ett med en gratis första period
+            // (provmånaden) väljs det, annars basplanen.
+            val trial = offers.firstOrNull { o -> o.pricingPhases.pricingPhaseList.any { it.priceAmountMicros == 0L } }
+            val offer = trial ?: offers.firstOrNull() ?: return@queryProductDetailsAsync
             proDetails = d
-            val price = d.oneTimePurchaseOfferDetailsList?.firstOrNull()?.formattedPrice ?: d.oneTimePurchaseOfferDetails?.formattedPrice
-            if (price != null) js("kalejdoPrice", price)
+            proOfferToken = offer.offerToken
+            val price = offer.pricingPhases.pricingPhaseList.lastOrNull()?.formattedPrice ?: ""
+            js("kalejdoPrice", JSONObject().put("price", price).put("trial", trial != null).toString())
         }
     }
 
-    /** Finns Pro redan köpt på det här Google-kontot (ny telefon, ominstallation)? Då skickas kvittot till sidan. */
+    /** Finns en aktiv Pro-prenumeration på det här Google-kontot (ny telefon, ominstallation)? Då skickas kvittot till sidan. */
     private fun checkOwned(tell: Boolean) {
-        val params = QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build()
+        val params = QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.SUBS).build()
         billing?.queryPurchasesAsync(params) { result, purchases ->
             if (result.responseCode != BillingClient.BillingResponseCode.OK) {
                 if (tell) js("kalejdoBilling", "Google Play can't be reached right now")
                 return@queryPurchasesAsync
             }
             val found = handlePurchases(purchases, false)
-            if (tell && !found) js("kalejdoBilling", "No Pro purchase was found on this Google account")
+            if (tell && !found) js("kalejdoBilling", "No active Pro subscription was found on this Google account")
         }
     }
 
@@ -186,13 +196,13 @@ class MainActivity : AppCompatActivity() {
             runOnUiThread {
                 val d = proDetails
                 val client = billing
-                if (d == null || client == null) {
+                val offer = proOfferToken
+                if (d == null || client == null || offer == null) {
                     queryPro()
                     js("kalejdoBilling", "Google Play can't be reached right now. Try again in a moment.")
                     return@runOnUiThread
                 }
-                val pd = BillingFlowParams.ProductDetailsParams.newBuilder().setProductDetails(d)
-                d.oneTimePurchaseOfferDetailsList?.firstOrNull()?.offerToken?.let { pd.setOfferToken(it) }
+                val pd = BillingFlowParams.ProductDetailsParams.newBuilder().setProductDetails(d).setOfferToken(offer)
                 client.launchBillingFlow(this@MainActivity, BillingFlowParams.newBuilder().setProductDetailsParamsList(listOf(pd.build())).build())
             }
         }
@@ -224,6 +234,32 @@ class MainActivity : AppCompatActivity() {
                 val c = WindowCompat.getInsetsController(window, web)
                 c.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
                 if (on) c.hide(WindowInsetsCompat.Type.systemBars()) else c.show(WindowInsetsCompat.Type.systemBars())
+            }
+        }
+
+        /** Androids delningsruta med en länk till ett delat kalejdoskop. */
+        @JavascriptInterface
+        fun share(text: String, title: String) {
+            runOnUiThread {
+                try {
+                    val send = Intent(Intent.ACTION_SEND).setType("text/plain")
+                        .putExtra(Intent.EXTRA_TEXT, text).putExtra(Intent.EXTRA_SUBJECT, title)
+                    startActivity(Intent.createChooser(send, null))
+                } catch (_: Exception) {
+                }
+            }
+        }
+
+        /** Öppnar Androids förhandsvisning av Kalejdo som levande bakgrund (KalejdoWallpaper). */
+        @JavascriptInterface
+        fun setWallpaper() {
+            runOnUiThread {
+                try {
+                    startActivity(Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER)
+                        .putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, ComponentName(this@MainActivity, KalejdoWallpaper::class.java)))
+                } catch (_: Exception) {
+                    js("kalejdoBilling", "Live wallpapers are not available on this phone")
+                }
             }
         }
 

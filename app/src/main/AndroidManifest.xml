@@ -4,6 +4,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <!-- biblioteket och Pro-kontot hämtas från gr8eam.com -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-feature android:name="android.software.live_wallpaper" android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -24,5 +25,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- Levande bakgrund: samma sida som appen, i helskärmsläge (index.html?wallpaper=1) -->
+        <service
+            android:name=".KalejdoWallpaper"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_WALLPAPER">
+            <intent-filter>
+                <action android:name="android.service.wallpaper.WallpaperService" />
+            </intent-filter>
+            <meta-data android:name="android.service.wallpaper" android:resource="@xml/wallpaper" />
+        </service>
     </application>
 </manifest>
