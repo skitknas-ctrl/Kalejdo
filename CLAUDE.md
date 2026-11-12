@@ -258,7 +258,7 @@ location /kalejdo/store/ {
 
 ## Bra att veta om koden (index.html)
 
-- Behållaren har fyra lager med lägena *Tumble*, *Float* och *Fixed*. Varje lager har en egen vinkel
+- Behållaren har fyra lager med lägena *Tumble* och *Fixed* (Float borttaget 2026-11-12). Varje lager har en egen vinkel
   (`L.th`), vrids med huvudhastigheten × lagrets faktor (`L.speed`, 0,1–1,9) och kan gå åt motsatt
   håll (`L.rev`) eller vara låst (`L.locked`, STOP-märket). Högst 40 prylar per lager.
 - Huvudreglaget (`S.spin`, 0–100) styr bara farten via `spinSpeed()`. Riktning finns bara per lager (`L.rev`).
@@ -284,3 +284,13 @@ Valet görs med två ikonknappar (#stageTabs) i scenens nedre vänstra hörn, i 
 helskärmsknappen #stageFull ligger i nedre högra hörnet och döljs när översikten visas (helskärm gäller bara kalejdoskopet). De låg först som flikrad ovanför scenen men hamnade bakom
 statusfältet på Dicks telefon. Valet sparas i localStorage "kalejdo.stageTab". I helskärm döljs knapparna och översikten.
 frame() ritar bara den synliga.
+- 2026-11-12 (webb + app, samma ändringar): Float-läget borttaget (kvar: Tumble, Fixed; gamla sparningar med float blir
+  tumble i migrateLayers). Skaka på ett Fixed-lager ger en halv sekunds puls: toWorld() + L.burst = sluttid, prylarna
+  svävar som i gamla Float, sedan toLocal() (isFixed(L) = fixed utan puls; används överallt där koordinaterna tolkas).
+  Knappen "Remove the last thing" borttagen; ny knapp "Empty all layers" (fyra soptunnor) bredvid "Empty layer".
+  Kameraknappen flyttad till en meny i helskärm (#fullMenuBtn uppe till höger): "Save picture (seamless tile)" sparar
+  exakt en period av mönstret (6 bitar: 3R × √3R, 8 bitar: 4a × 4a, skalat till hela pixlar) via drawPatternTo(ctx,W,H,R);
+  "Background colour" (input type=color, S.bg.c = huvudfärg i ytterkanten) + "Centre brightness" (S.bg.l, HSL-ljushet i
+  mitten) sätter S.light = -1; "Light" bläddrar tillbaka bland förinställda ljus. bg ingår i SAVE_FIELDS.
+  Översikten: tryck på en pryl ger menyn Delete/Resize/Rotate i alla lägen (#ctx); på Fixed-lager flyttas prylar med drag;
+  högerklick (PC) ger samma meny. Rotationen står still medan menyn är öppen (ctxOpen).
