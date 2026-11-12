@@ -5,29 +5,31 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
-// Kalejdoskopet ligger i index.html, props/ och store/ i repots rot (så att GitHub Pages kan köra det direkt).
+// Kalejdoskopet ligger i index.html och props/ i repots rot (så att GitHub Pages kan köra det direkt).
 // Här kopieras de in som app-assets vid varje bygge.
 val webAssets = layout.buildDirectory.dir("webassets")
 val copyWeb by tasks.registering(Copy::class) {
     from(rootProject.file("index.html"))
     from(rootProject.file("props")) { into("props") }
-    from(rootProject.file("store")) { into("store") }
     into(webAssets)
 }
 
 android {
     namespace = "io.github.skitknasctrl.kalejdo"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "io.github.skitknasctrl.kalejdo"
         minSdk = 29 // Android 10: bilder kan sparas i Bilder/ utan behörighetsfråga
-        targetSdk = 35
+        targetSdk = 36
         // CI skickar -PbuildNumber=<körningsnummer>; testbyggen får då versionen 0.1.0-test.<n>
+        // Bygget för Google Play (-PplayRelease) får versionsnamnet playVersion; versionskoden är alltid körningsnumret.
         val baseVersion = "0.1.0"
+        val playVersion = "1.0.0"
         val buildNumber = (project.findProperty("buildNumber") as String?)?.toIntOrNull()
         versionCode = buildNumber ?: 1
-        versionName = if (buildNumber != null) "$baseVersion-test.$buildNumber" else "$baseVersion-dev"
+        versionName = if (project.hasProperty("playRelease")) playVersion
+            else if (buildNumber != null) "$baseVersion-test.$buildNumber" else "$baseVersion-dev"
     }
 
     signingConfigs {
@@ -92,4 +94,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.webkit:webkit:1.11.0")
+    // Pro: köp i Google Play. QR-läsaren används för att logga in på webben.
+    implementation("com.android.billingclient:billing:9.1.0")
+    implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
 }

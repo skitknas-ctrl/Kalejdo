@@ -307,3 +307,22 @@ frame() ritar bara den synliga.
   kategorier appen visar. Utan nät: senast hämtade index i localStorage kalejdo.lib.v1, annars props/index.json. SVG:er cachas
   i Cache API "kalejdo-svg" (fetchSvg). Inbyggda prylar som inte finns i webbindexet läggs in dolt (it.hidden) så att sparade
   kalejdoskop fungerar; de visas inte i biblioteket eller i "Fill". Butikspaket (PACKS) fungerar som förut.
+
+## Pro, konto och QR-inloggning (2026-11-12)
+
+- Butiken (store/, paket, upplåsningskoder) är avskaffad. Det finns två nivåer: gratis och **Pro** (engångsköp i Google Play,
+  produkt-id `pro`). Gratisutbudet är detsamma som besökare ser på gr8eam.com/Kalejdo. `store/` byggs inte längre in i appen.
+- Kategorierna har på servern (gr8eam.com/Kalejdo/admin) lägena Gratis, Pro och Dev (Dev = bara admin). Appen hämtar biblioteket
+  för sitt konto: `POST api/konto.php action=index konto=<id.hemlighet>`. Kontot är anonymt och skapas vid första start
+  (`kalejdo.konto.v1` i localStorage).
+- Köpet: sidan anropar `KalejdoApp.proBuy()`, skalet (MainActivity.kt, Play Billing Library 9) kör köpflödet och skickar
+  kvittot till `window.kalejdoPurchase(token)`. Sidan skickar det till servern (`action=kop`), som kontrollerar det mot
+  Google Play Developer API (kräver `api/play_secrets.php` på servern) och märker kontot som Pro. Vid varje start frågar
+  skalet Google Play om Pro redan är köpt (`proInit`), så en ny telefon eller ominstallation låser upp sig själv.
+- Webben har ingen egen inloggning för användare: sidan visar en QR-kod (More > Show QR code), appen skannar den
+  (`KalejdoApp.scanQr()`, Googles kodläsare, ingen kamerabehörighet) och bekräftar med `action=par_bekrafta`. Kräver Pro.
+  Inloggad på webben kan man bygga ett eget bibliotek med bilder; det kommer med i appens bibliotek (kategori `own<id>`).
+- Bygget för Google Play: jobbet `play` i `.github/workflows/build.yml` (körs för hand eller vid tagg `v*`) ger en signerad
+  AAB (`-PplayRelease`, versionsnamn `playVersion` i app/build.gradle.kts, versionskod = körningsnumret).
+  Uppladdningsnyckeln ligger i GitHub secrets och i `butik-kalla/play-upload/` (privat, aldrig i repot).
+- Appen riktar sig mot Android 16 (targetSdk 36), som Google Play kräver för nya appar sedan 2026-08-31.

@@ -22,6 +22,20 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.webkit.WebViewAssetLoader
+import com.android.billingclient.api.AcknowledgePurchaseParams
+import com.android.billingclient.api.BillingClient
+import com.android.billingclient.api.BillingClientStateListener
+import com.android.billingclient.api.BillingFlowParams
+import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.PendingPurchasesParams
+import com.android.billingclient.api.ProductDetails
+import com.android.billingclient.api.Purchase
+import com.android.billingclient.api.QueryProductDetailsParams
+import com.android.billingclient.api.QueryPurchasesParams
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
+import org.json.JSONObject
 
 /**
  * Tunt skal runt kalejdoskopet: en WebView som visar index.html och props/ från appens assets.
@@ -32,6 +46,85 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var web: WebView
 
+    // Pro (2026-11-12): ett engångsköp i Google Play med produkt-id "pro". Skalet sköter bara köpflödet och skickar
+    // köpkvittot (purchaseToken) till sidan, som låter servern kontrollera det mot Google Play och låsa upp Pro.
+    private val proProduct = "pro"
+    private var billing: BillingClient? = null
+    private var proDetails: ProductDetails? = null
+    private var pageReady = false
+
+    /** Anropar window.<fn>(arg) i sidan. */
+    private fun js(fn: String, arg: String) {
+        runOnUiThread { web.evaluateJavascript("window.$fn && window.$fn(${JSONObject.quote(arg)})", null) }
+    }
+
+    private fun startBilling() {
+        val client = BillingClient.newBuilder(this)
+            .setListener { result, purchases ->
+                when (result.responseCode) {
+                    BillingClient.BillingResponseCode.OK -> handlePurchases(purchases ?: emptyList(), true)
+                    BillingClient.BillingResponseCode.USER_CANCELED -> {}
+                    BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> checkOwned(true)
+                    else -> js("kalejdoBilling", "The purchase did not go through")
+                }
+            }
+            .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
+            .enableAutoServiceReconnection()
+            .build()
+        billing = client
+        client.startConnection(object : BillingClientStateListener {
+            override fun onBillingSetupFinished(result: BillingResult) {
+                if (result.responseCode == BillingClient.BillingResponseCode.OK && pageReady) { queryPro(); checkOwned(false) }
+            }
+            override fun onBillingServiceDisconnected() {}
+        })
+    }
+
+    /** Hämtar produkten (pris m.m.) och skickar priset till sidan. */
+    private fun queryPro() {
+        val params = QueryProductDetailsParams.newBuilder().setProductList(listOf(
+            QueryProductDetailsParams.Product.newBuilder().setProductId(proProduct).setProductType(BillingClient.ProductType.INAPP).build()
+        )).build()
+        billing?.queryProductDetailsAsync(params) { result, details ->
+            if (result.responseCode != BillingClient.BillingResponseCode.OK) return@queryProductDetailsAsync
+            val d = details.productDetailsList.firstOrNull { it.productId == proProduct } ?: return@queryProductDetailsAsync
+            proDetails = d
+            val price = d.oneTimePurchaseOfferDetailsList?.firstOrNull()?.formattedPrice ?: d.oneTimePurchaseOfferDetails?.formattedPrice
+            if (price != null) js("kalejdoPrice", price)
+        }
+    }
+
+    /** Finns Pro redan köpt på det här Google-kontot (ny telefon, ominstallation)? Då skickas kvittot till sidan. */
+    private fun checkOwned(tell: Boolean) {
+        val params = QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build()
+        billing?.queryPurchasesAsync(params) { result, purchases ->
+            if (result.responseCode != BillingClient.BillingResponseCode.OK) {
+                if (tell) js("kalejdoBilling", "Google Play can't be reached right now")
+                return@queryPurchasesAsync
+            }
+            val found = handlePurchases(purchases, false)
+            if (tell && !found) js("kalejdoBilling", "No Pro purchase was found on this Google account")
+        }
+    }
+
+    private fun handlePurchases(purchases: List<Purchase>, tell: Boolean): Boolean {
+        var found = false
+        for (p in purchases) {
+            if (!p.products.contains(proProduct)) continue
+            if (p.purchaseState == Purchase.PurchaseState.PURCHASED) {
+                found = true
+                if (!p.isAcknowledged) {
+                    billing?.acknowledgePurchase(AcknowledgePurchaseParams.newBuilder().setPurchaseToken(p.purchaseToken).build()) { }
+                }
+                js("kalejdoPurchase", p.purchaseToken)
+            } else if (p.purchaseState == Purchase.PurchaseState.PENDING) {
+                found = true
+                if (tell) js("kalejdoBilling", "The payment is pending. Pro unlocks when it has gone through.")
+            }
+        }
+        return found
+    }
+
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +132,7 @@ class MainActivity : AppCompatActivity() {
         web.setBackgroundColor(Color.parseColor("#15131C"))
         setContentView(web)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        startBilling()
 
         // Android 15 ritar appar kant till kant: håll innehållet innanför statusfältet,
         // utskärningen och navigeringsfältet.
@@ -76,9 +170,53 @@ class MainActivity : AppCompatActivity() {
         web.loadUrl("https://appassets.androidplatform.net/assets/index.html")
     }
 
-    /** Det sidan får anropa från JavaScript: spara en bild i Bilder/Kalejdo, öppna en köplänk i webbläsaren
-     *  och dölja/visa operativets fält (statusfält och navigeringsknappar) i helskärmsläget. */
+    /** Det sidan får anropa från JavaScript: spara en bild i Bilder/Kalejdo, öppna en länk i webbläsaren,
+     *  dölja/visa operativets fält (statusfält och navigeringsknappar) i helskärmsläget, köpa/återställa Pro
+     *  och skanna webbsidans QR-kod. */
     inner class AppBridge {
+        /** Sidan är laddad: hämta priset och kolla om Pro redan är köpt. Svar via window.kalejdoPrice/kalejdoPurchase. */
+        @JavascriptInterface
+        fun proInit() {
+            pageReady = true
+            runOnUiThread { queryPro(); checkOwned(false) }
+        }
+
+        @JavascriptInterface
+        fun proBuy() {
+            runOnUiThread {
+                val d = proDetails
+                val client = billing
+                if (d == null || client == null) {
+                    queryPro()
+                    js("kalejdoBilling", "Google Play can't be reached right now. Try again in a moment.")
+                    return@runOnUiThread
+                }
+                val pd = BillingFlowParams.ProductDetailsParams.newBuilder().setProductDetails(d)
+                d.oneTimePurchaseOfferDetailsList?.firstOrNull()?.offerToken?.let { pd.setOfferToken(it) }
+                client.launchBillingFlow(this@MainActivity, BillingFlowParams.newBuilder().setProductDetailsParamsList(listOf(pd.build())).build())
+            }
+        }
+
+        @JavascriptInterface
+        fun proRestore() {
+            runOnUiThread { checkOwned(true) }
+        }
+
+        /** Öppnar Googles kodläsare (ingen kamerabehörighet behövs) och skickar texten i QR-koden till window.kalejdoQr. */
+        @JavascriptInterface
+        fun scanQr() {
+            runOnUiThread {
+                try {
+                    val opts = GmsBarcodeScannerOptions.Builder().setBarcodeFormats(Barcode.FORMAT_QR_CODE).build()
+                    GmsBarcodeScanning.getClient(this@MainActivity, opts).startScan()
+                        .addOnSuccessListener { code -> js("kalejdoQr", code.rawValue ?: "") }
+                        .addOnFailureListener { js("kalejdoBilling", "The scanner could not be opened. Try again in a moment.") }
+                } catch (_: Exception) {
+                    js("kalejdoBilling", "The scanner could not be opened")
+                }
+            }
+        }
+
         /** Helskärm (2026-11-12): systemfälten göms och sidan får hela skärmen; ett svep från kanten visar dem tillfälligt. */
         @JavascriptInterface
         fun setFullscreen(on: Boolean) {
@@ -125,5 +263,5 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() { super.onPause(); web.onPause() }
     override fun onResume() { super.onResume(); web.onResume() }
-    override fun onDestroy() { web.destroy(); super.onDestroy() }
+    override fun onDestroy() { billing?.endConnection(); web.destroy(); super.onDestroy() }
 }

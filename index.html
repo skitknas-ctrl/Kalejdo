@@ -57,7 +57,11 @@ body.full #fullMenu.on{display:flex}
 #fullMenu button:hover{background:var(--panel2)}
 #fullMenu label{display:flex;flex-direction:column;gap:4px;padding:8px 12px;font-size:12px;color:var(--dim)}
 #fullMenu label b{color:var(--text)}
-#fullMenu input[type=color]{width:100%;height:36px;border:0;background:none;padding:0;cursor:pointer}
+#fullMenu hr{border:0;border-top:1px solid var(--line);margin:4px 6px}
+#fullMenu h4{margin:6px 12px 0;font-size:12px;color:var(--text)}
+#fmHue{-webkit-appearance:none;appearance:none;height:12px;border-radius:6px;margin:5px 0;
+  background:linear-gradient(to right,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)}
+#fmHue::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid #2a1a00;box-shadow:0 0 3px #000a}
 .ib:active,.seg button:active,.chip:active{filter:brightness(1.3)}
 .spin{flex:1;display:flex;align-items:center;gap:4px;min-width:0;background:var(--panel2);border-radius:10px;padding:0 8px;height:38px}
 .spin button{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;flex:none;color:var(--brass)}
@@ -192,13 +196,14 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     <div id="hint">Tap: stop/start · double-tap: controls</div>
     <button id="fullMenuBtn" title="Menu"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
     <div id="fullMenu">
+      <label><b>Zoom</b><input type="range" id="fmZoom" min="25" max="100" step="1"></label>
+      <h4>Background colour</h4>
+      <label>Hue<input type="range" id="fmHue" min="0" max="360" step="1"></label>
+      <label>Saturation<input type="range" id="fmSat" min="0" max="100" step="1"></label>
+      <label>Lightness<input type="range" id="fmLum" min="0" max="100" step="1"></label>
+      <label>Centre brightness<input type="range" id="fmLight" min="0" max="100" step="1"></label>
       <button id="fmSave">Save picture (seamless tile)</button>
-      <label><b>Background colour</b><input type="color" id="fmColor"></label>
-      <label><b>Hue</b><input type="range" id="fmHue" min="0" max="360" step="1"></label>
-      <label><b>Saturation</b><input type="range" id="fmSat" min="0" max="100" step="1"></label>
-      <label><b>Lightness</b><input type="range" id="fmLum" min="0" max="100" step="1"></label>
-      <label><b>Centre brightness</b><input type="range" id="fmLight" min="0" max="100" step="1"></label>
-      <button id="fmPreset">Light</button>
+      <hr>
       <button id="fmExit">Exit full-screen</button>
     </div>
   </div>
@@ -257,7 +262,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
   <div class="line"><span>Field of view<small>Left: close-up · right: more of the container</small></span><input id="zoom" type="range" min="40" max="85" step="1" style="width:45%"></div>
   <div class="line" style="gap:8px">
     <button class="btn" id="openSavesBtn" style="flex:1">My kaleidoscopes</button>
-    <button class="btn" id="openShopBtn" style="flex:1">Shop</button>
+    <button class="btn" id="openProBtn" style="flex:1">Kalejdo Pro</button>
   </div>
   <button class="btn" id="fullBtn">Full-screen view</button>
   <div class="line" style="gap:8px">
@@ -273,11 +278,13 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
   <div id="savesList"></div>
   <button class="btn" id="closeSaves">Close</button>
 </div></div>
-<div id="shopSheet" class="sheet"><div class="box">
-  <h2>Shop</h2>
-  <p class="lead">New categories of things for the library – some free, some paid.</p>
-  <div id="shopList"></div>
-  <button class="btn" id="closeShop">Close</button>
+<div id="proSheet" class="sheet"><div class="box">
+  <h2>Kalejdo Pro</h2>
+  <p class="lead" id="proLead"></p>
+  <button class="btn brass" id="proBuy">Get Pro</button>
+  <button class="btn" id="proRestore">Restore purchase</button>
+  <button class="btn brass" id="proScan">Sign in on the web</button>
+  <button class="btn" id="closePro">Close</button>
 </div></div>
 <div id="ctx"></div>
 <div id="toast"><span id="toastMsg"></span><button id="toastBtn"></button></div>
@@ -1118,15 +1125,12 @@ const fullMenu = $("#fullMenu");
 function closeFullMenu() { fullMenu.classList.remove("on"); }
 function refreshFullMenu() {
   const bg = S.bg || {c: "#ffffff", l: 92}, [h, sat, l] = hexToHsl(bg.c);
-  $("#fmColor").value = bg.c; $("#fmLight").value = bg.l;
+  $("#fmLight").value = bg.l; $("#fmZoom").value = S.tile;
   $("#fmHue").value = Math.round(h); $("#fmSat").value = Math.round(sat * 100); $("#fmLum").value = Math.round(l * 100);
-  $("#fmPreset").textContent = "Light: " + (S.light < 0 ? "custom colour" : LIGHTS[S.light].name) + " \u203a";
 }
 // reglagen uppdateras inte medan man drar i dem (bara färgrutan), så den sparade färgen går att justera i små steg
 function setBg(patch) {
   S.bg = Object.assign({c: "#ffffff", l: 92}, S.bg, patch); S.light = -1; save();
-  $("#fmColor").value = S.bg.c;
-  $("#fmPreset").textContent = "Light: custom colour \u203a";
 }
 function bgFromSliders() { setBg({c: hslToHex(+$("#fmHue").value, +$("#fmSat").value / 100, +$("#fmLum").value / 100)}); }
 $("#fmHue").oninput = $("#fmSat").oninput = $("#fmLum").oninput = bgFromSliders;
@@ -1134,8 +1138,8 @@ $("#fullMenuBtn").onclick = () => { refreshFullMenu(); fullMenu.classList.toggle
 view.addEventListener("pointerdown", closeFullMenu);
 $("#fmSave").onclick = () => { closeFullMenu(); snapshot(); };
 $("#fmExit").onclick = () => { closeFullMenu(); toggleFull(); };
-$("#fmPreset").onclick = () => { S.light = (S.light + 1) % LIGHTS.length; refreshFullMenu(); toast("Light: " + LIGHTS[S.light].name); save(); };
-$("#fmColor").oninput = e => { setBg({c: e.target.value}); const [h, sat, l] = hexToHsl(S.bg.c); $("#fmHue").value = Math.round(h); $("#fmSat").value = Math.round(sat * 100); $("#fmLum").value = Math.round(l * 100); };
+// Zoom i helskärm = plattornas storlek (samma värde som Pattern size i More-arket)
+$("#fmZoom").oninput = e => { S.tile = +e.target.value; $("#tile").value = S.tile; sizeChamber(); save(); };
 $("#fmLight").oninput = e => setBg({l: +e.target.value});
 $("#starterBtn").onclick = () => { starterMix(); $("#sheet").classList.remove("on"); toast("Starter mix"); };
 
@@ -1150,14 +1154,14 @@ function toggleFull() {
 
 const BAG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2" stroke-linecap="round"/></svg>';
 function renderChips() {
-  $("#chips").innerHTML = `<button class="chip shop" data-c="__shop">${BAG}Shop</button>`
+  $("#chips").innerHTML = (PRO ? "" : `<button class="chip shop" data-c="__pro">Pro</button>`)
     + [{id: "all", name: "All"}].concat(CATS).map(c => `<button class="chip" data-c="${c.id}">${esc(c.name)}</button>`).join("");
 }
 function buildLibrary() {
   renderChips();
   $("#chips").addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b) return;
-    if (b.dataset.c === "__shop") { openShop(); return; }
+    if (b.dataset.c === "__pro") { openPro(); return; }
     S.cat = b.dataset.c; showCat(); save();
   });
   $("#lib").addEventListener("click", e => {
@@ -1288,202 +1292,116 @@ $("#savesList").addEventListener("click", e => {
   const prev = captureState();
   const missing = applyState(v.state);
   $("#savesSheet").classList.remove("on");
-  toast(missing ? `Opened “${v.name}” – ${missing} things need a pack from the shop` : `Opened “${v.name}”`, "Undo", () => applyState(prev));
+  toast(missing ? `Opened “${v.name}” – ${missing} things are not in your library` : `Opened “${v.name}”`, "Undo", () => applyState(prev));
 });
 
-/* ------------------------------------------------------------------ butiken
-   Katalogen store/catalog.json listar paket. Varje paket är en JSON-fil med prylarnas SVG-kod.
-   Betalda paket är krypterade (AES-GCM, nyckel från en upplåsningskod via PBKDF2) och låses upp med koden.
-   Installerade paket sparas i localStorage ("kalejdo.packs.v1") och fungerar sedan utan nät.
-   STORE_REMOTE: webbserverns butik (gr8eam.com/Kalejdo/api/store.php, kategorier som admin bockat "Erbjud i appens butik").
-   Den slås ihop med den inbyggda butiken (store/): samma id från servern vinner. Servern skickar Access-Control-Allow-Origin. */
-const STORE_REMOTE = "https://gr8eam.com/Kalejdo/api/store.php?f=";
-const STORE_LOCAL = "store/";
-const PACKS = "kalejdo.packs.v1", CODES = "kalejdo.codes.v1";
-let catalog = null, storeBase = STORE_LOCAL;
-function slug(t) { return String(t).toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "") || "x"; }
-function pretty(t) { const x = String(t).replace(/[_\-]+/g, " ").trim(); return x.charAt(0).toUpperCase() + x.slice(1); }
-function packCat(packId) { return "pack-" + slug(packId); }
-function registerPack(pk) {
-  const cid = packCat(pk.id);
-  unregisterPack(pk.id, true);
-  const cat = {id: cid, name: pk.name, pack: pk.id, items: []};
-  const seen = new Set();
-  pk.items.forEach((it, i) => {
-    if (!it || typeof it.svg !== "string") return;
-    let key = slug(it.name || "thing_" + i);
-    while (seen.has(key)) key += "_";
-    seen.add(key);
-    const id = `${cid}/${key}`;
-    const p = {id, name: pretty(it.name || key), svg: it.svg, cat: cid,
-      file: URL.createObjectURL(new Blob([it.svg], {type: "image/svg+xml"}))};
-    cat.items.push(p); PROPS[id] = p;
-  });
-  CATS.push(cat);
-  if (pk.keepColours) KEEP_COLOURS.add(cid);
-  if (pk.size) CAT_SIZE[cid] = pk.size;
-}
-function unregisterPack(packId, keepItems) {
-  const cid = packCat(packId), i = CATS.findIndex(c => c.id === cid);
-  if (i < 0) return 0;
-  for (const p of CATS[i].items) { delete PROPS[p.id]; images.delete(p.id); try { URL.revokeObjectURL(p.file); } catch (e) {} }
-  for (const k of [...rasters.keys()]) if (k.startsWith(cid + "/")) rasters.delete(k);
-  CATS.splice(i, 1);
-  let removed = 0;
-  if (!keepItems) for (const L of S.layers) { const n = L.items.length; L.items = L.items.filter(it => PROPS[it.p]); removed += n - L.items.length; }
-  return removed;
-}
-async function loadCatalog() {
-  // inbyggd butik + webbserverns butik; varje paket minns varifrån det kom (base)
-  const packs = [];
-  for (const base of STORE_REMOTE ? [STORE_LOCAL, STORE_REMOTE] : [STORE_LOCAL]) {
-    try {
-      const r = await fetch(base + "catalog.json", {cache: "no-cache"});
-      if (!r.ok) continue;
-      const c = await r.json();
-      if (!c || !Array.isArray(c.packs)) continue;
-      for (const pk of c.packs) {
-        const i = packs.findIndex(x => x.id === pk.id);
-        const rec = Object.assign({}, pk, {base});
-        if (i >= 0) packs[i] = rec; else packs.push(rec);
-      }
-    } catch (e) {}
-  }
-  catalog = packs.length ? {packs} : null;
-  return catalog;
-}
-function svgURL(svg) { return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg); }
-function renderShop() {
-  if (!catalog) { $("#shopList").innerHTML = '<div class="empty">The shop can’t be reached right now</div>'; return; }
-  const inst = readJSON(PACKS, {});
-  $("#shopList").innerHTML = catalog.packs.map(pk => {
-    const mine = inst[pk.id], paid = pk.price > 0, upd = mine && (pk.version || 1) > (mine.version || 1);
-    const price = mine ? '<span class="price own">Installed</span>'
-      : paid ? `<span class="price">${esc(pk.price)} ${esc(pk.currency || "kr")}</span>` : '<span class="price free">Free</span>';
-    const acts = mine
-      ? `${upd ? '<button class="btn brass" data-act="get">Update</button>' : '<button class="btn" data-act="show">Show</button>'}<button class="btn" data-act="remove">Remove</button>`
-      : paid ? '<button class="btn brass" data-act="buy">Buy</button><button class="btn" data-act="code">I have a code</button>'
-      : '<button class="btn brass" data-act="get">Get</button>';
-    return `<div class="pk" data-id="${esc(pk.id)}">
-      <div class="top"><div class="pv">${(pk.preview || []).slice(0, 4).map(v => `<img src="${svgURL(v)}" alt="">`).join("")}</div>
-        <div class="pi"><b>${esc(pk.name)}</b><small>${esc(pk.items || "")} things${pk.version > 1 ? " · v" + esc(pk.version) : ""}</small><p>${esc(pk.description || "")}</p></div>${price}</div>
-      <div class="acts">${acts}</div>
-      <div class="code"><input class="txt" placeholder="Unlock code" autocomplete="off" autocapitalize="characters"><button class="btn brass" data-act="unlock">Unlock</button></div>
-    </div>`;
-  }).join("") || '<div class="empty">The shop is empty</div>';
-}
-async function openShop() {
-  $("#sheet").classList.remove("on");
-  $("#shopSheet").classList.add("on");
-  $("#shopList").innerHTML = '<div class="empty">Opening the shop…</div>';
-  await loadCatalog();
-  renderShop();
-}
-function b64(t) { return Uint8Array.from(atob(t), c => c.charCodeAt(0)); }
-function normCode(c) { return String(c).toUpperCase().replace(/[^A-Z0-9]/g, ""); }
-async function decryptPack(enc, code) {
-  if (!window.crypto || !crypto.subtle) { toast("Unlocking needs a secure (https) page"); return null; }
+/* ------------------------------------------------------------------ Pro (2026-11-12, ersätter butiken)
+   Två nivåer: gratis (samma kategorier som besökare ser på gr8eam.com/Kalejdo) och Pro (ett engångsköp i Google Play).
+   Appen skapar ett anonymt konto på servern (id + hemlighet i localStorage). Köpet sköts av Android-skalet
+   (KalejdoApp.proBuy), som skickar köpkvittot hit (window.kalejdoPurchase); servern kontrollerar det mot Google Play
+   och märker kontot som Pro. Biblioteket hämtas sedan för kontots nivå: Pro-kategorierna och det egna biblioteket
+   (som byggs på webben) följer med. Webben låses upp genom att appen skannar sidans QR-kod (KalejdoApp.scanQr). */
+const LIB_URL = "https://gr8eam.com/Kalejdo/", LIB_CACHE = "kalejdo.lib.v1";
+const KONTO = "kalejdo.konto.v1", PROKEY = "kalejdo.pro.v1";
+let PRO = false, proPrice = "";
+try { PRO = localStorage.getItem(PROKEY) === "1"; } catch (e) {}
+function setPro(v) { PRO = !!v; try { localStorage.setItem(PROKEY, PRO ? "1" : "0"); } catch (e) {} }
+async function kontoPost(action, data) {
+  const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 10000);
   try {
-    const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(normCode(code)), "PBKDF2", false, ["deriveKey"]);
-    const key = await crypto.subtle.deriveKey({name: "PBKDF2", salt: b64(enc.salt), iterations: enc.iter, hash: "SHA-256"},
-      base, {name: "AES-GCM", length: 256}, false, ["decrypt"]);
-    const plain = await crypto.subtle.decrypt({name: "AES-GCM", iv: b64(enc.iv)}, key, b64(enc.data));
-    return JSON.parse(new TextDecoder().decode(plain));
-  } catch (e) { return null; }
+    const r = await fetch(LIB_URL + "api/konto.php", {method: "POST", body: new URLSearchParams(Object.assign({action}, data)), signal: ctl.signal});
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) { const e = new Error(j.error || ("Error " + r.status)); e.status = r.status; throw e; }
+    return j;
+  } finally { clearTimeout(tm); }
 }
-async function installPack(pk, code) {
-  let data;
+async function getKonto(renew) {
+  let k = "";
+  if (!renew) try { k = localStorage.getItem(KONTO) || ""; } catch (e) {}
+  if (k) return k;
+  const j = await kontoPost("konto_ny", {});
+  try { localStorage.setItem(KONTO, j.konto); } catch (e) {}
+  return j.konto;
+}
+// anropar servern som kontot; är kontot okänt (t.ex. rensad server) skapas ett nytt och anropet görs om
+async function asKonto(action, data) {
+  try { return await kontoPost(action, Object.assign({konto: await getKonto()}, data)); }
+  catch (e) { if (e.status !== 401) throw e; return await kontoPost(action, Object.assign({konto: await getKonto(true)}, data)); }
+}
+function refreshPro() {
+  $("#openProBtn").textContent = PRO ? "Sign in on the web" : "Kalejdo Pro";
+  $("#proLead").textContent = PRO
+    ? "Pro is active. To use Pro in a web browser too, open gr8eam.com/Kalejdo on a computer, choose More and Show QR code, then scan the code here. On the web you can also build your own library of pictures – it shows up in this app."
+    : "All libraries, your own library of pictures, and the same libraries in a web browser. One payment, no subscription." + (proPrice ? " " + proPrice + "." : "");
+  $("#proBuy").hidden = $("#proRestore").hidden = PRO;
+  $("#proScan").hidden = !PRO;
+  $("#proBuy").textContent = proPrice ? "Get Pro – " + proPrice : "Get Pro";
+}
+function openPro() { $("#sheet").classList.remove("on"); refreshPro(); $("#proSheet").classList.add("on"); }
+const native = name => window.KalejdoApp && typeof KalejdoApp[name] === "function";
+$("#openProBtn").onclick = openPro;
+$("#closePro").onclick = () => $("#proSheet").classList.remove("on");
+$("#proSheet").addEventListener("click", e => { if (e.target.id === "proSheet") $("#proSheet").classList.remove("on"); });
+$("#proBuy").onclick = () => { if (native("proBuy")) KalejdoApp.proBuy(); else toast("Pro is bought in the Android app from Google Play"); };
+$("#proRestore").onclick = () => { if (native("proRestore")) KalejdoApp.proRestore(); else toast("Pro is restored in the Android app"); };
+$("#proScan").onclick = () => { if (native("scanQr")) KalejdoApp.scanQr(); else toast("Scanning needs the Android app"); };
+// anropas av Android-skalet
+window.kalejdoPrice = p => { proPrice = String(p || ""); refreshPro(); };
+window.kalejdoBilling = msg => toast(String(msg || ""));
+let buying = false;
+window.kalejdoPurchase = async token => {
+  if (PRO || buying) return;
+  buying = true;
   try {
-    const r = await fetch((pk.base || storeBase) + pk.file, {cache: "no-cache"});
-    if (!r.ok) throw 0;
-    data = await r.json();
-  } catch (e) { toast("Could not download the pack"); return false; }
-  if (data.encrypted) {
-    const codes = readJSON(CODES, {});
-    code = code || codes[pk.id];
-    if (!code) return "code";
-    data = await decryptPack(data.encrypted, code);
-    if (!data) { toast("That code doesn’t fit this pack"); return "code"; }
-    codes[pk.id] = normCode(code); writeJSON(CODES, codes);
-  }
-  if (!data || !Array.isArray(data.items) || !data.items.length) { toast("The pack is broken"); return false; }
-  const rec = {id: pk.id, name: pk.name, version: pk.version || 1, keepColours: !!pk.keepColours, size: pk.size || 0,
-    items: data.items.filter(it => it && typeof it.svg === "string").map(it => ({name: String(it.name || ""), svg: it.svg}))};
-  const inst = readJSON(PACKS, {}); inst[pk.id] = rec;
-  if (!writeJSON(PACKS, inst)) return false;
-  registerPack(rec);
-  renderChips(); showCat();
-  S.layers.forEach(L => L.items.forEach(it => loadImage(it.p)));
-  toast(`${pk.name} is in the library`);
-  return true;
-}
-function openExternal(url) {
-  if (window.KalejdoApp && KalejdoApp.openUrl) { try { if (KalejdoApp.openUrl(url)) return; } catch (e) {} }
-  window.open(url, "_blank", "noopener");
-}
-$("#openShopBtn").onclick = openShop;
-$("#closeShop").onclick = () => $("#shopSheet").classList.remove("on");
-$("#shopList").addEventListener("click", async e => {
-  const b = e.target.closest("[data-act]"); if (!b) return;
-  const card = b.closest(".pk"), pk = catalog && catalog.packs.find(x => x.id === card.dataset.id); if (!pk) return;
-  const act = b.dataset.act;
-  if (act === "code") { card.classList.toggle("coding"); card.querySelector(".code input").focus(); return; }
-  if (act === "buy") {
-    if (pk.buyUrl) openExternal(pk.buyUrl);
-    else toast("Buying isn’t open yet – ask for an unlock code");
-    card.classList.add("coding");
-    return;
-  }
-  if (act === "show") { S.cat = packCat(pk.id); showCat(); save(); $("#shopSheet").classList.remove("on"); return; }
-  if (act === "remove") {
-    const inst = readJSON(PACKS, {}), rec = inst[pk.id], before = JSON.parse(JSON.stringify(S.layers));
-    delete inst[pk.id]; writeJSON(PACKS, inst);
-    const removed = unregisterPack(pk.id);
-    renderChips(); showCat(); refreshLayerUI(); save(); renderShop();
-    toast(`Removed ${pk.name}${removed ? ` (and ${removed} things from the layers)` : ""}`, "Undo", () => {
-      const i2 = readJSON(PACKS, {}); i2[pk.id] = rec; writeJSON(PACKS, i2);
-      registerPack(rec); S.layers = before; renderChips(); showCat(); refreshLayerUI(); save(); renderShop();
-    });
-    return;
-  }
-  if (act === "get" || act === "unlock") {
-    const code = act === "unlock" ? card.querySelector(".code input").value.trim() : "";
-    if (act === "unlock" && !code) { toast("Type the code first"); return; }
-    card.classList.add("busy");
-    const res = await installPack(pk, code);
-    card.classList.remove("busy");
-    if (res === "code") { card.classList.add("coding"); return; }
-    if (res) renderShop();
-  }
-});
+    await asKonto("kop", {token});
+    setPro(true);
+    await loadLibrary();
+    renderChips(); showCat(); refreshPro();
+    toast("Kalejdo Pro is unlocked");
+  } catch (e) { toast(e.message || "The purchase could not be verified"); }
+  buying = false;
+};
+window.kalejdoQr = async text => {
+  const m = /[?&]par=([A-Za-z0-9]{20})(?![A-Za-z0-9])/.exec(String(text || ""));
+  if (!m) { toast("That is not a Kalejdo code"); return; }
+  try { await asKonto("par_bekrafta", {kod: m[1]}); $("#proSheet").classList.remove("on"); toast("Signed in on the web"); }
+  catch (e) { toast(e.message || "Could not sign in"); }
+};
 
 document.addEventListener("visibilitychange", () => { if (document.hidden) save(true); });
 window.addEventListener("pagehide", () => save(true));
 window.addEventListener("resize", layout);
 
 /* ------------------------------------------------------------------ start */
-/* Biblioteket (2026-11-12): hämtas från webben vid varje start, så att admin på gr8eam.com styr vilka kategorier
-   som syns i appen (Synlig). Utan nät används senast hämtade biblioteket, och i sista hand det inbyggda props/index.json.
+/* Biblioteket hämtas från webben vid varje start, för kontots nivå (gratis eller Pro), så att admin på gr8eam.com styr
+   vilka kategorier som syns. Går inte kontot att nå hämtas gratisbiblioteket öppet. Utan nät används senast hämtade
+   biblioteket, och i sista hand de inbyggda gratiskategorierna i props/index.json.
    Inbyggda prylar som inte längre syns på webben behålls dolt (it.hidden) så att sparade kalejdoskop fortsätter fungera. */
-const LIB_URL = "https://gr8eam.com/Kalejdo/", LIB_CACHE = "kalejdo.lib.v1";
+const FREE_BUNDLED = ["gems", "shapes", "food", "things"];
 async function loadLibrary() {
   let idx = null, src = "web";
+  const fix = d => {
+    if (!d || !Array.isArray(d.categories)) throw new Error("bad index");
+    for (const c of d.categories) for (const it of c.items) if (!/^https?:/.test(it.file)) it.file = LIB_URL + it.file;
+    return d;
+  };
   try {
-    const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 8000);
-    idx = await fetch(LIB_URL + "api/bibliotek.php?action=index", {cache: "no-store", signal: ctl.signal})
-      .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
-    clearTimeout(t);
-    if (!Array.isArray(idx.categories)) throw new Error("bad index");
-    for (const c of idx.categories) for (const it of c.items) if (!/^https?:/.test(it.file)) it.file = LIB_URL + it.file;
+    try { idx = fix(await asKonto("index", {})); setPro(idx.pro); }
+    catch (e) {
+      const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 8000);
+      idx = fix(await fetch(LIB_URL + "api/bibliotek.php?action=index", {cache: "no-store", signal: ctl.signal})
+        .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }));
+      clearTimeout(tm);
+    }
     try { localStorage.setItem(LIB_CACHE, JSON.stringify(idx)); } catch (e) {}
   } catch (e) { idx = readJSON(LIB_CACHE, null); src = idx ? "cache" : "bundled"; }
   const bundled = await fetch("props/index.json").then(r => r.json()).catch(() => ({categories: []}));
-  if (!idx) idx = bundled;
-  CATS = idx.categories || [];
+  if (!idx) idx = {categories: (bundled.categories || []).filter(c => FREE_BUNDLED.includes(c.id))};
+  CATS = (idx.categories || []).filter(c => !c.own || c.items.length);   // det egna biblioteket visas först när det har innehåll
   for (const c of CATS) {
     if (typeof c.size === "number" && c.size > 0) CAT_SIZE[c.id] = c.size;
     if (c.keep === true) KEEP_COLOURS.add(c.id); else if (c.keep === false) KEEP_COLOURS.delete(c.id);
-    for (const it of c.items) { it.cat = c.id; PROPS[it.id] = it; }
+    for (const it of c.items) { it.cat = c.id; delete it.hidden; PROPS[it.id] = it; }
   }
   for (const c of bundled.categories || []) for (const it of c.items) if (!PROPS[it.id]) { it.cat = c.id; it.hidden = true; PROPS[it.id] = it; }
   return src;
@@ -1496,7 +1414,6 @@ async function loadLibrary() {
     $("#loading").textContent = "Could not load the library";
     return;
   }
-  for (const pk of Object.values(readJSON(PACKS, {}))) { try { registerPack(pk); } catch (e) {} }
   const saved = load();
   S = saved || defaultState();
   theta = saved && saved.theta || 0;
@@ -1525,6 +1442,9 @@ async function loadLibrary() {
   await Promise.all([...ids].map(loadImage));
   $("#loading").classList.add("gone");
   requestAnimationFrame(frame);
+  refreshPro();
+  // skalet hämtar priset och kollar om Pro redan är köpt på det här Google-kontot (svar via kalejdoPrice/kalejdoPurchase)
+  if (native("proInit")) try { KalejdoApp.proInit(); } catch (e) {}
 })();
 </script>
 </body>
