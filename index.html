@@ -17,10 +17,14 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
 #app{display:flex;flex-direction:column;height:100%;padding-top:env(safe-area-inset-top)}
 #stage{flex:none;position:relative;display:flex;justify-content:center;align-items:center;padding:6px 0}
-/* flikarna Kaleidoscope/Overview (2026-11-11): samma plats, en i taget */
-#stageTabs{align-self:center;margin-top:4px}
-#stageTabs button{padding:5px 14px;font-size:12.5px}
-body.full #stageTabs{display:none}
+/* vyval Kaleidoscope/Overview (2026-11-12): två ikonknappar i scenens nedre vänstra hörn, i tomrummet mellan cirkeln och
+   kvadraten (bort från statusfältet överst). Helskärmsknappen i nedre högra hörnet. I helskärm döljs alla tre. */
+#stageTabs{position:absolute;left:5px;bottom:11px;display:flex;flex-direction:column;gap:3px;z-index:2}
+#stageTabs button,#stageFull{width:30px;height:30px;border-radius:9px;background:var(--panel2);color:var(--dim);display:grid;place-items:center}
+#stageTabs button svg,#stageFull svg{width:20px;height:20px}
+#stageTabs button.on{background:var(--brass);color:#2a1a00}
+#stageFull{position:absolute;right:5px;bottom:11px;z-index:2}
+body.full #stageTabs,body.full #stageFull{display:none}
 body.over #view{display:none}
 body:not(.over) #cellWrap{display:none}
 body.full #cellWrap{display:none}
@@ -159,10 +163,14 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 </head>
 <body>
 <div id="app">
-  <div class="seg" id="stageTabs"><button data-v="kal">Kaleidoscope</button><button data-v="over">Overview</button></div>
   <div id="stage">
     <canvas id="view"></canvas>
     <div id="cellWrap" title="The container: drag to turn · tap a thing to remove it"><canvas id="cell"></canvas></div>
+    <div id="stageTabs">
+      <button data-v="kal" title="Kaleidoscope"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 2.5v19M3.8 7.2l16.4 9.6M3.8 16.8l16.4-9.6"/></svg></button>
+      <button data-v="over" title="Overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><circle cx="9" cy="10" r="2" fill="currentColor" stroke="none"/><circle cx="15" cy="14" r="2" fill="currentColor" stroke="none"/><path d="M14 7.5l2 2M7.5 15l2-1.5" stroke-linecap="round"/></svg></button>
+    </div>
+    <button id="stageFull" title="Full-screen view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
     <div id="hint">Tap: stop/start · double-tap: controls</div>
   </div>
   <div id="panel">
@@ -695,7 +703,7 @@ function layout() {
     view.style.width = w + "px"; view.style.height = h + "px";
     view.width = Math.round(w * fd); view.height = Math.round(h * fd);
   } else {
-    viewCss = Math.floor(Math.min(iw - 12, Math.max(200, ih - 404)));   // 404 = panelen + flikraden
+    viewCss = Math.floor(Math.min(iw - 12, Math.max(200, ih - 372)));   // 372 = panelen (vyknapparna ligger inne i scenen)
     cellCss = viewCss;   // översikten är lika stor som kalejdoskopet och ligger bakom en egen flik
     cell.style.width = cell.style.height = cellCss + "px";
     cell.width = cell.height = Math.min(1600, Math.round(cellCss * d));
@@ -936,6 +944,7 @@ $("#inertia").oninput = e => { S.inertia = +e.target.value; save(); };
 $("#grav").oninput = e => { S.grav = +e.target.value; save(); };
 $("#zoom").oninput = e => { S.zoom = +e.target.value; sizeChamber(); save(); };
 $("#fullBtn").onclick = () => { $("#sheet").classList.remove("on"); toggleFull(); };
+$("#stageFull").onclick = toggleFull;
 $("#emptyAllBtn").onclick = () => {
   const old = S.layers.map(L => L.items);
   S.layers.forEach(L => L.items = []); refreshLayerUI(); save();

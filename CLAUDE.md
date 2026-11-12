@@ -278,8 +278,9 @@ location /kalejdo/store/ {
 - iPhone: rörelsesensorns axlar har omvänt tecken mot Android (`IOS` i koden), och sensorn kräver
   `requestPermission()` efter ett tryck.
 
-## Flikar Kaleidoscope / Overview (2026-11-11)
-Ovanför scenen ligger segmentet #stageTabs. Kalejdoskopet (#view) och översikten (#cellWrap/#cell) ligger båda i #stage,
-lika stora, och bara en visas (body.over). Valet sparas i localStorage "kalejdo.stageTab". I helskärm döljs flikarna och
-översikten. frame() ritar bara den synliga.
-
+## Vyval Kaleidoscope / Overview (2026-11-12)
+Kalejdoskopet (#view) och översikten (#cellWrap/#cell) ligger båda i #stage, lika stora, och bara en visas (body.over).
+Valet görs med två ikonknappar (#stageTabs) i scenens nedre vänstra hörn, i tomrummet mellan cirkeln och kvadraten;
+helskärmsknappen #stageFull ligger i nedre högra hörnet. De låg först som flikrad ovanför scenen men hamnade bakom
+statusfältet på Dicks telefon. Valet sparas i localStorage "kalejdo.stageTab". I helskärm döljs knapparna och översikten.
+frame() ritar bara den synliga.
