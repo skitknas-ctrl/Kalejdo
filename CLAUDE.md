@@ -326,3 +326,19 @@ frame() ritar bara den synliga.
   AAB (`-PplayRelease`, versionsnamn `playVersion` i app/build.gradle.kts, versionskod = körningsnumret).
   Uppladdningsnyckeln ligger i GitHub secrets och i `butik-kalla/play-upload/` (privat, aldrig i repot).
 - Appen riktar sig mot Android 16 (targetSdk 36), som Google Play kräver för nya appar sedan 2026-08-31.
+
+## Pro som prenumeration, delning och levande bakgrund (2026-11-12)
+
+- Butiken (`store/`, Shop-chipet, paketen) är avskaffad; avsnitten om den ovan är historik. Biblioteket hämtas från
+  gr8eam.com för kontots nivå (gratis eller Pro).
+- Pro = månadsprenumeration i Google Play, produkt-id `pro` (SUBS). `MainActivity.queryPro()` väljer erbjudandet med gratis
+  första period om Google Play listar det (provmånaden), annars basplanen, och skickar `{"price","trial"}` till
+  `window.kalejdoPrice`. Servern (gr8eam.com/Kalejdo/api/konto.php) avgör om Pro är aktivt.
+- Dela (Pro): knappen Share i My kaleidoscopes sparar kalejdoskopet på kontot och öppnar Androids delningsruta
+  (`KalejdoApp.share`). Länken slutar fungera när prenumerationen upphör.
+- Levande bakgrund (Pro): More > "Use as live wallpaper" sparar kalejdoskopet i localStorage `kalejdo.wallpaper.v1` och
+  öppnar Androids bakgrundsväljare. `KalejdoWallpaper.kt` visar `index.html?wallpaper=1` (konstanten `WALL` i sidan: bara
+  mönstret i helskärm, inget sparas) i en WebView på en virtuell skärm som ritar på bakgrundens yta.
+  INTE PROVAD PÅ TELEFON när den skrevs.
+- Samma gränssnittsändringar som webben: standardlager, värden vid reglagen, bakgrundsfärg i panelen, Duplicate,
+  10 slumpade saker på varje lager.
