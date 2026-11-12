@@ -47,10 +47,10 @@ body.full #view{position:absolute;left:0;top:0;border-radius:0}
 .ib{width:38px;height:38px;border-radius:10px;background:var(--panel2);display:grid;place-items:center;flex:none}
 .ib svg{width:22px;height:22px}
 /* helskärmsmenyn (2026-11-12): liten knapp uppe till höger, meny med Spara bild (sömlös platta) och bakgrundsfärg */
-#fullMenuBtn{display:none;position:absolute;right:10px;top:10px;width:36px;height:36px;border-radius:50%;background:#0007;color:#fff;place-items:center;z-index:3}
+#fullMenuBtn{display:none;position:absolute;right:14px;top:calc(14px + env(safe-area-inset-top));width:40px;height:40px;border-radius:50%;background:#0007;color:#fff;place-items:center;z-index:3}
 body.full #fullMenuBtn{display:grid}
 #fullMenuBtn svg{width:22px;height:22px}
-#fullMenu{display:none;position:absolute;right:10px;top:52px;z-index:4;background:#2c2839;border:1px solid var(--line);border-radius:12px;padding:6px;
+#fullMenu{display:none;position:absolute;right:14px;top:calc(60px + env(safe-area-inset-top));z-index:4;background:#2c2839;border:1px solid var(--line);border-radius:12px;padding:6px;
   flex-direction:column;min-width:210px;box-shadow:0 6px 20px #0008}
 body.full #fullMenu.on{display:flex}
 #fullMenu button{text-align:left;padding:9px 12px;border-radius:8px}
@@ -1102,6 +1102,8 @@ $("#starterBtn").onclick = () => { starterMix(); $("#sheet").classList.remove("o
 function toggleFull() {
   const on = document.body.classList.toggle("full");
   closeFullMenu();
+  // i appen göms operativets statusfält och navigeringsknappar i helskärm (svep från kanten visar dem tillfälligt)
+  if (window.KalejdoApp && KalejdoApp.setFullscreen) { try { KalejdoApp.setFullscreen(on); } catch (e) {} }
   layout();
   if (on) { $("#hint").classList.add("on"); setTimeout(() => $("#hint").classList.remove("on"), 2200); }
 }

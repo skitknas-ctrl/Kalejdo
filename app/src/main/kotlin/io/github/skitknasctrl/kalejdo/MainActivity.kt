@@ -18,6 +18,8 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.webkit.WebViewAssetLoader
 
@@ -74,8 +76,19 @@ class MainActivity : AppCompatActivity() {
         web.loadUrl("https://appassets.androidplatform.net/assets/index.html")
     }
 
-    /** Det sidan får anropa från JavaScript: spara en bild i Bilder/Kalejdo och öppna en köplänk i webbläsaren. */
+    /** Det sidan får anropa från JavaScript: spara en bild i Bilder/Kalejdo, öppna en köplänk i webbläsaren
+     *  och dölja/visa operativets fält (statusfält och navigeringsknappar) i helskärmsläget. */
     inner class AppBridge {
+        /** Helskärm (2026-11-12): systemfälten göms och sidan får hela skärmen; ett svep från kanten visar dem tillfälligt. */
+        @JavascriptInterface
+        fun setFullscreen(on: Boolean) {
+            runOnUiThread {
+                val c = WindowCompat.getInsetsController(window, web)
+                c.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                if (on) c.hide(WindowInsetsCompat.Type.systemBars()) else c.show(WindowInsetsCompat.Type.systemBars())
+            }
+        }
+
         @JavascriptInterface
         fun openUrl(url: String): Boolean {
             val uri = Uri.parse(url)

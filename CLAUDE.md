@@ -294,3 +294,6 @@ frame() ritar bara den synliga.
   mitten) sätter S.light = -1; "Light" bläddrar tillbaka bland förinställda ljus. bg ingår i SAVE_FIELDS.
   Översikten: tryck på en pryl ger menyn Delete/Resize/Rotate i alla lägen (#ctx); på Fixed-lager flyttas prylar med drag;
   högerklick (PC) ger samma meny. Rotationen står still medan menyn är öppen (ctxOpen).
+- 2026-11-12 (helskärm i appen): KalejdoApp.setFullscreen(on) i MainActivity döljer/visar systemfälten (statusfält +
+  navigeringsknappar) med WindowInsetsControllerCompat; svep från kanten visar dem tillfälligt. Anropas från toggleFull().
+  Insets-lyssnaren ger då 0 i padding så sidan får hela skärmen. Helskärmsmenyns knapp ligger 14 px + safe-area från kanten.
