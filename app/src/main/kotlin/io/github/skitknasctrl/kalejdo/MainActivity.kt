@@ -113,7 +113,7 @@ class MainActivity : AppCompatActivity() {
                 return@queryPurchasesAsync
             }
             val found = handlePurchases(purchases, false)
-            if (tell && !found) js("kalejdoBilling", "No active Pro subscription was found on this Google account")
+            if (tell && !found) js("kalejdoBilling", "No active Kalejdo + subscription was found on this Google account")
         }
     }
 
@@ -129,7 +129,7 @@ class MainActivity : AppCompatActivity() {
                 js("kalejdoPurchase", p.purchaseToken)
             } else if (p.purchaseState == Purchase.PurchaseState.PENDING) {
                 found = true
-                if (tell) js("kalejdoBilling", "The payment is pending. Pro unlocks when it has gone through.")
+                if (tell) js("kalejdoBilling", "The payment is pending. Kalejdo + unlocks when it has gone through.")
             }
         }
         return found

@@ -275,7 +275,7 @@ body.wall #fullMenuBtn,body.wall #hint,body.wall #toast,body.wall #loading,body.
   <div class="line"><span>Field of view</span><input id="zoom" type="range" min="40" max="85" step="1" style="width:45%"></div>
   <div class="line" style="gap:8px">
     <button class="btn" id="openSavesBtn" style="flex:1">My kaleidoscopes</button>
-    <button class="btn" id="openProBtn" style="flex:1">Kalejdo Pro</button>
+    <button class="btn" id="openProBtn" style="flex:1">Kalejdo +</button>
   </div>
   <div class="line" style="gap:8px">
     <button class="btn" id="wallBtn" style="flex:1">Use as live wallpaper</button>
@@ -286,18 +286,18 @@ body.wall #fullMenuBtn,body.wall #hint,body.wall #toast,body.wall #loading,body.
 <div id="savesSheet" class="sheet"><div class="box">
   <h2>My kaleidoscopes</h2>
   <p class="lead">Save the kaleidoscope as it looks now and open it again later.</p>
-  <div class="line"><input class="txt" id="saveName" maxlength="40" placeholder="Name"><button class="btn brass" id="saveNowBtn">Save</button><button class="btn" id="shareNowBtn" title="Share a link to this kaleidoscope (Pro)">Share</button></div>
+  <div class="line"><input class="txt" id="saveName" maxlength="40" placeholder="Name"><button class="btn brass" id="saveNowBtn">Save</button><button class="btn" id="shareNowBtn" title="Share a link to this kaleidoscope (Kalejdo +)">Share</button></div>
   <div id="savesList"></div>
   <div id="pubBox" hidden>
-    <h3>Shared – anyone with the link can open these while your Pro subscription is active</h3>
+    <h3>Shared – anyone with the link can open these while your Kalejdo + subscription is active</h3>
     <div id="pubList" style="margin-top:8px"></div>
   </div>
   <button class="btn" id="closeSaves">Close</button>
 </div></div>
 <div id="proSheet" class="sheet"><div class="box">
-  <h2>Kalejdo Pro</h2>
+  <h2>Kalejdo +</h2>
   <p class="lead" id="proLead"></p>
-  <button class="btn brass" id="proBuy">Get Pro</button>
+  <button class="btn brass" id="proBuy">Get Kalejdo +</button>
   <button class="btn" id="proRestore">Restore subscription</button>
   <button class="btn" id="proManage">Manage subscription</button>
   <button class="btn brass" id="proScan">Sign in on the web</button>
@@ -312,7 +312,7 @@ body.wall #fullMenuBtn,body.wall #hint,body.wall #toast,body.wall #loading,body.
 "use strict";
 const $ = s => document.querySelector(s);
 const TAU = Math.PI * 2;
-const LAYERS = 4, MAX_PER_LAYER = 40, G = 2.6, MAX_SPIN = .65;   // MAX_SPIN halverad 2026-11-13
+const LAYERS = 4, MAX_PER_LAYER = 40, G = 2.6, MAX_SPIN = .975;   // halverad 2026-11-13, sedan +50 % samma dag (Dick: för långsamt i mobilen)
 // Huvudreglagets fart (0–100) i rad/s. Jämfört med första versionen är farten 80 % lägre längst
 // ner på reglaget och 60 % lägre längst upp (faktor 0,2 -> 0,4 längs reglaget).
 function spinSpeed(v) { const t = v / 100; return t * MAX_SPIN * (0.2 + 0.2 * t); }
@@ -1240,7 +1240,7 @@ function toggleFull() {
 
 const BAG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2" stroke-linecap="round"/></svg>';
 function renderChips() {
-  $("#chips").innerHTML = (PRO ? "" : `<button class="chip shop" data-c="__pro">Pro</button>`)
+  $("#chips").innerHTML = (PRO ? "" : `<button class="chip shop" data-c="__pro">+</button>`)
     + [{id: "all", name: "All"}].concat(CATS).map(c => `<button class="chip" data-c="${c.id}">${esc(c.name)}</button>`).join("");
 }
 function buildLibrary() {
@@ -1460,22 +1460,22 @@ async function asKonto(action, data) {
   catch (e) { if (e.status !== 401) throw e; return await kontoPost(action, Object.assign({konto: await getKonto(true)}, data)); }
 }
 function refreshPro() {
-  $("#openProBtn").textContent = PRO ? "Sign in on the web" : "Kalejdo Pro";
+  $("#openProBtn").textContent = PRO ? "Sign in on the web" : "Kalejdo +";
   $("#proLead").textContent = PRO
-    ? "Pro is active. To use Pro in a web browser too, open kalejdo.app on a computer, choose More and Show QR code, then scan the code here. On the web you can also build your own library of pictures – it shows up in this app."
+    ? "Kalejdo + is active. To use it in a web browser too, open kalejdo.app on a computer, choose More and Show QR code, then scan the code here. On the web you can also build your own library of pictures – it shows up in this app."
     : "All libraries, your own library of pictures, sharing, live wallpaper, and the same libraries in a web browser. "
       + (proTrial ? "The first month is free, then " : "") + (proPrice ? proPrice + " per month. " : (proTrial ? "a monthly subscription. " : "Monthly subscription. ")) + "Cancel any time in Google Play.";
   $("#proBuy").hidden = $("#proRestore").hidden = PRO;
   $("#proScan").hidden = $("#proManage").hidden = !PRO;
-  $("#proBuy").textContent = proTrial ? "Try Pro free for a month" : (proPrice ? "Subscribe – " + proPrice + " per month" : "Subscribe");
+  $("#proBuy").textContent = proTrial ? "Try Kalejdo + free for a month" : (proPrice ? "Subscribe – " + proPrice + " per month" : "Subscribe");
 }
 function openPro() { $("#sheet").classList.remove("on"); refreshPro(); $("#proSheet").classList.add("on"); }
 const native = name => window.KalejdoApp && typeof KalejdoApp[name] === "function";
 $("#openProBtn").onclick = openPro;
 $("#closePro").onclick = () => $("#proSheet").classList.remove("on");
 $("#proSheet").addEventListener("click", e => { if (e.target.id === "proSheet") $("#proSheet").classList.remove("on"); });
-$("#proBuy").onclick = () => { if (native("proBuy")) KalejdoApp.proBuy(); else toast("Pro is bought in the Android app from Google Play"); };
-$("#proRestore").onclick = () => { if (native("proRestore")) KalejdoApp.proRestore(); else toast("Pro is restored in the Android app"); };
+$("#proBuy").onclick = () => { if (native("proBuy")) KalejdoApp.proBuy(); else toast("Kalejdo + is bought in the Android app from Google Play"); };
+$("#proRestore").onclick = () => { if (native("proRestore")) KalejdoApp.proRestore(); else toast("Kalejdo + is restored in the Android app"); };
 $("#proManage").onclick = () => { if (native("openUrl")) KalejdoApp.openUrl("https://play.google.com/store/account/subscriptions?sku=pro&package=com.gr8eam.kalejdo"); };
 $("#privacyBtn").onclick = () => { if (native("openUrl")) KalejdoApp.openUrl(LIB_URL + "privacy.html"); else window.open(LIB_URL + "privacy.html"); };
 // Levande bakgrund (Pro): kalejdoskopet som det ser ut nu sparas undan, sedan öppnas Androids bakgrundsväljare
@@ -1512,7 +1512,7 @@ window.kalejdoPurchase = async token => {
     setPro(true);
     await loadLibrary();
     renderChips(); showCat(); refreshPro();
-    toast("Kalejdo Pro is unlocked");
+    toast("Kalejdo + is unlocked");
   } catch (e) { toast(e.message || "The purchase could not be verified"); }
   buying = false;
 };

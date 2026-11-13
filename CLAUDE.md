@@ -356,3 +356,10 @@ frame() ritar bara den synliga.
   onCreate, onWindowFocusChanged och från `AppBridge.setFullscreen`. Raden från 2026-11-12 om att setFullscreen visar fälten
   igen gäller inte längre. Kamerautskärningen ger fortfarande padding (trolig mörk remsa i överkant).
 - Maskinen saknar JDK/Android SDK: bygget sker på GitHub efter push. Inget är committat.
+
+## 2026-11-13 (omgång 2): fart, namnbytet till "+", aldrig admin
+- `MAX_SPIN` .975 (+50 % mot .65; Dick: för långsamt i mobilen). Gäller bara appen.
+- Betalnivån heter "+" ("Kalejdo +") i all text användaren ser (index.html och MainActivity.kt). Interna namn är oförändrade:
+  produkt-id `pro`, variabeln `PRO`, `proBuy` osv.
+- Admin finns bara på webben. Appen har inget adminläge i koden, och servern (`kj_admin()` i kalejdo.app/api/bas.php) svarar
+  aldrig admin på anrop från appens WebView (ursprung appassets.androidplatform.net eller X-Requested-With = paketnamnet).
