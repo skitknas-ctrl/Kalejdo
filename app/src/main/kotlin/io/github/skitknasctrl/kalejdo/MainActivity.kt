@@ -142,10 +142,12 @@ class MainActivity : AppCompatActivity() {
         web.setBackgroundColor(Color.parseColor("#15131C"))
         setContentView(web)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        hideSystemBars()
         startBilling()
 
         // Android 15 ritar appar kant till kant: håll innehållet innanför statusfältet,
-        // utskärningen och navigeringsfältet.
+        // utskärningen och navigeringsfältet. Systemfälten är dolda i hela appen (hideSystemBars), så de ger
+        // 0 här; kvar blir kamerautskärningen, som fortfarande ger marginal så att inget hamnar under den.
         ViewCompat.setOnApplyWindowInsetsListener(web) { v, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
             v.setPadding(bars.left, bars.top, bars.right, bars.bottom)
@@ -227,14 +229,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        /** Helskärm (2026-11-12): systemfälten göms och sidan får hela skärmen; ett svep från kanten visar dem tillfälligt. */
+        /** Sidans helskärmsläge. Sedan 2026-11-13 är systemfälten dolda i hela appen, så de visas inte igen när
+         *  helskärmsläget lämnas; anropet ser bara till att de är dolda. */
         @JavascriptInterface
         fun setFullscreen(on: Boolean) {
-            runOnUiThread {
-                val c = WindowCompat.getInsetsController(window, web)
-                c.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-                if (on) c.hide(WindowInsetsCompat.Type.systemBars()) else c.show(WindowInsetsCompat.Type.systemBars())
-            }
+            runOnUiThread { hideSystemBars() }
         }
 
         /** Androids delningsruta med en länk till ett delat kalejdoskop. */
@@ -295,6 +294,19 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             false
         }
+    }
+
+    /** Statusfält och navigeringsfält är dolda i hela appen (2026-11-13); ett svep från kanten visar dem tillfälligt. */
+    private fun hideSystemBars() {
+        val c = WindowCompat.getInsetsController(window, window.decorView)
+        c.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        c.hide(WindowInsetsCompat.Type.systemBars())
+    }
+
+    // fälten kan komma tillbaka när appen tappat fokus (dialoger, köpflödet, andra appar): dölj dem igen
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) hideSystemBars()
     }
 
     override fun onPause() { super.onPause(); web.onPause() }

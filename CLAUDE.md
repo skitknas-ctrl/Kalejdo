@@ -346,3 +346,13 @@ frame() ritar bara den synliga.
   databas kalejdo_db på VPS:en, lokal kod `C:\Users\dick\kod\kalejdo.app`). `LIB_URL` pekar dit; API, delningslänkar
   (`https://kalejdo.app/?k=…`), QR-inloggning och integritetssidan (`https://kalejdo.app/privacy.html`) ligger där.
   Äldre rader ovan som nämner gr8eam.com/Kalejdo gäller numera kalejdo.app. Paketnamnet `com.gr8eam.kalejdo` är oförändrat.
+
+## 2026-11-13: ändringar från webben + dolda systemfält (EJ byggt, EJ provat på telefon)
+- index.html: Shake i lagerraden och bara valt lager; `gravScale()` kvadratisk under 100 % + `viscosity()` (faller som i olja);
+  MAX_SPIN .65; helskärmsmenyn har Speed (`#fmSpin`) och Pattern size; Pattern size och Spin inertia borta ur More, `inertia()` = 8;
+  hjälptexterna under Gravity och Field of view borta; webbens skärpelösning införd (`raster(id, px)`, `CH`/`sizeChamber()` med
+  1,5 gångers översampling, helskärm upp till 3200 px, `drawPatternTo(..., snap)`); `.lrow .ib` får krympa på smala skärmar.
+- MainActivity.kt: `hideSystemBars()` (status- och navigeringsfält dolda i hela appen, svep visar dem tillfälligt), anropas i
+  onCreate, onWindowFocusChanged och från `AppBridge.setFullscreen`. Raden från 2026-11-12 om att setFullscreen visar fälten
+  igen gäller inte längre. Kamerautskärningen ger fortfarande padding (trolig mörk remsa i överkant).
+- Maskinen saknar JDK/Android SDK: bygget sker på GitHub efter push. Inget är committat.

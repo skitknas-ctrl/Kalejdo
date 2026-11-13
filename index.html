@@ -105,9 +105,9 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 #tabs button.hidden b{opacity:.4;text-decoration:line-through}
 .lrow{display:flex;gap:6px;align-items:center}
 /* knappraden för valt lager (2026-11-12): samma höjd som skakknappen; lägesknappen Tumble/Fixed i mässing */
-.lrow .ib{width:38px;height:38px}
+.lrow .ib{width:38px;height:38px;flex:0 1 38px;min-width:0}   /* får krympa lite på smala skärmar sedan skakknappen flyttade hit (2026-11-13) */
 .lrow .ib svg{width:22px;height:22px}
-.lrow .ib.mode{width:auto;padding:0 12px;font-weight:600;font-size:12.5px;background:var(--brass);color:#2a1a00}
+.lrow .ib.mode{width:auto;flex:none;padding:0 12px;font-weight:600;font-size:12.5px;background:var(--brass);color:#2a1a00}
 .op{flex:1;display:flex;align-items:center;gap:4px;min-width:0}
 .op svg{width:16px;height:16px;flex:none;color:var(--dim)}
 .lrow .gap{flex:1}
@@ -209,7 +209,8 @@ body.wall #fullMenuBtn,body.wall #hint,body.wall #toast,body.wall #loading,body.
     <div id="hint">Tap: stop/start · double-tap: controls</div>
     <button id="fullMenuBtn" title="Menu"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
     <div id="fullMenu">
-      <label><b>Zoom</b><input type="range" id="fmZoom" min="25" max="100" step="1"></label>
+      <label><b>Speed</b><input type="range" id="fmSpin" min="0" max="100" step="1"></label>
+      <label><b>Pattern size</b><input type="range" id="fmZoom" min="25" max="100" step="1"></label>
       <div id="bgCtl"><h4>Background colour</h4>
       <label>Hue<input type="range" id="fmHue" min="0" max="360" step="1"></label>
       <label>Saturation<input type="range" id="fmSat" min="0" max="100" step="1"></label>
@@ -227,7 +228,6 @@ body.wall #fullMenuBtn,body.wall #hint,body.wall #toast,body.wall #loading,body.
         <button id="pauseBtn" title="Stop/start rotation"></button>
         <input id="spin" type="range" min="0" max="100" step="1">
       </div>
-      <button class="ib" id="shakeBtn" title="Shake"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="5" width="10" height="14" rx="2"/><path d="M3 9v6M21 9v6M5 7v10M19 7v10" opacity=".55"/></svg></button>
       <button class="ib" id="lightBtn" title="Background colour"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
       <button class="ib" id="savesBtn" title="My kaleidoscopes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 10v6M9 13h6" stroke-linecap="round"/></svg></button>
       <button class="ib" id="moreBtn" title="More"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
@@ -241,6 +241,7 @@ body.wall #fullMenuBtn,body.wall #hint,body.wall #toast,body.wall #loading,body.
           <button class="ib" id="lockBtn" title="Lock this layer: it stops turning"></button>
           <button class="ib" id="revBtn" title="Turn this layer the opposite way"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v4h-4"/></svg></button>
           <button class="ib mode" id="modeBtn" title="Tumble: things fall and roll · Fixed: things stay put">Tumble</button>
+          <button class="ib" id="shakeBtn" title="Shake this layer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="5" width="10" height="14" rx="2"/><path d="M3 9v6M21 9v6M5 7v10M19 7v10" opacity=".55"/></svg></button>
           <button class="ib" id="fillBtn" title="Fill with random things"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.3" fill="currentColor"/><circle cx="15" cy="15" r="1.3" fill="currentColor"/><circle cx="15" cy="9" r="1.3" fill="currentColor"/><circle cx="9" cy="15" r="1.3" fill="currentColor"/></svg></button>
           <button class="ib" id="clearBtn" title="Empty layer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button>
           <span class="gap"></span>
@@ -270,10 +271,8 @@ body.wall #fullMenuBtn,body.wall #hint,body.wall #toast,body.wall #loading,body.
 <div id="sheet" class="sheet"><div class="box">
   <h2>Kalejdo</h2>
   <div class="line"><span>Tilt to tumble<small>Gravity follows how you hold the phone</small></span><button class="sw" id="tiltSw"></button></div>
-  <div class="line"><span>Pattern size<small>Size of the tiles in full-screen view</small></span><input id="tile" type="range" min="25" max="100" step="1" style="width:45%"></div>
-  <div class="line"><span>Spin inertia<small>Left: things twirl easily · right: heavy and slow</small></span><input id="inertia" type="range" min="1" max="10" step="1" style="width:45%"></div>
-  <div class="line"><span>Gravity<small>How hard things fall in Tumble layers</small></span><input id="grav" type="range" min="10" max="300" step="5" style="width:45%"></div>
-  <div class="line"><span>Field of view<small>Left: close-up · right: more of the container</small></span><input id="zoom" type="range" min="40" max="85" step="1" style="width:45%"></div>
+  <div class="line"><span>Gravity</span><input id="grav" type="range" min="10" max="300" step="5" style="width:45%"></div>
+  <div class="line"><span>Field of view</span><input id="zoom" type="range" min="40" max="85" step="1" style="width:45%"></div>
   <div class="line" style="gap:8px">
     <button class="btn" id="openSavesBtn" style="flex:1">My kaleidoscopes</button>
     <button class="btn" id="openProBtn" style="flex:1">Kalejdo Pro</button>
@@ -313,13 +312,15 @@ body.wall #fullMenuBtn,body.wall #hint,body.wall #toast,body.wall #loading,body.
 "use strict";
 const $ = s => document.querySelector(s);
 const TAU = Math.PI * 2;
-const LAYERS = 4, MAX_PER_LAYER = 40, G = 2.6, MAX_SPIN = 1.3;
+const LAYERS = 4, MAX_PER_LAYER = 40, G = 2.6, MAX_SPIN = .65;   // MAX_SPIN halverad 2026-11-13
 // Huvudreglagets fart (0–100) i rad/s. Jämfört med första versionen är farten 80 % lägre längst
 // ner på reglaget och 60 % lägre längst upp (faktor 0,2 -> 0,4 längs reglaget).
 function spinSpeed(v) { const t = v / 100; return t * MAX_SPIN * (0.2 + 0.2 * t); }
-// Tröghet (1–10) och gravitation (procent) från inställningarna
-function inertia() { return S.inertia || 4; }
-function gravScale() { return (S.grav == null ? 100 : S.grav) / 100; }
+function inertia() { return 8; }   // fast värde sedan 2026-11-13, reglaget borttaget
+// Gravitation (procent) från inställningarna; under 100 % avtar den kvadratiskt
+function gravScale() { const v = (S.grav == null ? 100 : S.grav) / 100; return v >= 1 ? v : v * v; }
+// vätskans tröghet: 1 vid normal tyngdkraft, upp till ~4 vid lägsta (sakerna sjunker som i olja)
+function viscosity() { const v = (S.grav == null ? 100 : S.grav) / 100; return v >= 1 ? 1 : 1 + (1 - v) * 3.3; }
 const STORE = "kalejdo.v1";
 /* Levande bakgrund (2026-11-12): Android-skalets bakgrundstjänst (KalejdoWallpaper) laddar sidan med ?wallpaper=1.
    Då visas bara mönstret i helskärm, inget sparas, och kalejdoskopet hämtas ur WKEY (det användaren valde som bakgrund). */
@@ -413,8 +414,7 @@ function save(now) {
 
 /* ------------------------------------------------------------------ images */
 const images = new Map();   // prop id -> Promise<HTMLImageElement|null>
-const rasters = new Map();  // id|hue -> canvas
-const RASTER = 192;
+const rasters = new Map();  // id|storlek -> canvas
 // SVG-filerna från webben sparas i Cache API så att de finns kvar utan nät (v-parametern i adressen byts när prylen ändras)
 async function fetchSvg(url) {
   let c = null;
@@ -444,20 +444,29 @@ function loadImage(id) {
   pr.then(img => { if (img) img.ready = true; p && (p.img = img); });
   return pr;
 }
-function raster(id, hue) {
-  hue = 0;  // Mix colours togs bort 2026-11-11: prylar visas alltid i sina egna färger
-  const key = id + "|" + hue;
+// Skärpa (2026-11-13, som webben): prylen rastreras ur SVG:n i den storlek den faktiskt ritas (px = sidan i skärmpixlar),
+// avrundat uppåt till närmaste tvåpotens 64–1024. Då förstoras aldrig en liten bitmapp, och SVG:erna blir skarpa
+// oavsett Pattern size / Field of view. Storlekar som inte använts på ett tag kastas (pruneRasters).
+// Prylar visas alltid i sina egna färger (Mix colours togs bort 2026-11-11).
+let rasterTick = 0;
+function raster(id, px) {
+  let n = 64;
+  while (n < px && n < 1024) n *= 2;
+  const key = id + "|" + n;
   let c = rasters.get(key);
-  if (c) return c;
+  if (c) { c.used = rasterTick; return c; }
   const p = PROPS[id];
   if (!p || !p.img) { loadImage(id); return null; }
   c = document.createElement("canvas");
-  c.width = c.height = RASTER;
-  const x = c.getContext("2d");
-  if (hue && "filter" in x) x.filter = `hue-rotate(${hue}deg) saturate(1.15)`;
-  x.drawImage(p.img, 0, 0, RASTER, RASTER);
+  c.width = c.height = n;
+  c.getContext("2d").drawImage(p.img, 0, 0, n, n);
+  c.used = rasterTick;
   rasters.set(key, c);
   return c;
+}
+function pruneRasters() {
+  if (++rasterTick % 240) return;
+  for (const [k, c] of rasters) if (rasterTick - c.used > 240) rasters.delete(k);
 }
 
 /* ------------------------------------------------------------------ items */
@@ -548,7 +557,7 @@ function physics(dt) {
     if (isFixed(L) || L.locked || !L.items.length) continue;
     const w = w0 * layerK(L);
     const float = !!L.burst, its = L.items, n = its.length;   // under skak-pulsen svävar sakerna tyngdlöst
-    const k = float ? 1.1 : .55, I = inertia(), GG = G * gravScale(), vaMax = 12 / I;
+    const k = float ? 1.1 : .55 * viscosity(), I = inertia(), GG = G * gravScale(), vaMax = 12 / I;
     for (const it of its) {
       // vätskan i cellen roterar med cellen och drar med sig sakerna
       it.vx += (-w * it.y - it.vx) * k * dt;
@@ -604,15 +613,16 @@ function physics(dt) {
     }
   }
 }
-function shake() {
+function shake() {   // skakar bara det valda lagret (2026-11-13)
   const g = gravity(), now = performance.now();
-  for (const L of S.layers) {
-    if (L.locked || !L.items.length) continue;
+  for (const L of [S.layers[S.sel]]) {
+    if (L.locked) { toast(`Layer ${S.sel + 1} is locked`); continue; }
+    if (!L.items.length) continue;
     if (L.mode === "fixed") { if (!L.burst) toWorld(L); L.burst = now + 500; }   // lossnar en halv sekund
     for (const it of L.items) {
       const up = L.mode === "tumble" ? rnd(1.2, 2.6) : 0;
       it.vx += rnd(-1.6, 1.6) - g.x * up; it.vy += rnd(-1.6, 1.6) - g.y * up;
-      it.va += rnd(-10, 10) / inertia();
+      it.va += rnd(-10, 10);
     }
   }
   if (navigator.vibrate) try { navigator.vibrate(30); } catch (e) {}
@@ -621,6 +631,7 @@ function shake() {
 /* ------------------------------------------------------------------ drawing */
 const view = $("#view"), vctx = view.getContext("2d");
 const cham = document.createElement("canvas"), hctx = cham.getContext("2d");
+const CH = {x0: -1, y0: -1, w: 2, h: 2, k: 100};   // utsnittet av behållaren som cham visar, sätts i sizeChamber()
 let viewCss = 300, cellCss = 96;
 const cell = $("#cell"), cctx = cell.getContext("2d");
 
@@ -662,12 +673,15 @@ function backdrop(ctx, R) {
     ctx.fillStyle = g; ctx.fillRect(-R, -R, 2 * R, 2 * R);
   }
 }
-function drawCell(ctx, px, dim) {
-  const R = px / 2;
+// Ritar behållaren. Utan reg: hela behållaren i en px×px-yta. Med reg (CH): bara utsnittet reg.x0/y0/w/h
+// (behållarenheter) i skalan reg.k pixlar per enhet – så ritas den tårtbit speglarna ser i full upplösning.
+function drawCell(ctx, px, dim, reg) {
+  const R = reg ? reg.k : px / 2, ox = reg ? -reg.x0 * R : R, oy = reg ? -reg.y0 * R : R;
+  const cw = ctx.canvas.width, chh = ctx.canvas.height;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.clearRect(0, 0, px, px);
+  ctx.clearRect(0, 0, cw, chh);
   ctx.save();
-  ctx.translate(R, R);
+  ctx.translate(ox, oy);
   ctx.beginPath(); ctx.arc(0, 0, R, 0, TAU); ctx.clip();
   backdrop(ctx, R);
   const ct = Math.cos(theta), st = Math.sin(theta);
@@ -676,13 +690,15 @@ function drawCell(ctx, px, dim) {
     ctx.globalAlpha = L.opacity * (dim && li !== S.sel ? .3 : 1);
     const fixed = isFixed(L), lt = layerTheta(L), ct = Math.cos(lt), st = Math.sin(lt);
     for (const it of L.items) {
-      const c = raster(it.p, it.h);
-      if (!c) continue;
       let x = it.x, y = it.y, a = it.a;
       if (fixed) { x = it.x * ct - it.y * st; y = it.x * st + it.y * ct; a += lt; }
-      const s = it.s * R, ca = Math.cos(a) * s / RASTER, sa = Math.sin(a) * s / RASTER;
-      ctx.setTransform(ca, sa, -sa, ca, R + x * R, R + y * R);
-      ctx.drawImage(c, -RASTER / 2, -RASTER / 2);
+      const s = it.s * R, tx = ox + x * R, ty = oy + y * R, h = s * .71;
+      if (tx + h < 0 || ty + h < 0 || tx - h > cw || ty - h > chh) continue;   // utanför utsnittet
+      const c = raster(it.p, s);
+      if (!c) continue;
+      const n = c.width, ca = Math.cos(a) * s / n, sa = Math.sin(a) * s / n;
+      ctx.setTransform(ca, sa, -sa, ca, tx, ty);
+      ctx.drawImage(c, -n / 2, -n / 2);
     }
   });
   ctx.restore();
@@ -711,7 +727,7 @@ function drawWedges(ctx, cx, cy, R, straight) {
     ctx.rotate(-Math.PI / 2);
     ctx.scale(k, k);
     ctx.translate(0, -apex);
-    ctx.drawImage(cham, -1, -1, 2, 2);
+    ctx.drawImage(cham, CH.x0, CH.y0, CH.w, CH.h);
     ctx.restore();
   }
 }
@@ -750,10 +766,12 @@ function polygonPath(ctx, cx, cy, R, n) {
   }
   ctx.closePath();
 }
-function drawPattern() { vctx.setTransform(1, 0, 0, 1, 0, 0); drawPatternTo(vctx, view.width, view.height, tileR()); }
+function drawPattern() { vctx.setTransform(1, 0, 0, 1, 0, 0); drawPatternTo(vctx, view.width, view.height, tileR(), true); }
 // Ritar mönstret med plattradien R över ytan W×H i ctx (i ctx:s nuvarande transform).
-function drawPatternTo(vctx, W, H, R) {
-  const N = S.slices;
+// snap = plattorna läggs på hela pixlar (skärmen), så att de inte mjukas upp av omsampling. Sparade bilder (snapshot,
+// delningsbild) ritas utan snap, eftersom de skalas och måste hålla den exakta perioden.
+function drawPatternTo(vctx, W, H, R, snap) {
+  const N = S.slices, rp = snap ? Math.round : v => v;
   const T = Math.ceil(2 * R + 12), tc = T / 2;
   if (tileC.width !== T) tileC.width = tileC.height = T;
   tctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -770,7 +788,7 @@ function drawPatternTo(vctx, W, H, R) {
     const ni = Math.ceil(cx / dx) + 1, nj = Math.ceil(cy / dy) + 1;
     for (let i = -ni; i <= ni; i++) {
       const x = cx + i * dx, off = (i & 1) ? dy / 2 : 0;
-      for (let j = -nj - 1; j <= nj; j++) vctx.drawImage(tileC, x - tc, cy + j * dy + off - tc);
+      for (let j = -nj - 1; j <= nj; j++) vctx.drawImage(tileC, rp(x - tc), rp(cy + j * dy + off - tc));
     }
   } else {
     // åttahörning: apotem a, rutnät med steget 2a. Kvadraternas halva diagonal h.
@@ -791,12 +809,13 @@ function drawPatternTo(vctx, W, H, R) {
     const ni = Math.ceil(cx / d) + 1, nj = Math.ceil(cy / d) + 1;
     for (let i = -ni; i <= ni; i++) for (let j = -nj; j <= nj; j++) {
       vctx.save();
-      vctx.translate(cx + i * d, cy + j * d); vctx.scale((i & 1) ? -1 : 1, (j & 1) ? -1 : 1);
+      // plattans övre vänstra hörn avrundas (inte mitten), så att kanterna hamnar på hela pixlar även när den speglas
+      vctx.translate(rp(cx + i * d - tc) + tc, rp(cy + j * d - tc) + tc); vctx.scale((i & 1) ? -1 : 1, (j & 1) ? -1 : 1);
       vctx.drawImage(tileC, -tc, -tc);
       vctx.restore();
     }
     for (let i = -ni; i <= ni; i++) for (let j = -nj; j <= nj; j++)
-      vctx.drawImage(sqC, cx + (i + .5) * d - qc, cy + (j + .5) * d - qc);
+      vctx.drawImage(sqC, rp(cx + (i + .5) * d - qc), rp(cy + (j + .5) * d - qc));
   }
 }
 // Lilla behållarbilden: valt lager i full styrka, övriga nedtonade, och den tårtbit speglarna ser streckad.
@@ -821,7 +840,7 @@ function layout() {
   const iw = innerWidth, ih = innerHeight - 12;
   const d = dpr();
   if (full) {
-    const st = $("#stage"), w = st.clientWidth, h = st.clientHeight, fd = Math.min(d, 2400 / Math.max(w, h));
+    const st = $("#stage"), w = st.clientWidth, h = st.clientHeight, fd = Math.min(d, 3200 / Math.max(w, h));   // telefonens fulla upplösning
     view.style.width = w + "px"; view.style.height = h + "px";
     view.width = Math.round(w * fd); view.height = Math.round(h * fd);
   } else {
@@ -836,9 +855,15 @@ function layout() {
 }
 function sizeChamber() {
   const full = document.body.classList.contains("full");
-  const vr = full ? tileR() : view.width / 2, {L} = wedge();
-  const px = Math.max(400, Math.min(1600, Math.round(2 * vr / L)));
-  if (cham.width !== px) cham.width = cham.height = px;
+  const vr = Math.max(50, full ? tileR() : view.width / 2), {L, apex, half} = wedge();
+  // cham täcker bara tårtbiten (spets i (0, apex), radie L nedåt) plus 8 px marginal. Skalan är 1,5 × den som
+  // ritas på skärmen (vr / L pixlar per behållarenhet): översamplingen gör att de vridna tårtbitarna inte blir mjuka.
+  // drawWedges ritar cham i behållarenheter (CH.x0/y0/w/h), så storleken på skärmen påverkas inte av faktorn.
+  const k = 1.5 * vr / L, m = 8 / k;
+  const pw = Math.ceil((2 * L * Math.sin(half) + 2 * m) * k), ph = Math.ceil((L + 2 * m) * k);
+  if (cham.width !== pw) cham.width = pw;
+  if (cham.height !== ph) cham.height = ph;
+  CH.k = k; CH.w = pw / k; CH.h = ph / k; CH.x0 = -CH.w / 2; CH.y0 = apex - m;
 }
 
 /* ------------------------------------------------------------------ loop */
@@ -853,7 +878,8 @@ function frame(t) {
   let n = 0;
   while (acc >= STEP && n < 8) { physics(STEP); acc -= STEP; n++; }
   if (n === 8) acc = 0;
-  drawCell(hctx, cham.width, false);
+  pruneRasters();
+  drawCell(hctx, 0, false, CH);
   const full = document.body.classList.contains("full");
   if (full || !document.body.classList.contains("over")) drawView();
   else drawCellPreview();
@@ -1043,7 +1069,7 @@ $("#toastBtn").onclick = () => { toastFn && toastFn(); toastFn = null; $("#toast
 
 /* Värde bredvid varje reglage (2026-11-12): varje input[type=range] får en siffra efter sig (b.rv) som följer reglaget. */
 const RV_FMT = {spin: v => v + "%", opacity: v => v + "%", speed: v => "×" + (v / 10).toFixed(1), size: v => v + "%", grav: v => v + "%",
-  tile: v => v + "%", fmZoom: v => v + "%", zoom: v => v + "%", inertia: v => v, fmHue: v => v + "°", fmSat: v => v + "%", fmLum: v => v + "%",
+  fmSpin: v => v + "%", fmZoom: v => v + "%", zoom: v => v + "%", fmHue: v => v + "°", fmSat: v => v + "%", fmLum: v => v + "%",
   fmLight: v => v + "%", deg: v => Math.round(v) + "°", sz: v => Math.round(v * 10) / 10};
 function rvSync(root) {
   (root || document).querySelectorAll("input[type=range]").forEach(inp => {
@@ -1057,11 +1083,9 @@ document.addEventListener("input", e => { if (e.target.type === "range") rvSync(
 function refreshTop() {
   document.querySelectorAll("#slices button").forEach(b => b.classList.toggle("on", +b.dataset.n === S.slices));
   $("#spin").value = S.spin;
-  $("#inertia").value = inertia();
   $("#grav").value = S.grav == null ? 100 : S.grav;
   $("#pauseBtn").innerHTML = running() ? ICON_PAUSE : ICON_PLAY;
   $("#spinBox").classList.toggle("off", !running());
-  $("#tile").value = S.tile;
   $("#size").value = S.size;
   $("#tiltSw").classList.toggle("on", S.tilt);
   $("#zoom").value = S.zoom;
@@ -1121,7 +1145,7 @@ $("#clearBtn").onclick = () => {
   L.items = []; refreshLayerUI(); save();
   toast(`Layer ${li + 1} emptied`, "Undo", () => { S.layers[li].items = old; refreshLayerUI(); save(); });
 };
-$("#slices").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; S.slices = +b.dataset.n; refreshTop(); save(); });
+$("#slices").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; S.slices = +b.dataset.n; sizeChamber(); refreshTop(); save(); });
 $("#spin").oninput = e => {
   let v = +e.target.value; if (v < 2) v = 0;
   S.spin = v; if (v) { S.lastSpin = v; S.paused = false; }
@@ -1129,7 +1153,6 @@ $("#spin").oninput = e => {
 };
 
 $("#pauseBtn").onclick = () => setRunning(!running());
-$("#tile").oninput = e => { S.tile = +e.target.value; sizeChamber(); save(); };
 $("#stageTabs").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   document.body.classList.toggle("over", b.dataset.v === "over");
@@ -1152,7 +1175,6 @@ $("#tiltSw").onclick = () => {
     setTimeout(() => { if (S.tilt && !tiltG) toast(window.isSecureContext ? "No motion sensor found" : "Tilt needs https"); }, 1500);
   });
 };
-$("#inertia").oninput = e => { S.inertia = +e.target.value; save(); };
 $("#grav").oninput = e => { S.grav = +e.target.value; save(); };
 $("#zoom").oninput = e => { S.zoom = +e.target.value; sizeChamber(); save(); };
 $("#stageFull").onclick = toggleFull;
@@ -1176,7 +1198,7 @@ function curBg() {
 }
 function refreshFullMenu() {
   const bg = curBg(), [h, sat, l] = hexToHsl(bg.c);
-  $("#fmLight").value = bg.l; $("#fmZoom").value = S.tile;
+  $("#fmLight").value = bg.l; $("#fmZoom").value = S.tile; $("#fmSpin").value = S.spin;
   $("#fmHue").value = Math.round(h); $("#fmSat").value = Math.round(sat * 100); $("#fmLum").value = Math.round(l * 100);
   rvSync(fullMenu); rvSync(bgPop);
 }
@@ -1202,8 +1224,9 @@ document.addEventListener("pointerdown", e => { if (bgPop.classList.contains("on
 view.addEventListener("pointerdown", closeFullMenu);
 $("#fmSave").onclick = () => { closeFullMenu(); snapshot(); };
 $("#fmExit").onclick = () => { closeFullMenu(); toggleFull(); };
-// Zoom i helskärm = plattornas storlek (samma värde som Pattern size i More-arket)
-$("#fmZoom").oninput = e => { S.tile = +e.target.value; $("#tile").value = S.tile; sizeChamber(); save(); };
+// Pattern size i helskärm = plattornas storlek (S.tile); Speed skickar vidare till huvudreglaget
+$("#fmZoom").oninput = e => { S.tile = +e.target.value; sizeChamber(); save(); };
+$("#fmSpin").oninput = e => { $("#spin").value = e.target.value; $("#spin").oninput({target: $("#spin")}); };
 $("#fmLight").oninput = e => setBg({l: +e.target.value});
 
 function toggleFull() {
