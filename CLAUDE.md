@@ -363,3 +363,10 @@ frame() ritar bara den synliga.
   produkt-id `pro`, variabeln `PRO`, `proBuy` osv.
 - Admin finns bara på webben. Appen har inget adminläge i koden, och servern (`kj_admin()` i kalejdo.app/api/bas.php) svarar
   aldrig admin på anrop från appens WebView (ursprung appassets.androidplatform.net eller X-Requested-With = paketnamnet).
+
+## 2026-11-13 (sent): synpunktsknapp i testfasen, + på kategorichipen
+- `TESTFAS = true` i index.html: en fet knapp `#fb` ("Tell us what you think", 56 px, hela bredden) ligger sist i `#app`, där annonsbannern
+  ska ligga i skarpt läge. Den öppnar `https://kalejdo.app/feedback.php?app=<version>` via `KalejdoApp.openUrl` (versionen från nya
+  bryggfunktionen `appVersion()`). `body.fb` gör att `layout()` drar 56 px från kalejdoskopets höjd; knappen döljs i helskärm och visas
+  inte i levande bakgrund. När bannern byggs: sätt TESTFAS false och låt bannern ta samma plats.
+- `chipLabel(c)`: kategorier med status `pro` får ett orangegult + efter namnet (ett + sist i namnet ritas inte dubbelt).

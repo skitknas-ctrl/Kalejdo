@@ -124,6 +124,15 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 #chips::-webkit-scrollbar{display:none}
 .chip{flex:none;padding:6px 12px;border-radius:16px;background:var(--panel2);color:var(--dim);font-size:13px;white-space:nowrap}
 .chip.on{background:var(--brass);color:#2a1a00;font-weight:600}
+.chip .plus{color:#ffb52e;font-weight:800;font-size:15px;line-height:1}
+.chip.on .plus{color:#7a3200}
+/* Testfasen: fet knapp för synpunkter där annonsbannern ska ligga i skarpt läge (se TESTFAS) */
+#fb{flex:none;height:56px;box-sizing:content-box;padding:0 12px env(safe-area-inset-bottom);border:0;border-radius:0;background:linear-gradient(#ffc24f,#f0871a);color:#2a1a00;
+  font-weight:800;font-size:17px;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:10px}
+#fb svg{width:22px;height:22px;flex:none}
+#fb:active{filter:brightness(1.12)}
+#fb[hidden],body.full #fb{display:none}
+body.fb #panel{padding-bottom:4px}
 .opts{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--dim)}
 .opts .grow{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .tog{display:flex;align-items:center;gap:5px;padding:4px 8px;border-radius:14px;background:var(--panel2);color:var(--dim);flex:none}
@@ -266,6 +275,7 @@ body.wall #fullMenuBtn,body.wall #hint,body.wall #toast,body.wall #loading,body.
     </div>
     <div id="lib"></div>
   </div>
+  <button id="fb" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg>Tell us what you think</button>
 </div>
 
 <div id="sheet" class="sheet"><div class="box">
@@ -844,7 +854,7 @@ function layout() {
     view.style.width = w + "px"; view.style.height = h + "px";
     view.width = Math.round(w * fd); view.height = Math.round(h * fd);
   } else {
-    viewCss = Math.floor(Math.min(iw - 12, Math.max(200, ih - 372)));   // 372 = panelen (vyknapparna ligger inne i scenen)
+    viewCss = Math.floor(Math.min(iw - 12, Math.max(200, ih - 372 - (document.body.classList.contains("fb") ? 56 : 0))));   // 372 = panelen (vyknapparna ligger inne i scenen)
     cellCss = viewCss;   // översikten är lika stor som kalejdoskopet och ligger bakom en egen flik
     cell.style.width = cell.style.height = cellCss + "px";
     cell.width = cell.height = Math.min(1600, Math.round(cellCss * d));
@@ -1241,7 +1251,7 @@ function toggleFull() {
 const BAG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2" stroke-linecap="round"/></svg>';
 function renderChips() {
   $("#chips").innerHTML = (PRO ? "" : `<button class="chip shop" data-c="__pro">+</button>`)
-    + [{id: "all", name: "All"}].concat(CATS).map(c => `<button class="chip" data-c="${c.id}">${esc(c.name)}</button>`).join("");
+    + [{id: "all", name: "All"}].concat(CATS).map(c => `<button class="chip" data-c="${c.id}">${chipLabel(c)}</button>`).join("");
 }
 function buildLibrary() {
   renderChips();
@@ -1470,7 +1480,24 @@ function refreshPro() {
   $("#proBuy").textContent = proTrial ? "Try Kalejdo + free for a month" : (proPrice ? "Subscribe – " + proPrice + " per month" : "Subscribe");
 }
 function openPro() { $("#sheet").classList.remove("on"); refreshPro(); $("#proSheet").classList.add("on"); }
+// Kategorichipets text: +-bibliotek får ett orangegult plus (ett plus sist i namnet, som "Christmas +", ritas inte dubbelt)
+function chipLabel(c) {
+  const plus = c.status === "pro";
+  return esc(plus ? c.name.replace(/\s*\+\s*$/, "") : c.name) + (plus ? ' <b class="plus">+</b>' : "");
+}
 const native = name => window.KalejdoApp && typeof KalejdoApp[name] === "function";
+// TESTFAS: under utprovningen ligger en knapp för synpunkter där annonsbannern ska ligga i skarpt läge. Sätt false när bannern
+// byggs in; FB_H är då bannerns höjd och layout() ger redan plats åt den.
+const TESTFAS = true, FB_H = 56;
+if (TESTFAS && !WALL) {
+  document.body.classList.add("fb");
+  requestAnimationFrame(() => { try { layout(); } catch (e) {} });
+  $("#fb").hidden = false;
+  $("#fb").onclick = () => {
+    const url = LIB_URL + "feedback.php?app=" + encodeURIComponent(native("appVersion") ? KalejdoApp.appVersion() : "web");
+    if (native("openUrl")) KalejdoApp.openUrl(url); else window.open(url);
+  };
+}
 $("#openProBtn").onclick = openPro;
 $("#closePro").onclick = () => $("#proSheet").classList.remove("on");
 $("#proSheet").addEventListener("click", e => { if (e.target.id === "proSheet") $("#proSheet").classList.remove("on"); });

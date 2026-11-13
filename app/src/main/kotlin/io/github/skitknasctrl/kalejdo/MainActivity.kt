@@ -262,6 +262,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        /** Appens versionsnamn, t.ex. 0.1.0-test.30 (följer med synpunkter från testpersoner). */
+        @JavascriptInterface
+        fun appVersion(): String = try {
+            packageManager.getPackageInfo(packageName, 0).versionName ?: ""
+        } catch (_: Exception) {
+            ""
+        }
+
         @JavascriptInterface
         fun openUrl(url: String): Boolean {
             val uri = Uri.parse(url)
