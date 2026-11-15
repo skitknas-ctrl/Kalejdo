@@ -387,7 +387,8 @@ function defaultLayers() { return LAYER_DEFAULTS.map(([m, sp, rev]) => Object.as
 // Ett låst lager står helt still.
 function layerK(L) { return L.locked ? 0 : (L.speed || 1) * (L.rev ? -1 : 1); }
 function layerTheta(L) { return L.th || 0; }
-/* Skaka på ett Fixed-lager (2026-11-12): sakerna lossnar och svävar fritt i en halv sekund (L.burst = sluttid i ms),
+/* Skaka på ett Fixed-lager (2026-11-12): sakerna lossnar och svävar fritt i en halv sekund (L.burst = återstående
+   sekunder fysiktid sedan 2026-11-15, så att pulsen räknas även om ritloopen ännu inte gått igång),
    sedan sätter de sig där de hamnade. Under pulsen ligger sakerna i världskoordinater som i ett Tumble-lager. */
 function isFixed(L) { return L.mode === "fixed" && !L.burst; }
 function toWorld(L) { // lokal -> värld
@@ -563,7 +564,7 @@ function physics(dt) {
   }
   const g = gravity();
   for (const L of S.layers) {
-    if (L.burst && performance.now() > L.burst) endBurst(L);
+    if (L.burst && (L.burst -= dt) <= 0) endBurst(L);
     if (isFixed(L) || L.locked || !L.items.length) continue;
     const w = w0 * layerK(L);
     const float = !!L.burst, its = L.items, n = its.length;   // under skak-pulsen svävar sakerna tyngdlöst
@@ -623,19 +624,20 @@ function physics(dt) {
     }
   }
 }
-function shake() {   // skakar bara det valda lagret (2026-11-13)
-  const g = gravity(), now = performance.now();
-  for (const L of [S.layers[S.sel]]) {
-    if (L.locked) { toast(`Layer ${S.sel + 1} is locked`); continue; }
-    if (!L.items.length) continue;
-    if (L.mode === "fixed") { if (!L.burst) toWorld(L); L.burst = now + 500; }   // lossnar en halv sekund
-    for (const it of L.items) {
-      const up = L.mode === "tumble" ? rnd(1.2, 2.6) : 0;
-      it.vx += rnd(-1.6, 1.6) - g.x * up; it.vy += rnd(-1.6, 1.6) - g.y * up;
-      it.va += rnd(-10, 10);
-    }
+function shake() { shakeLayer(S.sel); }   // knappen skakar bara det valda lagret (2026-11-13)
+// Skakar ett lager. quiet = ingen vibration eller toast; används direkt efter att saker slumpats in (2026-11-15),
+// så att två saker aldrig blir liggande ovanpå varandra (kollisionerna under pulsen skiljer dem åt).
+function shakeLayer(li, quiet) {
+  const L = S.layers[li], g = gravity();
+  if (L.locked) { if (!quiet) toast(`Layer ${li + 1} is locked`); return; }
+  if (!L.items.length) return;
+  if (L.mode === "fixed") { if (!L.burst) toWorld(L); L.burst = .5; }   // lossnar en halv sekund
+  for (const it of L.items) {
+    const up = L.mode === "tumble" ? rnd(1.2, 2.6) : 0;
+    it.vx += rnd(-1.6, 1.6) - g.x * up; it.vy += rnd(-1.6, 1.6) - g.y * up;
+    it.va += rnd(-10, 10);
   }
-  if (navigator.vibrate) try { navigator.vibrate(30); } catch (e) {}
+  if (!quiet && navigator.vibrate) try { navigator.vibrate(30); } catch (e) {}
 }
 
 /* ------------------------------------------------------------------ drawing */
@@ -1147,6 +1149,7 @@ $("#fillBtn").onclick = () => {
   const pool = (S.cat === "all" ? Object.keys(PROPS).filter(id => !PROPS[id].hidden) : (CATS.find(c => c.id === S.cat) || {items: []}).items.map(i => i.id));
   let n = 0;
   for (let i = 0; i < 10 && pool.length; i++) if (addItem(pool[Math.floor(Math.random() * pool.length)], S.sel, true)) n++;
+  if (n) shakeLayer(S.sel, true);   // slumpat in: skaka direkt så att inget hamnar ovanpå något annat (2026-11-15)
   toast(n ? `Added ${n} random things to layer ${S.sel + 1}` : `Layer ${S.sel + 1} is full`);
 };
 $("#clearBtn").onclick = () => {
@@ -1281,6 +1284,7 @@ function fillAll(quiet) {
   const pool = (S.cat === "all" ? CATS : CATS.filter(c => c.id === S.cat)).reduce((a, c) => a.concat(c.items.map(i => i.id)), []);
   let n = 0;
   for (let li = 0; li < LAYERS; li++) for (let i = 0; i < 10 && pool.length; i++) if (addItem(pool[Math.floor(Math.random() * pool.length)], li, true)) n++;
+  if (n) for (let li = 0; li < LAYERS; li++) shakeLayer(li, true);   // skaka direkt efter slumpningen (2026-11-15)
   refreshLayerUI(); save();
   if (!quiet) toast(n ? `Added ${n} random things, 10 to each layer` : "All layers are full");
 }
