@@ -381,3 +381,6 @@ frame() ritar bara den synliga.
 - `#size`/`S.size` (storlek på nya saker) är borta. `#lsize` under opaciteten = lagrets storlek (`L.size`, 50–200 %): skalar alla
   saker i lagret. Nya saker: kategorins grundstorlek × lagrets storlek, utan slump.
 - Samma ändring finns i webben (kod\kalejdo.app\app.html), där menyn på bred skärm ligger framför kalejdoskopet.
+- My kaleidoscopes är EN lista med meny (Open, Share, Stop sharing, Delete, Update), knappen "Save As", inga dubbla namn och
+  rättad svart miniatyr. Se "My kaleidoscopes som en lista med meny" i kod\kalejdo.app\CLAUDE.md; koden är densamma utom
+  plattformsdelen (svCanShare … svOpenRemote). confirm() fungerar inte i WebView – använd `svAsk`.
