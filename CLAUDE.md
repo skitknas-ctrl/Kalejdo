@@ -284,6 +284,10 @@ Valet görs med två ikonknappar (#stageTabs) i scenens nedre vänstra hörn, i 
 helskärmsknappen #stageFull ligger i nedre högra hörnet och döljs när översikten visas (helskärm gäller bara kalejdoskopet). De låg först som flikrad ovanför scenen men hamnade bakom
 statusfältet på Dicks telefon. Valet sparas i localStorage "kalejdo.stageTab". I helskärm döljs knapparna och översikten.
 frame() ritar bara den synliga.
+- 2026-11-17 (bara appen, Dicks skiss): #stageTabs flyttade till nedre HÖGRA hörnet, #stageFull uppe till höger (top 26 px, inte
+  ända uppe i hörnet). Ögonknappen är borta: #visBox i nedre vänstra hörnet = texten "Visible layers" + fyra kryssrutor, en per
+  lager. S.vis = [bool × 4] (ej i sparade kalejdoskop); gamla S.view görs om vid start (visFromView) och tas bort. layerShown(i)
+  läser S.vis. Knappraden är nu: stopp, riktning, läge, skaka, fyll, töm | fyll alla, töm alla. Webben är inte ändrad.
 - 2026-11-12 (webb + app, samma ändringar): Float-läget borttaget (kvar: Tumble, Fixed; gamla sparningar med float blir
   tumble i migrateLayers). Skaka på ett Fixed-lager ger en halv sekunds puls: toWorld() + L.burst = sluttid, prylarna
   svävar som i gamla Float, sedan toLocal() (isFixed(L) = fixed utan puls; används överallt där koordinaterna tolkas).
