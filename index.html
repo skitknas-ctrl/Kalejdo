@@ -93,10 +93,18 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 .row2{display:flex;gap:8px;align-items:center}
 #cellWrap{flex:none;display:grid;place-items:center}
 #cell{display:block;touch-action:none;border-radius:50%;box-shadow:0 0 0 2px var(--brass2),0 0 0 4px #0006}
-/* objektmenyn i översikten (2026-11-12): tryck på en sak -> Delete/Resize/Rotate */
-#ctx{position:fixed;z-index:8;background:#2c2839;border:1px solid var(--line);border-radius:10px;padding:4px;box-shadow:0 6px 20px #0008;display:none;flex-direction:column;min-width:150px}
+/* objektmenyn (2026-11-17): en panel i stället för en liten meny vid saken. I appen täcker den hela nedre delen (#panel). Size och Rotation visas direkt; Move to flyttar saken till ett annat lager. */
+#ctx{position:fixed;z-index:8;background:#2c2839;border:1px solid var(--line);border-radius:14px;padding:12px 14px;box-shadow:0 6px 20px #0008;display:none;flex-direction:column;gap:10px;overflow-y:auto}
 #ctx.on{display:flex}
-#ctx button{text-align:left;padding:8px 12px;border-radius:7px}
+#ctx.low{border-radius:18px 18px 0 0;border-width:1px 0 0;padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+#ctx .hd{display:flex;align-items:center;gap:8px}
+#ctx .hd b{flex:1;font-size:15px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+#ctx .hd button{width:34px;height:34px;border-radius:9px;background:var(--panel2);font-size:18px;line-height:1;flex:none}
+#ctx .row{display:flex;gap:6px;align-items:center}
+#ctx .row span{font-size:12px;color:var(--text);font-weight:700;flex:none;margin-right:4px}
+#ctx .row button{flex:1;padding:10px 8px;border-radius:9px;background:var(--panel2);text-align:center;font-weight:600}
+#ctx .row button:hover,#ctx .hd button:hover{filter:brightness(1.25)}
+#ctx label{padding:0}
 #ctx label b{color:var(--text)}
 #layerBox{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
 #layerBox .lrow{gap:4px}
@@ -118,7 +126,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 .op{flex:1;display:flex;align-items:center;gap:4px;min-width:0}
 .op svg{width:16px;height:16px;flex:none;color:var(--dim)}
 .lrow .gap{flex:1}
-.sliders{display:flex;gap:12px;align-items:center}
+.sliders{display:grid;grid-template-columns:1fr 1fr;gap:0 12px;align-items:center}
 .op b{font-size:12px;color:var(--brass);min-width:34px;text-align:right;font-variant-numeric:tabular-nums}
 .op.off{opacity:.4}
 #revBtn svg{transition:transform .2s}
@@ -269,6 +277,8 @@ body.wall #fullMenuBtn,body.wall #hint,body.wall #toast,body.wall #loading,body.
             <input id="opacity" type="range" min="15" max="100" step="1"></label>
           <label class="op" id="speedBox" title="Speed of this layer compared with the main slider"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 18a9 9 0 1 1 16 0"/><path d="M12 15l4-5"/></svg>
             <input id="speed" type="range" min="1" max="19" step="1"></label>
+          <label class="op" title="Size of everything in this layer"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="7" cy="15" r="4"/><circle cx="16" cy="10" r="7" opacity=".55"/></svg>
+            <input id="lsize" type="range" min="50" max="200" step="5"></label>
         </div>
     </div>
     </div>
@@ -277,7 +287,6 @@ body.wall #fullMenuBtn,body.wall #hint,body.wall #toast,body.wall #loading,body.
       <div id="chips"></div>
       <div class="opts">
         <span class="grow" id="dropInfo"></span>
-        <label class="sz" title="Size of new things"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg><input id="size" type="range" min="60" max="160" step="5"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><circle cx="12" cy="12" r="9"/></svg></label>
       </div>
     </div>
     <div id="lib"></div>
@@ -478,9 +487,11 @@ function pruneRasters() {
 
 /* ------------------------------------------------------------------ items */
 function catOf(id) { return id.split("/")[0]; }
+// lagrets storlek i procent (2026-11-17): reglaget under opaciteten skalar alla saker i lagret; nya saker får samma skala
+function lsize(L) { return L && L.size ? L.size : 100; }
 function makeItem(id, layer) {
   const base = CAT_SIZE[catOf(id)] || .22;
-  const it = {p: id, h: 0, s: base * S.size / 100 * rnd(.88, 1.12),
+  const it = {p: id, h: 0, s: base * lsize(layer) / 100,
     x: 0, y: 0, vx: 0, vy: 0, a: rnd(0, TAU), va: rnd(-1, 1) / inertia(), w: rnd(0, TAU)};
   placeItem(it, layer);
   return it;
@@ -990,47 +1001,73 @@ cell.addEventListener("pointerup", endItemDrag);
 cell.addEventListener("pointercancel", endItemDrag);
 attachRotate(cell, e => { openCtx(e); }, e => isFixed(S.layers[S.sel]) && hitItem(e) >= 0);
 
-// objektmenyn: Delete, Resize, Rotate
+// objektmenyn (2026-11-17): Delete, Duplicate, Size, Rotation och Move to i en panel (se CSS #ctx)
 const ctx = $("#ctx");
 let ctxItem = null;
 function closeCtx() { ctx.classList.remove("on"); ctx.innerHTML = ""; ctxItem = null; ctxOpen = false; }
-function placeCtx(x, y) {
-  ctx.style.left = Math.max(4, Math.min(x, innerWidth - ctx.offsetWidth - 8)) + "px";
-  ctx.style.top = Math.max(4, Math.min(y, innerHeight - ctx.offsetHeight - 8)) + "px";
+function ctxSheet() { return true; }   // appen: alltid över hela nedre delen (webben har även ett läge framför kalejdoskopet)
+function placeCtx() {
+  if (!ctx.classList.contains("on")) return;
+  const sheet = ctxSheet(), r = (sheet ? $("#panel") : view).getBoundingClientRect();
+  ctx.classList.toggle("low", sheet);
+  if (sheet) {
+    ctx.style.left = r.left + "px"; ctx.style.top = r.top + "px"; ctx.style.width = r.width + "px"; ctx.style.height = (innerHeight - r.top) + "px";
+    ctx.style.maxHeight = "";
+  } else {
+    const w = Math.max(230, Math.min(320, r.width - 24));
+    ctx.style.width = w + "px"; ctx.style.height = ""; ctx.style.maxHeight = (innerHeight - 16) + "px";
+    ctx.style.left = Math.max(8, r.left + (r.width - w) / 2) + "px";
+    ctx.style.top = Math.max(8, Math.min(r.top + (r.height - ctx.offsetHeight) / 2, innerHeight - ctx.offsetHeight - 8)) + "px";
+  }
 }
 function openCtx(e) {
   const L = S.layers[S.sel], i = hitItem(e);
   if (i < 0) { closeCtx(); return; }
-  ctxItem = {li: S.sel, i, it: L.items[i]};
-  ctx.innerHTML = `<button data-a="delete">Delete</button><button data-a="duplicate">Duplicate</button><button data-a="resize">Resize</button><button data-a="rotate">Rotate</button>`;
+  const it = L.items[i], deg = ((it.a * 180 / Math.PI) % 360 + 360) % 360, li = S.sel;
+  ctxItem = {li, i, it};
+  const namn = PROPS[it.p] ? PROPS[it.p].name : "Thing";
+  ctx.innerHTML = `<div class="hd"><b></b><button data-a="close" title="Close">×</button></div>`
+    + `<div class="row"><button data-a="delete">Delete</button><button data-a="duplicate">Duplicate</button></div>`
+    + `<label><b>Size</b><input type="range" data-k="s" data-fmt="sz" min="2" max="90" step="0.5" value="${(it.s * 100).toFixed(1)}"></label>`
+    + `<label><b>Rotation</b><input type="range" data-k="a" data-fmt="deg" min="0" max="360" step="1" value="${deg.toFixed(0)}"></label>`
+    + `<div class="row"><span>Move to</span>` + S.layers.map((_, n) => n === li ? "" : `<button data-a="move" data-to="${n}">Layer ${n + 1}</button>`).join("") + `</div>`;
+  ctx.querySelector(".hd b").textContent = namn;
+  ctx.querySelector('input[data-k="s"]').oninput = ev => { it.s = +ev.target.value / 100; save(); };
+  ctx.querySelector('input[data-k="a"]').oninput = ev => { it.a = +ev.target.value * Math.PI / 180; it.va = 0; save(); };
   ctx.classList.add("on"); ctxOpen = true;
-  placeCtx(e.clientX, e.clientY);
+  rvSync(ctx); placeCtx();
 }
+window.addEventListener("resize", placeCtx);
 cell.addEventListener("contextmenu", e => { e.preventDefault(); openCtx(e); });
 ctx.addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b || !ctxItem) return;
-  const {li, it} = ctxItem, L = S.layers[li], x = parseFloat(ctx.style.left), y = parseFloat(ctx.style.top);
-  if (b.dataset.a === "delete") {
+  const {li, it} = ctxItem, L = S.layers[li], namn = PROPS[it.p] ? PROPS[it.p].name.toLowerCase() : "thing";
+  if (b.dataset.a === "close") closeCtx();
+  else if (b.dataset.a === "delete") {
     const i = L.items.indexOf(it); if (i < 0) return closeCtx();
     L.items.splice(i, 1); refreshLayerUI(); save(); closeCtx();
-    toast(`Removed ${PROPS[it.p] ? PROPS[it.p].name.toLowerCase() : "thing"}`, "Undo", () => { S.layers[li].items.splice(i, 0, it); refreshLayerUI(); save(); });
+    toast(`Removed ${namn}`, "Undo", () => { S.layers[li].items.splice(i, 0, it); refreshLayerUI(); save(); });
   } else if (b.dataset.a === "duplicate") {
     // en kopia strax bredvid, i samma lager, med samma storlek och vridning
+    if (!usable(it.p)) { closeCtx(); lockedAlert(); return; }
     if (L.items.length >= MAX_PER_LAYER) { closeCtx(); toast(`Layer ${li + 1} is full (${MAX_PER_LAYER} things)`); return; }
     const cp = Object.assign({}, it, {x: it.x + it.s * .5, y: it.y + it.s * .5, w: rnd(0, TAU)});
     const d = Math.hypot(cp.x, cp.y), lim = 1 - cp.s * .42;
     if (d > lim) { cp.x *= lim / d; cp.y *= lim / d; }
     L.items.push(cp); refreshLayerUI(); save(); closeCtx();
-    toast(`Duplicated ${PROPS[it.p] ? PROPS[it.p].name.toLowerCase() : "thing"}`, "Undo", () => { const a = S.layers[li].items, i = a.indexOf(cp); if (i >= 0) a.splice(i, 1); refreshLayerUI(); save(); });
-  } else if (b.dataset.a === "resize") {
-    ctx.innerHTML = `<label><b>Size</b><input type="range" data-fmt="sz" min="5" max="60" step="0.5" value="${(it.s * 100).toFixed(1)}"></label>`;
-    ctx.querySelector("input").oninput = ev => { it.s = +ev.target.value / 100; save(); };
-    rvSync(ctx); placeCtx(x, y);
-  } else if (b.dataset.a === "rotate") {
-    const deg = ((it.a * 180 / Math.PI) % 360 + 360) % 360;
-    ctx.innerHTML = `<label><b>Rotation</b><input type="range" data-fmt="deg" min="0" max="360" step="1" value="${deg.toFixed(0)}"></label>`;
-    ctx.querySelector("input").oninput = ev => { it.a = +ev.target.value * Math.PI / 180; it.va = 0; save(); };
-    rvSync(ctx); placeCtx(x, y);
+    toast(`Duplicated ${namn}`, "Undo", () => { const a = S.layers[li].items, i = a.indexOf(cp); if (i >= 0) a.splice(i, 1); refreshLayerUI(); save(); });
+  } else if (b.dataset.a === "move") {
+    // flyttar saken till ett annat lager; den behåller plats, storlek och vridning, och mållagret visas om det var dolt
+    const to = +b.dataset.to, T = S.layers[to], i = L.items.indexOf(it);
+    if (!T || i < 0) return closeCtx();
+    if (T.items.length >= MAX_PER_LAYER) { toast(`Layer ${to + 1} is full (${MAX_PER_LAYER} things)`); return; }
+    L.items.splice(i, 1); T.items.push(it);
+    if (!layerShown(to)) S.vis[to] = true;
+    refreshLayerUI(); save(); closeCtx();
+    toast(`Moved ${namn} to layer ${to + 1}`, "Undo", () => {
+      const k = T.items.indexOf(it); if (k < 0) return;
+      T.items.splice(k, 1); S.layers[li].items.splice(i, 0, it); refreshLayerUI(); save();
+    });
   }
 });
 document.addEventListener("pointerdown", e => { if (ctx.classList.contains("on") && !ctx.contains(e.target)) closeCtx(); }, true);
@@ -1076,7 +1113,7 @@ function toast(msg, btn, fn) {
 $("#toastBtn").onclick = () => { toastFn && toastFn(); toastFn = null; $("#toast").classList.remove("on"); };
 
 /* Värde bredvid varje reglage (2026-11-12): varje input[type=range] får en siffra efter sig (b.rv) som följer reglaget. */
-const RV_FMT = {spin: v => v + "%", opacity: v => v + "%", speed: v => "×" + (v / 10).toFixed(1), size: v => v + "%", grav: v => v + "%",
+const RV_FMT = {spin: v => v + "%", opacity: v => v + "%", speed: v => "×" + (v / 10).toFixed(1), lsize: v => v + "%", grav: v => v + "%",
   fmSpin: v => v + "%", fmZoom: v => v + "%", zoom: v => v + "%", fmHue: v => v + "°", fmSat: v => v + "%", fmLum: v => v + "%",
   fmLight: v => v + "%", deg: v => Math.round(v) + "°", sz: v => Math.round(v * 10) / 10};
 function rvSync(root) {
@@ -1094,7 +1131,6 @@ function refreshTop() {
   $("#grav").value = S.grav == null ? 100 : S.grav;
   $("#pauseBtn").innerHTML = running() ? ICON_PAUSE : ICON_PLAY;
   $("#spinBox").classList.toggle("off", !running());
-  $("#size").value = S.size;
   $("#tiltSw").classList.toggle("on", S.tilt);
   $("#zoom").value = S.zoom;
   rvSync();
@@ -1119,6 +1155,7 @@ function refreshLayerUI() {
   $("#speed").value = Math.round((L.speed || 1) * 10);
   $("#speedBox").classList.toggle("off", !!L.locked);
   $("#opacity").value = Math.round(L.opacity * 100);
+  $("#lsize").value = lsize(L);
   $("#dropInfo").textContent = `Tap a thing to drop it in layer ${S.sel + 1}`;
   rvSync($("#layerBox"));
 }
@@ -1175,7 +1212,11 @@ $("#stageTabs").addEventListener("click", e => {
   document.body.classList.toggle("over", v === "over");
   document.querySelectorAll("#stageTabs button").forEach(x => x.classList.toggle("on", x.dataset.v === v)); })();
 $("#shakeBtn").onclick = shake;
-$("#size").oninput = e => { S.size = +e.target.value; save(); };
+$("#lsize").oninput = e => {
+  const L = S.layers[S.sel], v = +e.target.value, f = v / lsize(L);
+  L.items.forEach(it => { it.s = Math.max(.02, Math.min(.9, it.s * f)); });
+  L.size = v; save();
+};
 $("#moreBtn").onclick = () => $("#sheet").classList.add("on");
 $("#closeSheet").onclick = () => $("#sheet").classList.remove("on");
 document.querySelectorAll(".sheet").forEach(sh => sh.addEventListener("click", e => { if (e.target === sh) sh.classList.remove("on"); }));

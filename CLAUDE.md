@@ -374,3 +374,10 @@ frame() ritar bara den synliga.
   bryggfunktionen `appVersion()`). `body.fb` gör att `layout()` drar 56 px från kalejdoskopets höjd; knappen döljs i helskärm och visas
   inte i levande bakgrund. När bannern byggs: sätt TESTFAS false och låt bannern ta samma plats.
 - `chipLabel(c)`: kategorier med status `pro` får ett orangegult + efter namnet (ett + sist i namnet ritas inte dubbelt).
+
+## 2026-11-17: objektmenyn som panel, lagrets storlek
+- Objektmenyn (`#ctx`) täcker hela nedre delen (`#panel`, klassen `low`; får inte heta `sheet`). Innehåll: namn + stäng, Delete,
+  Duplicate, reglagen Size och Rotation direkt, "Move to" + en knapp per annat lager (Undo i toasten).
+- `#size`/`S.size` (storlek på nya saker) är borta. `#lsize` under opaciteten = lagrets storlek (`L.size`, 50–200 %): skalar alla
+  saker i lagret. Nya saker: kategorins grundstorlek × lagrets storlek, utan slump.
+- Samma ändring finns i webben (kod\kalejdo.app\app.html), där menyn på bred skärm ligger framför kalejdoskopet.
