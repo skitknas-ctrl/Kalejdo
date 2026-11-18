@@ -1530,9 +1530,7 @@ function svGiveLink(k, namn) { shareLink(LIB_URL + "?k=" + encodeURIComponent(k)
 // öppnar ett kalejdoskop som bara finns delat på kontot (inte sparat i den här telefonen)
 async function svOpenRemote(k) {
   try {
-    const r = await fetch(LIB_URL + "api/bibliotek.php?action=delat&k=" + encodeURIComponent(k), {cache: "no-store"});
-    const j = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(j.error || "Could not open the kaleidoscope");
+    const j = await asKonto("delat_hamta", {nyckel: k});   // kontots eget, även ett som inte är delat
     for (const p of j.props || []) {
       if (!PROPS[p.id]) PROPS[p.id] = {id: p.id, name: p.name, file: /^https?:/.test(p.file) ? p.file : LIB_URL + p.file, cat: p.cat};
       if (typeof p.size === "number" && p.size > 0 && !CAT_SIZE[p.cat]) CAT_SIZE[p.cat] = p.size;
@@ -1558,7 +1556,7 @@ function svReconcile() {
   if (!pubOk) return;
   const list = readSaves(), keys = new Set(PUB.map(p => p.nyckel)), used = new Set();
   let ch = false;
-  for (const v of list) { if (v.k && !keys.has(v.k)) { delete v.k; ch = true; } if (v.k) used.add(v.k); }
+  for (const v of list) { if (v.k && !keys.has(v.k)) { delete v.k; v.nosync = 1; ch = true; } if (v.k) used.add(v.k); }
   for (const v of list) {
     if (v.k) continue;
     const p = PUB.find(p => !used.has(p.nyckel) && svNorm(p.namn) === svNorm(v.name));
@@ -1566,16 +1564,38 @@ function svReconcile() {
   }
   if (ch) writeJSON(SAVES, list);
 }
+/* Sparat på kontot (2026-11-18, Dick): för admin och +-konton sparar Save och Save As även på servern (tabellen kalejdo_delat,
+   delad = 0), så att listan är densamma i alla webbläsare och i appen. v.k = nyckeln till serverraden; delat (orange länk,
+   ?k=-länken fungerar) är den först när raden har delad = 1. Sparade som bara finns i den här webbläsaren laddas upp av
+   svSync(). Ett sparat vars serverrad tagits bort på en annan enhet märks v.nosync och laddas inte upp igen av sig självt.
+   Högst 100 per +-konto (servern svarar med fel). */
+function svShared(k) { const p = k && PUB.find(p => p.nyckel === k); return !!(p && p.delad !== false); }
+let syncing = false;
+async function svSync() {
+  if (!svPubOn() || !pubOk || syncing) return;
+  syncing = true;
+  let n = 0;
+  try {
+    for (const v0 of readSaves()) {
+      if (v0.k || v0.nosync || !v0.state) continue;
+      const j = await svPublish({namn: v0.name, state: JSON.stringify(v0.state), thumb: v0.thumb || "", bild: "", delad: 0});
+      const l = readSaves(), v = l.find(i => i.id === v0.id);
+      if (v) { v.k = j.nyckel; writeJSON(SAVES, l); n++; }
+    }
+  } catch (e) {}
+  syncing = false;
+  if (n) renderSaves();
+}
 function svItems() {
   const list = readSaves(), used = new Set(list.map(v => v.k).filter(Boolean));
-  return list.map(v => ({id: v.id, k: v.k || "", name: v.name, thumb: v.thumb, date: new Date(v.t).toLocaleDateString()}))
-    .concat(PUB.filter(p => !used.has(p.nyckel)).map(p => ({id: "", k: p.nyckel, name: p.namn, thumb: p.thumb, date: String(p.skapad).slice(0, 10)})));
+  return list.map(v => ({id: v.id, k: v.k || "", sh: svShared(v.k), name: v.name, thumb: v.thumb, date: new Date(v.t).toLocaleDateString()}))
+    .concat(PUB.filter(p => !used.has(p.nyckel)).map(p => ({id: "", k: p.nyckel, sh: svShared(p.nyckel), name: p.namn, thumb: p.thumb, date: String(p.skapad).slice(0, 10)})));
 }
 function renderSaves() {
   svReconcile();
   const items = svItems(), sh = svCanShare();
   $("#savesList").innerHTML = items.length ? items.map(x => `<div class="sv" data-id="${esc(x.id)}" data-k="${esc(x.k)}">${sh ? `
-      <span class="lnk${x.k ? " on" : ""}" title="${x.k ? "Shared" : "Not shared"}">${ICON_LINK}</span>` : ""}
+      <span class="lnk${x.sh ? " on" : ""}" title="${x.sh ? "Shared" : "Not shared"}">${ICON_LINK}</span>` : ""}
       <img src="${esc(x.thumb || "")}" alt=""><b>${esc(x.name)}</b><small>${esc(x.date)}</small></div>`).join("")
     : '<div class="empty" style="grid-column:1/-1">Nothing saved yet</div>';
   refreshFile();
@@ -1584,6 +1604,7 @@ async function loadPub() {
   if (!svPubOn()) { PUB = []; pubOk = false; return; }
   try { const j = await svApi("delat_list", {}); PUB = j.delade || []; pubOk = true; } catch (e) { pubOk = false; }
   renderSaves();
+  svSync();
 }
 function openSaves() { renderSaves(); loadPub(); $("#savesSheet").classList.add("on"); }
 function closeSaves() { closeSvMenu(); $("#savesSheet").classList.remove("on"); }
@@ -1606,9 +1627,9 @@ function refreshFile() {
   const [, v] = curSave();
   if (v) S.name = v.name; else S.cid = "";
   $("#curName").textContent = S.name || "Untitled";
-  const k = curKey();
-  $("#fShare").classList.toggle("on", !!k);
-  $("#fCopy").disabled = !k;
+  const k = curKey(), sh = svShared(k);
+  $("#fShare").classList.toggle("on", sh);
+  $("#fCopy").disabled = !sh;
   $("#fSaveInfo").textContent = v || k ? "Save latest updates to " + S.name : "";
   $("#fShareRow").hidden = !svCanShare();
   refreshDock();
@@ -1621,22 +1642,25 @@ function fileSaveAs() {
 async function fileSave() {
   const [l, v] = curSave(), k = curKey();
   if (!v && !k) { fileSaveAs(); return; }   // aldrig sparat: fråga efter ett namn
-  const state = captureState(), thumb = makeThumb(), name = S.name;
-  if (v) { v.state = state; v.thumb = thumb; v.t = Date.now(); }
-  else l.unshift({id: svNewId(), name, t: Date.now(), thumb, state, k});   // fanns bara delat: sparas även här
+  const state = captureState(), thumb = makeThumb(), name = S.name, sh = svShared(k);
+  if (v) { v.state = state; v.thumb = thumb; v.t = Date.now(); delete v.nosync; }
+  else l.unshift({id: svNewId(), name, t: Date.now(), thumb, state, k});   // fanns bara på kontot: sparas även här
   if (!writeJSON(SAVES, l)) return;
   if (!v) { S.cid = l[0].id; S.ck = ""; }
   refreshFile(); save();
-  if (!k) { toast(`Saved “${name}”`); return; }
+  if (!svPubOn()) { toast(`Saved “${name}”`); return; }
   try {
-    await svPublish({nyckel: k, namn: name, state: JSON.stringify(state), thumb, bild: makeShareImage()});
-    toast(`Saved “${name}” – the shared link shows the new version`);
-  } catch (err) { toast(`Saved “${name}”, but the shared copy was not updated: ` + (err.message || "no connection")); }
+    const d = {nyckel: k, namn: name, state: JSON.stringify(state), thumb, bild: sh ? makeShareImage() : ""};
+    if (!k) d.delad = 0;
+    const j = await svPublish(d);
+    if (!k) { const [l2, v2] = curSave(); if (v2) { v2.k = j.nyckel; writeJSON(SAVES, l2); } refreshFile(); }
+    toast(sh ? `Saved “${name}” – the shared link shows the new version` : `Saved “${name}”`);
+  } catch (err) { toast(`Saved “${name}” here, but not to your account: ` + (err.message || "no connection")); }
 }
 $("#fOpen").onclick = openSaves;
 $("#fSave").onclick = fileSave;
 $("#fSaveAs").onclick = fileSaveAs;
-$("#saveNowBtn").onclick = () => {
+$("#saveNowBtn").onclick = async () => {
   const name = $("#saveName").value.trim() || nextSaveName();
   if (svTaken(name)) { toast(`“${name}” already exists – choose another name`); $("#saveName").focus(); $("#saveName").select(); return; }
   const list = readSaves(), id = svNewId();
@@ -1645,34 +1669,39 @@ $("#saveNowBtn").onclick = () => {
   $("#fNameRow").hidden = true; $("#saveName").blur();
   setCur(name, id, "");
   toast(`Saved “${name}”`);
+  if (!svPubOn()) return;
+  try {   // även på kontot, så att det syns i andra webbläsare och i appen
+    const j = await svPublish({namn: name, state: JSON.stringify(list[0].state), thumb: list[0].thumb, bild: "", delad: 0});
+    const l = readSaves(), v = l.find(i => i.id === id); if (v) { v.k = j.nyckel; writeJSON(SAVES, l); }
+    refreshFile();
+  } catch (err) { toast(`Saved “${name}” here, but not to your account: ` + (err.message || "no connection")); }
 };
 $("#saveName").addEventListener("keydown", e => { if (e.key === "Enter") $("#saveNowBtn").click(); });
 $("#fShare").onclick = async () => {
   if (!svShareGate()) return;
   const k = curKey();
   try {
-    if (k) {
+    if (svShared(k)) {
       svRect = $("#fShare").getBoundingClientRect();
       if (!await svAsk(S.name, "Stop sharing? The link will stop working.", "Stop sharing")) return;
-      const j = await svApi("delat_radera", {nyckel: k}); PUB = j.delade || []; pubOk = true;
-      const [l, v] = curSave(); if (v && v.k) { delete v.k; writeJSON(SAVES, l); }
-      S.ck = ""; refreshFile(); save(); toast("No longer shared");
+      const j = await svApi("delat_delad", {nyckel: k, delad: 0}); PUB = j.delade || []; pubOk = true;   // ligger kvar sparat på kontot
+      refreshFile(); toast("No longer shared");
       return;
     }
     let [l, v] = curSave();
-    if (!v) { toast("Save the kaleidoscope first"); fileSaveAs(); return; }
+    if (!v && !k) { toast("Save the kaleidoscope first"); fileSaveAs(); return; }
     if (sharing) return;
     sharing = true; toast("Sharing…");
     try {
       // delar kalejdoskopet som det ser ut nu, och sparar det samtidigt så att det sparade och det delade är samma
       const state = captureState(), thumb = makeThumb();
-      const j = await svPublish({namn: v.name, state: JSON.stringify(state), thumb, bild: makeShareImage()});
-      [l, v] = curSave(); if (v) { v.k = j.nyckel; v.state = state; v.thumb = thumb; v.t = Date.now(); writeJSON(SAVES, l); }
+      const j = await svPublish({nyckel: k, namn: S.name, state: JSON.stringify(state), thumb, bild: makeShareImage(), delad: 1});
+      [l, v] = curSave(); if (v) { v.k = j.nyckel; v.state = state; v.thumb = thumb; v.t = Date.now(); delete v.nosync; writeJSON(SAVES, l); }
       refreshFile(); svGiveLink(j.nyckel, j.namn, true);
     } finally { sharing = false; }
   } catch (err) { toast(err.message || "Something went wrong"); }
 };
-$("#fCopy").onclick = () => { const k = curKey(); if (k) svGiveLink(k, S.name, false); };
+$("#fCopy").onclick = () => { const k = curKey(); if (svShared(k)) svGiveLink(k, S.name, false); };
 // sparar på servern; med nyckel uppdateras den delningen (länken är densamma), utan nyckel skapas en ny
 async function svPublish(data) { const j = await svApi("delat_spara", data); if (j.delade) { PUB = j.delade; pubOk = true; } return j; }
 
@@ -1717,17 +1746,20 @@ svMenu.addEventListener("click", async e => {
         const prev = captureUndo(), missing = applyState(v.state);
         setCur(v.name, v.id, "");
         toast(missing ? `Opened “${v.name}” – ${missing} things are no longer in the library` : `Opened “${v.name}”`, "Undo", () => applyState(prev));
-      } else if (await svOpenRemote(x.k) !== false) setCur(x.name, "", x.k);   // finns bara delat: Save skriver över delningen
+      } else if (await svOpenRemote(x.k) !== false) setCur(x.name, "", x.k);   // finns bara på kontot: Save skriver över det där
     } else if (a === "delete") {
+      const [, v0] = find();
       if (x.k) {
-        if (!await svAsk(x.name, "This kaleidoscope is shared. Deleting it also stops sharing, and the link will stop working.", "Delete")) return;
+        // delat: länken slutar fungera. Finns det bara på kontot (inte i den här webbläsaren) går det inte att ångra.
+        if (x.sh) { if (!await svAsk(x.name, "This kaleidoscope is shared. Deleting it also stops sharing, and the link will stop working.", "Delete")) return; }
+        else if (!v0 && !await svAsk(x.name, "Delete this kaleidoscope from your account? This cannot be undone.", "Delete")) return;
         const j = await svApi("delat_radera", {nyckel: x.k}); PUB = j.delade || []; pubOk = true;
       }
       const [l, v] = find();
       if (v) {
         const i = l.indexOf(v); l.splice(i, 1); writeJSON(SAVES, l); renderSaves();
-        if (x.k) toast(`Deleted “${x.name}”`);
-        else toast(`Deleted “${x.name}”`, "Undo", () => { const l2 = readSaves(); l2.splice(i, 0, v); writeJSON(SAVES, l2); renderSaves(); });
+        if (x.sh) toast(`Deleted “${x.name}”`);
+        else toast(`Deleted “${x.name}”`, "Undo", () => { const l2 = readSaves(); delete v.k; delete v.nosync; l2.splice(i, 0, v); writeJSON(SAVES, l2); renderSaves(); svSync(); });
       } else { renderSaves(); toast(`Deleted “${x.name}”`); }
     }
   } catch (err) { toast(err.message || "Something went wrong"); }
@@ -1934,6 +1966,7 @@ async function loadLibrary() {
   $("#loading").classList.add("gone");
   requestAnimationFrame(frame);
   refreshPro();
+  if (svPubOn() && !WALL) loadPub();   // hämtar listan från kontot och laddar upp det som bara finns sparat här
   // skalet hämtar priset och kollar om Pro redan är köpt på det här Google-kontot (svar via kalejdoPrice/kalejdoPurchase)
   if (native("proInit")) try { KalejdoApp.proInit(); } catch (e) {}
 })();

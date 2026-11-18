@@ -413,3 +413,15 @@ frame() ritar bara den synliga.
   (Tumble/Fixed), reglagen på var sin rad; `#modeBtn`/`#revBtn` finns inte längre. Filpanelen: Open, Save, Save As på var sin rad
   (`.frow`), efter Save den grå texten `#fSaveInfo` "Save latest updates to <namn>" (bara när det finns något sparat/delat att skriva över).
   Helskärmsmenyn har Segments (`#fmSlices`). Skript: `kj_patch_rader.py`.
+
+## Save sparar på kontot (2026-11-18, Dick)
+- För admin och +-konton (`svPubOn()`) sparar Save och Save As även på servern, så att listan under Open är densamma i alla
+  webbläsare och i appen. Besökare/gratis sparar bara lokalt (localStorage `kalejdo.saves.v1`) som förut.
+- Servern: `kalejdo_delat` rymmer nu alla sparade; kolumnen `delad` (1 = länken ?k= fungerar, 0 = bara ägaren). `delat_spara` tar
+  POST `delad` (saknas fältet: nytt = delat, befintligt behåller läget – så fungerar äldre appar), tom `bild` skriver inte över.
+  Nya åtgärder: `delat_delad` (nyckel, delad) och `delat_hamta` (konto.php, ägarens eget även odelat; admin läser odelat via GET delat).
+  Odelade syns inte i `delat`, `delat_bild`, `forstasida` eller og-taggarna i index.php. `KJ_DELAT_MAX` = 100 per +-konto (admin obegränsat).
+- Klienten: `v.k` = nyckeln till serverraden (INTE längre "är delat"); `svShared(k)` = `PUB`-raden har `delad`. `svSync()` (körs efter
+  `loadPub()`, även vid start) laddar upp sparade som bara finns lokalt. En rad som tagits bort på en annan enhet märks `v.nosync`
+  och laddas inte upp igen av sig självt. Share-kryssrutan sätter `delad` 1/0 – att sluta dela tar inte bort det sparade.
+- Skript: scratchpad `kj_srv.py` (servern), `kj_patch_konto.py <fil> web|app`.
