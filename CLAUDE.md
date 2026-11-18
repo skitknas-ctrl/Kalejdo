@@ -407,3 +407,5 @@ frame() ritar bara den synliga.
 - Nya texter som Dick inte själv formulerat (förslag, ändras om han vill): panelrubrikerna Kaleidoscope/Account, Segments,
   Relative speed, Object size, Direction, Mode, Untitled, "Save the kaleidoscope first".
 - Patchskript: scratchpad `kj_patch_ui.py <fil> web|app`.
+- Rättat samma dag: uppe till vänster är `#topLeft` = etiketten `#layerName` ("Layer 2") och UNDER den inställningsknappen `#layerBtn`
+  (tre reglage, röd prick `#layerDot` vid fart 0) som öppnar lagerpanelen. Etiketten är ingen knapp. Skript: `kj_patch_lbl.py`.

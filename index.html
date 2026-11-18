@@ -31,7 +31,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 #visBox button{width:22px;height:22px;border-radius:5px;border:2px solid #fff;background:#0006;display:grid;place-items:center}
 #visBox button svg{width:16px;height:16px;visibility:hidden}
 #visBox button.on svg{visibility:visible}
-body.full #stageTabs,body.full #stageFull,body.full #visBox,body.full #runBtn,body.full #layerBtn,body.full #topRight{display:none}
+body.full #stageTabs,body.full #stageFull,body.full #visBox,body.full #runBtn,body.full #topLeft,body.full #topRight{display:none}
 body.full.over #view{display:block}   /* helskärm från översikten visar kalejdoskopet */
 body.over #view{display:none}
 body:not(.over) #cellWrap{display:none}
@@ -230,8 +230,12 @@ body.wall #fullMenuBtn,body.wall #hint,body.wall #toast,body.wall #loading,body.
 #stageTabs button[data-v=kal]{right:50px;bottom:5px}
 #stageTabs button[data-v=over]{right:5px;bottom:50px}
 #runBtn{position:absolute;left:5px;bottom:50px;z-index:2}
-#layerBtn{position:absolute;left:5px;top:5px;z-index:2;height:30px;padding:0 10px;border-radius:9px;background:var(--panel2);color:var(--text);font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px}
-#layerBtn.on{background:var(--brass);color:#2a1a00}
+/* uppe till vänster (2026-11-18, rättat): valt lager som etikett, under den inställningsknappen för lagret (röd prick = fart 0) */
+#topLeft{position:absolute;left:5px;top:3px;z-index:2;display:flex;flex-direction:column;align-items:flex-start;gap:5px;pointer-events:none}
+#layerName{padding-left:14px;font-size:12px;line-height:16px;color:#fff;white-space:nowrap}
+#layerBtn{position:relative;pointer-events:auto}
+#layerDot{position:absolute;right:-3px;top:-3px;box-shadow:0 0 0 2px var(--bg)}
+#layerDot[hidden]{display:none}
 .dot{width:8px;height:8px;border-radius:50%;background:#e5262c;display:inline-block;flex:none}
 #topRight{position:absolute;right:5px;top:3px;z-index:2;display:flex;flex-direction:column;align-items:flex-end;gap:5px;pointer-events:none}
 #topRight>div{display:flex;gap:5px}
@@ -276,7 +280,7 @@ body.full #panel{display:none}   /* måste stå efter regeln för bred skärm (d
     </div>
     <button id="runBtn" class="sb" title="Stop/start rotation"></button>
     <div id="visBox"><span>Visible layers</span><div></div></div>
-    <button id="layerBtn" title="Settings for this layer"></button>
+    <div id="topLeft"><b id="layerName"></b><button class="sb" id="layerBtn" title="Settings for this layer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h9M19 6h1M4 12h2M12 12h8M4 18h8M18 18h2"/><circle cx="16" cy="6" r="2.4"/><circle cx="9" cy="12" r="2.4"/><circle cx="15" cy="18" r="2.4"/></svg><i class="dot" id="layerDot" hidden></i></button></div>
     <div id="topRight"><b id="curName"></b>
       <div><button class="sb" id="userBtn" title="Account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button><button class="sb" id="setBtn" title="Kaleidoscope settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h9M19 6h1M4 12h2M12 12h8M4 18h8M18 18h2"/><circle cx="16" cy="6" r="2.4"/><circle cx="9" cy="12" r="2.4"/><circle cx="15" cy="18" r="2.4"/></svg></button></div>
       <div><button class="sb" id="fileBtn" title="Open, save and share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></button></div>
@@ -1206,7 +1210,8 @@ function tabSpeed(L) {
 function refreshTabs() {
   $("#tabs").innerHTML = S.layers.map((L, i) =>
     `<button data-i="${i}" class="${i === S.sel ? "on" : ""} ${layerShown(i) ? "" : "hidden"}"><b>${i + 1}</b><small>${L.items.length}${tabSpeed(L)}</small></button>`).join("");
-  $("#layerBtn").innerHTML = `<span>Layer ${S.sel + 1}</span>` + (S.layers[S.sel].speed ? "" : '<i class="dot"></i>');
+  $("#layerName").textContent = "Layer " + (S.sel + 1);
+  $("#layerDot").hidden = !!S.layers[S.sel].speed;
 }
 function refreshLayerUI() {
   refreshTabs();
