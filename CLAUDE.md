@@ -384,3 +384,26 @@ frame() ritar bara den synliga.
 - My kaleidoscopes är EN lista med meny (Open, Share, Stop sharing, Delete, Update), knappen "Save As", inga dubbla namn och
   rättad svart miniatyr. Se "My kaleidoscopes som en lista med meny" i kod\kalejdo.app\CLAUDE.md; koden är densamma utom
   plattformsdelen (svCanShare … svOpenRemote). confirm() fungerar inte i WebView – använd `svAsk`.
+
+## Knappar i scenens hörn och fyra paneler (2026-11-18, Dick; webb + app)
+- Verktygsraden (`.bar`), More-arket (`#sheet`), `#bgPop`, stoppknappen (`#lockBtn`) och reglageraden under lagerflikarna är BORTA.
+  Kvar i `#panel`: lagerflikarna, raden skaka/fyll/töm (+ fyll alla/töm alla) och biblioteket.
+- Scenens hörn: nere till höger helskärm (`#stageFull`) i hörnet, vyknapparna till vänster om och ovanför (15 px mellanrum; `#stageTabs`
+  är ett genomskinligt lager, knapparna är absolut placerade). Uppe till höger `#topRight`: namnet (`#curName`, 14 px indrag),
+  under det konto (`#userBtn`) + inställningar (`#setBtn`), under inställningar fil (`#fileBtn`). Uppe till vänster `#layerBtn`
+  ("Layer 2", röd prick vid fart 0). Nere till vänster `#runBtn` (start/stopp, växlar symbol) ovanför "Visible layers" på en rad.
+- `#dock` = panelen över `#panel` (bred webb: 560 px mitt i nederkanten), en sida i taget (`openDock(p)`, samma knapp stänger):
+  `set` (Segments 3/4/6/8, Speed, Gravity, Field of view, bakgrundsfärg = `#bgCtl` som flyttas hit från helskärmsmenyn; appen även
+  Tilt to tumble), `layer` (Direction, Mode, Relative speed, Opacity, Object size + lagerväljare 1–4 i huvudet), `file`, `user`
+  (webb: Kalejdo +/QR, Admin, Privacy; app: det som låg i `#proSheet` + Privacy; `openPro()` öppnar den sidan).
+- Fart 0: `#speed` går 0–19, `L.locked` finns inte längre (`migrateLayers` gör låst → `speed = 0`). Använd aldrig `L.speed || 1`.
+- Fil: `S.name`/`S.cid`/`S.ck` = aktuellt kalejdoskop (namn, id i sparlistan, delningsnyckel för ett som bara finns delat).
+  Open = listan (`#savesSheet`, kortmenyn har bara Open och Delete), Save skriver över det aktuella (delat: samma länk), Save As
+  frågar efter namn (`#fNameRow`), Share-kryssrutan (`#fShare`) delar/slutar dela det aktuella, Copy share URL (`#fCopy`).
+  `captureUndo()` tar med namnet så att Undo efter Open återställer det. `refreshFile()` ritar namn och Share-raden.
+- 3 och 4 delar: 4 = kvadrater som speglas varannan; 3 = bit 1 och 2 är spegelbilder av bit 0 (en skarv rakt ner i den runda bilden),
+  helskärm = trianglar speglade över varje kant (hörnfärger `(i − j) mod 3`). `snapshot()` och `makeShareImage()` har perioderna.
+- Rättat: på bred webb låg panelen kvar i helskärm (regeln för `display:grid` vann över `body.full #panel`).
+- Nya texter som Dick inte själv formulerat (förslag, ändras om han vill): panelrubrikerna Kaleidoscope/Account, Segments,
+  Relative speed, Object size, Direction, Mode, Untitled, "Save the kaleidoscope first".
+- Patchskript: scratchpad `kj_patch_ui.py <fil> web|app`.
