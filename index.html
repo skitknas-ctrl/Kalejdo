@@ -124,9 +124,6 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 .sliders{display:grid;grid-template-columns:1fr 1fr;gap:0 12px;align-items:center}
 .op b{font-size:12px;color:var(--brass);min-width:34px;text-align:right;font-variant-numeric:tabular-nums}
 .op.off{opacity:.4}
-#revBtn svg{transition:transform .2s}
-#revBtn.on{background:#ffd28a;color:#2a1a00}
-#revBtn.on svg{transform:scaleX(-1)}
 
 /* library */
 #libHead{display:flex;flex-direction:column;gap:6px}
@@ -267,6 +264,17 @@ body.wall #fullMenuBtn,body.wall #hint,body.wall #toast,body.wall #loading,body.
 .ck svg{width:20px;height:20px;visibility:hidden}
 .ck.on svg{visibility:visible}
 body.full #panel{display:none}   /* måste stå efter regeln för bred skärm (display:grid), annars låg panelen kvar i helskärm */
+/* en rubrik per rad i lager- och filpanelen (2026-11-18, omgång 3); Segments i helskärmsmenyn */
+#dock .row>span{min-width:84px}
+#dock .seg button{min-width:64px;display:grid;place-items:center}
+#dock #slices button,#dock #dockLayers button{min-width:34px}
+#dirSeg svg{width:20px;height:20px}
+#dirSeg button[data-r="1"] svg{transform:scaleX(-1)}
+#dock .frow .btn{flex:none;width:120px}
+#dock .frow small{color:var(--dim);font-size:12px;min-width:0;overflow:hidden;text-overflow:ellipsis}
+#fullMenu .fmRow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 12px;font-size:12px}
+#fullMenu .seg button{padding:6px 10px;text-align:center;min-width:34px}
+#fullMenu .seg button.on,#fullMenu .seg button.on:hover{background:var(--brass)}
 </style>
 </head>
 <body>
@@ -291,6 +299,7 @@ body.full #panel{display:none}   /* måste stå efter regeln för bred skärm (d
     <div id="fullMenu">
       <label><b>Speed</b><input type="range" id="fmSpin" min="0" max="100" step="1"></label>
       <label><b>Pattern size</b><input type="range" id="fmZoom" min="25" max="100" step="1"></label>
+      <div class="fmRow"><b>Segments</b><div class="seg" id="fmSlices"><button data-n="3">3</button><button data-n="4">4</button><button data-n="6">6</button><button data-n="8">8</button></div></div>
       <div id="bgCtl"><h4>Background colour</h4>
       <label>Hue<input type="range" id="fmHue" min="0" max="360" step="1"></label>
       <label>Saturation<input type="range" id="fmSat" min="0" max="100" step="1"></label>
@@ -347,15 +356,16 @@ body.full #panel{display:none}   /* måste stå efter regeln för bred skärm (d
     <div id="setBg"></div>
   </div>
   <div class="pg" data-p="layer">
-    <div class="lrow"><span class="lb">Direction</span><button class="ib" id="revBtn" title="Turn this layer the opposite way"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v4h-4"/></svg></button><span class="lb" style="margin-left:12px">Mode</span><button class="ib mode" id="modeBtn" title="Tumble: things fall and roll · Fixed: things stay put">Tumble</button></div>
-    <div class="g2">
-      <label id="speedBox" title="Speed of this layer compared with the kaleidoscope's speed · 0.0 = stands still"><b>Relative speed</b><input id="speed" type="range" min="0" max="19" step="1"></label>
-      <label><b>Opacity</b><input id="opacity" type="range" min="15" max="100" step="1"></label>
-      <label title="Size of everything in this layer"><b>Object size</b><input id="lsize" type="range" min="50" max="200" step="5"></label>
-    </div>
+    <div class="row"><span>Direction</span><div class="seg" id="dirSeg"><button data-r="0" title="Turns with the kaleidoscope"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v4h-4"/></svg></button><button data-r="1" title="Turns the opposite way"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v4h-4"/></svg></button></div></div>
+    <div class="row"><span>Mode</span><div class="seg" id="modeSeg"><button data-m="tumble" title="Things fall and roll">Tumble</button><button data-m="fixed" title="Things stay put">Fixed</button></div></div>
+    <label id="speedBox" title="Speed of this layer compared with the kaleidoscope's speed · 0.0 = stands still"><b>Relative speed</b><input id="speed" type="range" min="0" max="19" step="1"></label>
+    <label><b>Opacity</b><input id="opacity" type="range" min="15" max="100" step="1"></label>
+    <label title="Size of everything in this layer"><b>Object size</b><input id="lsize" type="range" min="50" max="200" step="5"></label>
   </div>
   <div class="pg" data-p="file">
-    <div class="row"><button class="btn" id="fOpen">Open</button><button class="btn" id="fSave">Save</button><button class="btn" id="fSaveAs">Save As</button></div>
+    <div class="row frow"><button class="btn" id="fOpen">Open</button></div>
+    <div class="row frow"><button class="btn" id="fSave">Save</button><small id="fSaveInfo"></small></div>
+    <div class="row frow"><button class="btn" id="fSaveAs">Save As</button></div>
     <div class="row" id="fNameRow" hidden><input class="txt" id="saveName" maxlength="40" placeholder="Name"><button class="btn brass" id="saveNowBtn" style="flex:none">Save</button></div>
     <div class="row" id="fShareRow"><span>Share</span><button class="ck" id="fShare" title="Share with a link"><svg viewBox="0 0 24 24" fill="none" stroke="#3ccf4e" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5 10-11"/></svg></button><button class="btn" id="fCopy">Copy share URL</button></div>
     <button class="btn" id="wallBtn">Use as live wallpaper</button>
@@ -1194,7 +1204,7 @@ function rvSync(root) {
 }
 document.addEventListener("input", e => { if (e.target.type === "range") rvSync(e.target.parentNode); }, true);
 function refreshTop() {
-  document.querySelectorAll("#slices button").forEach(b => b.classList.toggle("on", +b.dataset.n === S.slices));
+  document.querySelectorAll("#slices button,#fmSlices button").forEach(b => b.classList.toggle("on", +b.dataset.n === S.slices));
   $("#spin").value = S.spin;
   $("#grav").value = S.grav == null ? 100 : S.grav;
   $("#runBtn").innerHTML = running() ? ICON_PAUSE : ICON_PLAY;
@@ -1216,10 +1226,10 @@ function refreshTabs() {
 function refreshLayerUI() {
   refreshTabs();
   const L = S.layers[S.sel];
-  $("#modeBtn").textContent = L.mode === "fixed" ? "Fixed" : "Tumble";
+  document.querySelectorAll("#modeSeg button").forEach(b => b.classList.toggle("on", b.dataset.m === L.mode));
+  document.querySelectorAll("#dirSeg button").forEach(b => b.classList.toggle("on", !!+b.dataset.r === !!L.rev));
   $("#visBox div").innerHTML = S.layers.map((_, i) =>
     `<button data-i="${i}" class="${layerShown(i) ? "on" : ""}" title="Show layer ${i + 1}">${CHECK}</button>`).join("");
-  $("#revBtn").classList.toggle("on", !!L.rev);
   $("#speed").value = Math.round(L.speed * 10);
   $("#opacity").value = Math.round(L.opacity * 100);
   $("#lsize").value = lsize(L);
@@ -1230,11 +1240,12 @@ $("#tabs").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   S.sel = +b.dataset.i; refreshLayerUI(); save();
 });
-$("#modeBtn").onclick = () => setMode(S.sel, S.layers[S.sel].mode === "fixed" ? "tumble" : "fixed");
-$("#revBtn").onclick = () => {
-  const L = S.layers[S.sel]; L.rev = !L.rev; refreshLayerUI(); save();
+$("#modeSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (b) setMode(S.sel, b.dataset.m); });
+$("#dirSeg").addEventListener("click", e => {
+  const b = e.target.closest("button"), L = S.layers[S.sel]; if (!b || !!+b.dataset.r === !!L.rev) return;
+  L.rev = !L.rev; refreshLayerUI(); save();
   toast(L.rev ? `Layer ${S.sel + 1} turns the opposite way` : `Layer ${S.sel + 1} turns with the main slider`);
-};
+});
 $("#speed").oninput = e => {
   const L = S.layers[S.sel]; L.speed = +e.target.value / 10;
   refreshTabs(); save();
@@ -1260,7 +1271,7 @@ $("#clearBtn").onclick = () => {
   L.items = []; refreshLayerUI(); save();
   toast(`Layer ${li + 1} emptied`, "Undo", () => { S.layers[li].items = old; refreshLayerUI(); save(); });
 };
-$("#slices").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; S.slices = +b.dataset.n; sizeChamber(); refreshTop(); save(); });
+$("#slices").onclick = $("#fmSlices").onclick = e => { const b = e.target.closest("button"); if (!b) return; S.slices = +b.dataset.n; sizeChamber(); refreshTop(); save(); };
 $("#spin").oninput = e => {
   let v = +e.target.value; if (v < 2) v = 0;
   S.spin = v; if (v) { S.lastSpin = v; S.paused = false; }
@@ -1598,6 +1609,7 @@ function refreshFile() {
   const k = curKey();
   $("#fShare").classList.toggle("on", !!k);
   $("#fCopy").disabled = !k;
+  $("#fSaveInfo").textContent = v || k ? "Save latest updates to " + S.name : "";
   $("#fShareRow").hidden = !svCanShare();
   refreshDock();
 }

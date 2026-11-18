@@ -409,3 +409,7 @@ frame() ritar bara den synliga.
 - Patchskript: scratchpad `kj_patch_ui.py <fil> web|app`.
 - Rättat samma dag: uppe till vänster är `#topLeft` = etiketten `#layerName` ("Layer 2") och UNDER den inställningsknappen `#layerBtn`
   (tre reglage, röd prick `#layerDot` vid fart 0) som öppnar lagerpanelen. Etiketten är ingen knapp. Skript: `kj_patch_lbl.py`.
+- Omgång 3 samma dag: lager- och filpanelen har EN rubrik per rad. Direction = `#dirSeg` (två knappar), Mode = `#modeSeg`
+  (Tumble/Fixed), reglagen på var sin rad; `#modeBtn`/`#revBtn` finns inte längre. Filpanelen: Open, Save, Save As på var sin rad
+  (`.frow`), efter Save den grå texten `#fSaveInfo` "Save latest updates to <namn>" (bara när det finns något sparat/delat att skriva över).
+  Helskärmsmenyn har Segments (`#fmSlices`). Skript: `kj_patch_rader.py`.
