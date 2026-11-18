@@ -1456,7 +1456,7 @@ function snapshot() {
   if (window.KalejdoApp && KalejdoApp.saveImage) {
     let ok = false;
     try { ok = KalejdoApp.saveImage(url.split(",")[1], name); } catch (e) {}
-    toast(ok ? "Seamless tile saved to Pictures/Kalejdo" : "Could not save the picture");
+    toast(ok ? (KalejdoApp.platform === "ios" ? "Seamless tile saved to Photos" : "Seamless tile saved to Pictures/Kalejdo") : "Could not save the picture");
   } else {
     const a = document.createElement("a");
     a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
@@ -1800,7 +1800,16 @@ async function asKonto(action, data) {
   try { return await kontoPost(action, Object.assign({konto: await getKonto()}, data)); }
   catch (e) { if (e.status !== 401) throw e; return await kontoPost(action, Object.assign({konto: await getKonto(true)}, data)); }
 }
+// iPhone-skalet (ios/, 2026-11-18) har ännu inget köp via App Store: där visas bara en rad om det, och live wallpaper
+// (finns inte på iPhone) döljs. APPLE är sant bara i iPhone-appen, inte i Safari.
+const APPLE = !!(window.KalejdoApp && KalejdoApp.platform === "ios");
 function refreshPro() {
+  if (APPLE) $("#wallBtn").hidden = true;
+  if (APPLE && !PRO) {
+    $("#proLead").textContent = "Kalejdo + is not available in the iPhone app yet.";
+    $("#proBuy").hidden = $("#proRestore").hidden = $("#proScan").hidden = $("#proManage").hidden = true;
+    return;
+  }
   $("#proLead").textContent = PRO
     ? "Kalejdo + is active. To use it in a web browser too, open kalejdo.app on a computer, tap the account button and Show QR code, then scan the code here. On the web you can also build your own library of pictures – it shows up in this app."
     : "All libraries, your own library of pictures, sharing, live wallpaper, and the same libraries in a web browser. "

@@ -16,3 +16,8 @@ release.keystore
 butik-kalla/
 __pycache__/
 *.pyc
+
+# iPhone-appen: skapas vid bygget (se ios/project.yml och .github/workflows/ios.yml)
+/ios/web/
+/ios/*.xcodeproj/
+/ios/build/

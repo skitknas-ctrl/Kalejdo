@@ -1,0 +1,99 @@
+name: iOS
+
+# iPhone-appen (ios/): byggs på en Mac hos GitHub, eftersom Dick inte har någon Mac. Bygget provkör appen i en
+# iPhone-simulator, tar en skärmbild och läser appens självtest (Documents/diag.json, se App.swift).
+# Utan Apple Developer-konto går det inte att signera, så härifrån kommer ännu ingen fil som kan installeras på en telefon.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ios/**'
+      - 'index.html'
+      - 'props/**'
+      - '.github/workflows/ios.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  simulator:
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Update prop library index
+        run: python3 tools/build_index.py
+
+      - name: Copy the web page into the app
+        run: |
+          rm -rf ios/web && mkdir -p ios/web
+          cp index.html ios/web/
+          cp -R props ios/web/props
+
+      - name: Generate the Xcode project
+        run: |
+          brew install xcodegen
+          cd ios && xcodegen
+
+      - name: Build for the simulator
+        run: |
+          cd ios
+          xcodebuild -project Kalejdo.xcodeproj -scheme Kalejdo -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build CODE_SIGNING_ALLOWED=NO \
+            CURRENT_PROJECT_VERSION=${{ github.run_number }} build | tail -n 40
+          test -d build/Build/Products/Debug-iphonesimulator/Kalejdo.app
+
+      - name: Build for a real iPhone (unsigned, compile check only)
+        run: |
+          cd ios
+          xcodebuild -project Kalejdo.xcodeproj -scheme Kalejdo -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' \
+            -derivedDataPath build-device CODE_SIGNING_ALLOWED=NO \
+            CURRENT_PROJECT_VERSION=${{ github.run_number }} build | tail -n 15
+
+      - name: Run in an iPhone simulator
+        run: |
+          set -x
+          UDID=$(xcrun simctl list devices available -j | python3 -c "
+          import json, sys
+          d = json.load(sys.stdin)['devices']
+          best = None
+          for rt in sorted(d):
+              if 'iOS' not in rt: continue
+              for dev in d[rt]:
+                  if dev['name'].startswith('iPhone') and 'SE' not in dev['name']:
+                      best = dev
+          print(best['udid'] if best else '')
+          ")
+          test -n "$UDID"
+          xcrun simctl list devices available | grep "$UDID"
+          xcrun simctl boot "$UDID"
+          xcrun simctl bootstatus "$UDID" -b
+          xcrun simctl install "$UDID" ios/build/Build/Products/Debug-iphonesimulator/Kalejdo.app
+          SIMCTL_CHILD_KALEJDO_DIAG=1 xcrun simctl launch "$UDID" com.gr8eam.kalejdo
+          mkdir -p out
+          sleep 12
+          xcrun simctl io "$UDID" screenshot out/kalejdo-ios-1.png
+          sleep 25
+          xcrun simctl io "$UDID" screenshot out/kalejdo-ios-2.png
+          DATA=$(xcrun simctl get_app_container "$UDID" com.gr8eam.kalejdo data)
+          cp "$DATA/Documents/diag.json" out/diag.json
+          cat out/diag.json; echo
+          python3 -c "
+          import json
+          d = json.load(open('out/diag.json'))
+          assert d.get('storage'), 'localStorage fungerar inte'
+          assert d.get('chips', 0) > 0, 'biblioteket laddades inte'
+          assert not d.get('errors'), d.get('errors')
+          print('Självtestet gick igenom')
+          "
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kalejdo-ios-simulator
+          path: out/

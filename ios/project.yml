@@ -1,0 +1,40 @@
+# Xcode-projektet för iPhone-appen skapas ur den här filen med XcodeGen (https://github.com/yonaskolb/XcodeGen):
+#   cd ios && xcodegen
+# Projektfilen (Kalejdo.xcodeproj) checkas inte in. Mappen web/ fylls före bygget med index.html och props/ från
+# repots rot (se .github/workflows/ios.yml) – samma sida som Android-appen och webben.
+name: Kalejdo
+options:
+  bundleIdPrefix: com.gr8eam
+  deploymentTarget:
+    iOS: "15.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.0"
+    TARGETED_DEVICE_FAMILY: "1"          # bara iPhone
+    ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+targets:
+  Kalejdo:
+    type: application
+    platform: iOS
+    sources:
+      - path: Kalejdo
+      - path: web
+        type: folder                     # mappreferens: hamnar som mappen "web" i appen
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.gr8eam.kalejdo
+        PRODUCT_NAME: Kalejdo
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: Kalejdo/Info.plist
+        CODE_SIGN_STYLE: Manual
+schemes:
+  Kalejdo:
+    build:
+      targets:
+        Kalejdo: all
+    run:
+      config: Debug
