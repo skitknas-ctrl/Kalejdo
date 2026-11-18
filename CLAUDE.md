@@ -425,3 +425,23 @@ frame() ritar bara den synliga.
   `loadPub()`, även vid start) laddar upp sparade som bara finns lokalt. En rad som tagits bort på en annan enhet märks `v.nosync`
   och laddas inte upp igen av sig självt. Share-kryssrutan sätter `delad` 1/0 – att sluta dela tar inte bort det sparade.
 - Skript: scratchpad `kj_srv.py` (servern), `kj_patch_konto.py <fil> web|app`.
+
+## iPhone-appen (2026-11-18, `ios/`)
+- Samma `index.html` + `props/` som Android-appen, i ett WKWebView-skal (`ios/Kalejdo/App.swift`, UIKit, en fil). Sidan serveras
+  via ett eget URL-schema, `com.gr8eam.kalejdo://app/index.html` (WKURLSchemeHandler läser appens mapp `web`). Schemat innehåller
+  paketnamnet med flit: servern känner igen appen på Origin-huvudet (`kj_admin()` svarar aldrig admin). Ursprunget är säker
+  kontext: localStorage, WebCrypto och Cache API fungerar (kontrollerat i simulator).
+- Bryggan `window.KalejdoApp` på iPhone: `platform` ("ios"), `appVersion`, `openUrl`, `share`, `setFullscreen`, `saveImage` (lägger
+  PNG:n i Bilder; svarar alltid true direkt, fel meddelas efteråt via `window.kalejdoBilling`). SAKNAS: `proBuy`, `proRestore`,
+  `scanQr`, `setWallpaper`. I sidan: `APPLE` (sant bara i iPhone-appen) döljer köp-/återställ-/QR-knapparna och live wallpaper och
+  visar en tillfällig rad om att Kalejdo + inte finns i iPhone-appen än. Texterna är inte godkända av Dick.
+- Marginalerna mot klocka/kamera/hemstreck sköter sidan själv (`env(safe-area-inset-*)`); webbvyn ligger kant i kant.
+- Projektet skapas med XcodeGen ur `ios/project.yml` (projektfilen checkas inte in). Bundle-id `com.gr8eam.kalejdo`, bara iPhone,
+  stående, iOS 15+. Ikonen (`icon-1024.png`) är ritad efter Android-vektorn.
+- `.github/workflows/ios.yml` (macos-latest; `macos-15` blev stående i kö): kopierar sidan till `ios/web`, bygger för simulator och
+  för telefon (osignerat, bara kompileringskontroll), startar appen i en iPhone-simulator med `KALEJDO_DIAG` satt, tar skärmbilder
+  och läser appens självtest (`Documents/diag.json`); bygget underkänns om biblioteket inte laddas eller sidan ger JavaScript-fel.
+  Artefakt: `kalejdo-ios-simulator`.
+- ÅTERSTÅR: Apple Developer-konto (krävs för TestFlight/App Store och för att alls kunna installera på en telefon), signering i
+  bygget, köp av Kalejdo + med StoreKit + kontroll på servern, QR-inloggning (kameran), integritetsuppgifter i App Store Connect.
+  Inget är provat på en riktig iPhone.
