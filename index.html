@@ -363,6 +363,7 @@ body.full #panel{display:none}   /* måste stå efter regeln för bred skärm (d
     <label title="Size of everything in this layer"><b>Object size</b><input id="lsize" type="range" min="50" max="200" step="5"></label>
   </div>
   <div class="pg" data-p="file">
+    <div class="row frow"><button class="btn" id="fNew">New</button></div>
     <div class="row frow"><button class="btn" id="fOpen">Open</button></div>
     <div class="row frow"><button class="btn" id="fSave">Save</button><small id="fSaveInfo"></small></div>
     <div class="row frow"><button class="btn" id="fSaveAs">Save As</button></div>
@@ -1657,6 +1658,16 @@ async function fileSave() {
     toast(sh ? `Saved “${name}” – the shared link shows the new version` : `Saved “${name}”`);
   } catch (err) { toast(`Saved “${name}” here, but not to your account: ` + (err.message || "no connection")); }
 }
+/* New (2026-11-19, Dick): stänger det aktuella kalejdoskopet och börjar på ett tomt utan namn. Lagren töms och får
+   standardinställningarna; inställningarna för hela kalejdoskopet (delar, fart, bakgrund) rörs inte. Inget sparat tas bort. */
+function fileNew() {
+  const prev = captureUndo();
+  S.layers = defaultLayers(); theta = 0; extraSpin = 0;
+  $("#fNameRow").hidden = true;
+  setCur("", "", ""); refreshLayerUI();
+  toast("New kaleidoscope", "Undo", () => applyState(prev));
+}
+$("#fNew").onclick = fileNew;
 $("#fOpen").onclick = openSaves;
 $("#fSave").onclick = fileSave;
 $("#fSaveAs").onclick = fileSaveAs;
